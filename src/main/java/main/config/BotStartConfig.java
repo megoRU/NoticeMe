@@ -1,5 +1,8 @@
 package main.config;
 
+import main.core.NoticeRegistry;
+import main.core.TrackingUser;
+import main.event.UserJoinEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Notice;
@@ -31,6 +34,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -81,15 +86,13 @@ public class BotStartConfig {
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
-                            GatewayIntent.GUILD_MESSAGES,
-                            GatewayIntent.DIRECT_MESSAGES,
-                            GatewayIntent.DIRECT_MESSAGE_TYPING));
+                            GatewayIntent.GUILD_VOICE_STATES,
+                            GatewayIntent.GUILD_MESSAGES));
 
             jdaBuilder.disableCache(
                     CacheFlag.CLIENT_STATUS,
                     CacheFlag.ACTIVITY,
                     CacheFlag.MEMBER_OVERRIDES,
-                    CacheFlag.VOICE_STATE,
                     CacheFlag.ONLINE_STATUS);
 
             jdaBuilder.setAutoReconnect(true);
@@ -98,6 +101,7 @@ public class BotStartConfig {
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository));
+            jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -206,13 +210,39 @@ public class BotStartConfig {
     }
 
     private void getAllUsers() {
+        List<Notice> noticeList = noticeRepository.findAll();
+        NoticeRegistry instance = NoticeRegistry.getInstance();
 
-        List<Notice> all = noticeRepository.findAll();
+        for (Notice notice : noticeList) {
+            String guildId = notice.getGuildId().getGuildId().toString();
+            String userIdTracker = notice.getUserTrackingId().toString();
+            String userId = notice.getUserId().toString();
 
-        for (int i = 0; i < all.size(); i++) {
-            System.out.println(all.get(i).getGuildId().getTextChannelId());
-            System.out.println(all.get(i).getUserId());
+            if (!instance.getTrackingUserConcurrentMap().containsKey(guildId)) {
+                TrackingUser trackingUser = new TrackingUser();
+                trackingUser.putUser(notice.getUserId().toString());
 
+                ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = new ConcurrentHashMap<>();
+                trackingUserConcurrentMap.put(userIdTracker, trackingUser);
+
+                instance.getTrackingUserConcurrentMap().put(guildId, trackingUserConcurrentMap);
+
+                System.out.println(instance.getTrackingUserConcurrentMap().get(guildId).size());
+            } else {
+                ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = instance.getTrackingUserConcurrentMap().get(guildId);
+                System.out.println(trackingUserConcurrentMap.size());
+
+                if (trackingUserConcurrentMap.get(userIdTracker) == null) {
+
+                    TrackingUser trackingUser = new TrackingUser();
+                    trackingUser.putUser(notice.getUserId().toString());
+
+                    trackingUserConcurrentMap.put(userIdTracker, trackingUser);
+
+                } else {
+                    trackingUserConcurrentMap.get(userIdTracker).putUser(userId);
+                }
+            }
         }
 
     }

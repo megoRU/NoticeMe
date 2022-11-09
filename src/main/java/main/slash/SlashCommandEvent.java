@@ -82,7 +82,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 event.reply("Теперь вы будите получать уведомление, когда пользователь: <@" + userDest.getIdLong() +
                         ">\nбудет заходить в голосовой канал").queue();
             } else {
-                event.reply("Гильдия ещё не настроена. Используйте `/setup`").queue();
+                event.reply("Гильдия ещё не настроена. Используйте </setup:1039918668135534625>").queue();
             }
             return;
         }
