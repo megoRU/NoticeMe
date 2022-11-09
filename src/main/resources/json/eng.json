@@ -3,7 +3,7 @@
   "language_set": "Language saved successfully",
   "yourself": "You can't choose yourself",
   "bot": "You can't choose a bot",
-  "you_cannot_set_channel" :"Вы ещё не настроили канал для уведомлений. Используйте: </setup:1039918668135534625>",
-  "now_you_will_receive": "Теперь вы будите получать уведомление, когда пользователь: <@%s>\nбудет заходить в голосовой канал"
+  "you_cannot_set_channel" :"You haven't set up a notification channel yet. Use: </setup:1039918668135534625>",
+  "now_you_will_receive": "Now you will receive a notification when the user: <@%s>\nwill enter the voice channel"
 
 }
