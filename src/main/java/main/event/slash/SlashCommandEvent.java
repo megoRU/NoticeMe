@@ -1,9 +1,13 @@
-package main.slash;
+package main.event.slash;
 
 import lombok.RequiredArgsConstructor;
+import main.config.BotStartConfig;
+import main.jsonparser.ParserClass;
 import main.model.entity.Guild;
+import main.model.entity.Language;
 import main.model.entity.Notice;
 import main.model.repository.GuildRepository;
+import main.model.repository.LanguageRepository;
 import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
@@ -25,6 +29,9 @@ public class SlashCommandEvent extends ListenerAdapter {
     //REPO
     private final NoticeRepository noticeRepository;
     private final GuildRepository guildRepository;
+    private final LanguageRepository languageRepository;
+
+    private static final ParserClass jsonParsers = new ParserClass();
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(SlashCommandEvent.class.getName());
@@ -36,6 +43,7 @@ public class SlashCommandEvent extends ListenerAdapter {
 
         User user = event.getUser();
         long guildId = event.getGuild().getIdLong();
+        String guildIdString = event.getGuild().getId();
 
         LOGGER.info(String.format("\nSlash Command name: %s", event.getName()));
 
@@ -47,12 +55,12 @@ public class SlashCommandEvent extends ListenerAdapter {
                 guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong()); //NPE
                 guildRepository.save(guild);
 
-                String text =
-                        "Теперь уведомления будут приходить в канал: <#" + guildChannelUnion.asTextChannel().getIdLong() + ">\n" +
-                                "Не забудьте сделать его общедоступным, и чтобы бот имел доступ к нему.";
-                event.reply(text).queue();
+                String nowBotWillReceive = String.format(
+                        jsonParsers.getTranslation("now_bot_will_receive", guildIdString),
+                        guildChannelUnion.asTextChannel().getIdLong());
+                event.reply(nowBotWillReceive).queue();
             } else if (guildChannelUnion instanceof NewsChannel) {
-                event.reply("это не может быть канал NewsChannel").queue();
+                event.reply("It can't be a channel NewsChannel").queue();
                 return;
             }
             return;
@@ -64,10 +72,12 @@ public class SlashCommandEvent extends ListenerAdapter {
                 event.reply("user is null").queue();
                 return;
             } else if (userDest.getIdLong() == user.getIdLong()) {
-                event.reply("Вы не можете выбрать себя").queue();
+                String yourself = jsonParsers.getTranslation("yourself", guildIdString);
+                event.reply(yourself).queue();
                 return;
             } else if (user.isBot()) {
-                event.reply("Вы не можете выбрать бота").queue();
+                String bot = jsonParsers.getTranslation("bot", guildIdString);
+                event.reply(bot).queue();
                 return;
             }
 
@@ -79,11 +89,30 @@ public class SlashCommandEvent extends ListenerAdapter {
                 notice.setUserTrackingId(userDest.getIdLong());
                 noticeRepository.save(notice);
 
-                event.reply("Теперь вы будите получать уведомление, когда пользователь: <@" + userDest.getIdLong() +
-                        ">\nбудет заходить в голосовой канал").queue();
+                String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
+                event.reply(nowYouWillReceive).queue();
             } else {
-                event.reply("Гильдия ещё не настроена. Используйте </setup:1039918668135534625>").queue();
+                String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
+                event.reply(youCannotSetChannel).queue();
             }
+            return;
+        }
+
+        if (event.getName().equals("language")) {
+            String languageAsString = event.getOption("bot", OptionMapping::getAsString);
+            if (languageAsString == null) return;
+
+            Language.LanguageEnum languageEnum = Language.LanguageEnum.valueOf(languageAsString);
+
+            Language language = new Language();
+            language.setGuildId(guildId);
+            language.setLanguage(languageEnum);
+
+            languageRepository.save(language);
+
+            BotStartConfig.mapLanguages.put(guildIdString, languageEnum);
+            String languageSet = jsonParsers.getTranslation("language_set", guildIdString);
+            event.reply(languageSet).queue();
             return;
         }
 

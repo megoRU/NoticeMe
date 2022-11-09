@@ -2,13 +2,15 @@ package main.config;
 
 import main.core.NoticeRegistry;
 import main.core.TrackingUser;
+import main.event.BotJoinToGuild;
 import main.event.UserJoinEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Notice;
 import main.model.repository.GuildRepository;
+import main.model.repository.LanguageRepository;
 import main.model.repository.NoticeRepository;
-import main.slash.SlashCommandEvent;
+import main.event.slash.SlashCommandEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -44,7 +46,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class BotStartConfig {
 
     public static final String activity = "/help | ";
-
+    public static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
@@ -62,6 +64,7 @@ public class BotStartConfig {
     //REPOSITORY
     private final NoticeRepository noticeRepository;
     private final GuildRepository guildRepository;
+    private final LanguageRepository languageRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -72,16 +75,18 @@ public class BotStartConfig {
     private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository) {
+    public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository, LanguageRepository languageRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
+        this.languageRepository = languageRepository;
     }
 
     @Bean
     public void startBot() {
         try {
-            //
+            //Update
             setLanguages();
+            getLanguages();
             getAllUsers();
 
             List<GatewayIntent> intents = new ArrayList<>(
@@ -100,8 +105,9 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository));
+            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository));
             jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository));
+            jdaBuilder.addEventListeners(new BotJoinToGuild());
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -204,6 +210,18 @@ public class BotStartConfig {
                 reader.close();
             }
             System.out.println("setLanguages()");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getLanguages() {
+        try {
+            List<Language> languageList = languageRepository.findAll();
+            for (Language language : languageList) {
+                mapLanguages.put(language.getGuildId().toString(), language.getLanguage());
+            }
+            System.out.println("getLanguages()");
         } catch (Exception e) {
             e.printStackTrace();
         }

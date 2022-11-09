@@ -3,6 +3,7 @@ package main.event;
 import lombok.AllArgsConstructor;
 import main.core.NoticeRegistry;
 import main.core.TrackingUser;
+import main.jsonparser.ParserClass;
 import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -19,6 +20,7 @@ import java.util.concurrent.ConcurrentMap;
 public class UserJoinEvent extends ListenerAdapter {
 
     private final GuildRepository guildRepository;
+    private static final ParserClass jsonParsers = new ParserClass();
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
@@ -32,34 +34,21 @@ public class UserJoinEvent extends ListenerAdapter {
 
         ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = instance.getTrackingUserConcurrentMap().get(guild.getId());
 
-        if (trackingUserConcurrentMap == null) {
-            return;
-        } else if (trackingUserConcurrentMap.get(user.getId()) == null) {
-            return;
-        } else {
-            String userList = trackingUserConcurrentMap.get(user.getId()).getUserList();
+        if (trackingUserConcurrentMap == null || trackingUserConcurrentMap.get(user.getId()) == null) return;
+        String userList = trackingUserConcurrentMap.get(user.getId()).getUserList();
+        Optional<main.model.entity.Guild> guildOptional = guildRepository.findById(guild.getIdLong());
 
-            Optional<main.model.entity.Guild> guildOptional = guildRepository.findById(guild.getIdLong());
+        if (guildOptional.isPresent()) {
+            main.model.entity.Guild guildDB = guildOptional.get();
+            TextChannel textChannel = event.getGuild().getTextChannelById(guildDB.getTextChannelId());
+            if (textChannel != null) {
+                String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
+                        user.getId(),
+                        voiceChannel.getId(),
+                        userList);
 
-            if (guildOptional.isPresent()) {
-                main.model.entity.Guild guildDB = guildOptional.get();
-                TextChannel textChannel = event.getGuild().getTextChannelById(guildDB.getTextChannelId());
-                if (textChannel != null) {
-
-                    String text = String.format("Пользователь: <@%s> зашёл в канал: <#%s>\n%s", user.getId(), voiceChannel.getId(), userList);
-
-
-                    textChannel.sendMessage(text).queue();
-
-
-//                "Пользователь: **" + nameUserWhoEnter
-//                        + "** зашёл в канал: " + nameChannelEnterUser
-
-
-                }
+                textChannel.sendMessage(text).queue();
             }
-
-
         }
     }
 }

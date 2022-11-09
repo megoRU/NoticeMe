@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -23,6 +20,7 @@ public class Language {
     private Long guildId;
 
     @Column(name = "language", columnDefinition = "enum ('RU', 'EN')", nullable = false)
+    @Enumerated(EnumType.STRING)
     private LanguageEnum language;
 
     public enum LanguageEnum {
