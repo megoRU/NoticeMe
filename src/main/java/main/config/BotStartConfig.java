@@ -2,8 +2,10 @@ package main.config;
 
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
+import main.model.entity.Notice;
+import main.model.repository.GuildRepository;
 import main.model.repository.NoticeRepository;
-import main.slash.NoticeSlash;
+import main.slash.SlashCommandEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -54,6 +56,7 @@ public class BotStartConfig {
 
     //REPOSITORY
     private final NoticeRepository noticeRepository;
+    private final GuildRepository guildRepository;
 
     //DataBase
     @Value("${spring.datasource.url}")
@@ -64,8 +67,9 @@ public class BotStartConfig {
     private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(NoticeRepository noticeRepository) {
+    public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository) {
         this.noticeRepository = noticeRepository;
+        this.guildRepository = guildRepository;
     }
 
     @Bean
@@ -73,6 +77,7 @@ public class BotStartConfig {
         try {
             //
             setLanguages();
+            getAllUsers();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -92,7 +97,7 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new NoticeSlash(noticeRepository));
+            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -103,7 +108,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -117,7 +122,6 @@ public class BotStartConfig {
                     .addChoice("russian", Language.LanguageEnum.RU.name())
                     .setRequired(true));
 
-
             List<OptionData> setup = new ArrayList<>();
 
             setup.add(new OptionData(CHANNEL, "text-channel", "Setting TextChannel for notification")
@@ -128,11 +132,20 @@ public class BotStartConfig {
             notifications.add(new OptionData(USER, "user", "Select a user to track")
                     .setRequired(true));
 
+            commands.addCommands(Commands.slash("language", "Setting language")
+                    .setGuildOnly(true)
+                    .addOptions(language));
 
-            commands.addCommands(Commands.slash("language", "Setting language").addOptions(language));
-            commands.addCommands(Commands.slash("help", "Bot commands"));
-            commands.addCommands(Commands.slash("setup", "Set up a TextChannel for notifications").addOptions(setup));
-            commands.addCommands(Commands.slash("notice", "Configure Notifications").addOptions(notifications));
+            commands.addCommands(Commands.slash("help", "Bot commands")
+                    .setGuildOnly(true));
+
+            commands.addCommands(Commands.slash("setup", "Set up a TextChannel for notifications")
+                    .setGuildOnly(true)
+                    .addOptions(setup));
+
+            commands.addCommands(Commands.slash("notice", "Configure Notifications")
+                    .setGuildOnly(true)
+                    .addOptions(notifications));
 
             commands.queue();
         } catch (Exception e) {
@@ -190,5 +203,17 @@ public class BotStartConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void getAllUsers() {
+
+        List<Notice> all = noticeRepository.findAll();
+
+        for (int i = 0; i < all.size(); i++) {
+            System.out.println(all.get(i).getGuildId().getTextChannelId());
+            System.out.println(all.get(i).getUserId());
+
+        }
+
     }
 }

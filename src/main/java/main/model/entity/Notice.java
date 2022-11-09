@@ -19,15 +19,14 @@ public class Notice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "guild_id", nullable = false)
-    private Long guildId;
+    @ManyToOne
+    @JoinColumn(name = "guild_id", referencedColumnName = "guild_id", nullable = false)
+    private Guild guildId;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Column(name = "user_tracking_id", nullable = false)
     private Long userTrackingId;
-
-
 
 }
