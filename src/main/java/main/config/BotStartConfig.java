@@ -161,8 +161,8 @@ public class BotStartConfig {
                     .setGuildOnly(true));
 
             commands.addCommands(Commands.slash("unsub", "Unsubscribe from the user")
-                    .setGuildOnly(true));
-
+                    .setGuildOnly(true)
+                    .addOptions(notifications));
 
             commands.queue();
         } catch (Exception e) {
@@ -251,11 +251,8 @@ public class BotStartConfig {
                 trackingUserConcurrentMap.put(userIdTracker, trackingUser);
 
                 instance.getTrackingUserConcurrentMap().put(guildId, trackingUserConcurrentMap);
-
-                System.out.println(instance.getTrackingUserConcurrentMap().get(guildId).size());
             } else {
                 ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = instance.getTrackingUserConcurrentMap().get(guildId);
-                System.out.println(trackingUserConcurrentMap.size());
 
                 if (trackingUserConcurrentMap.get(userIdTracker) == null) {
 
