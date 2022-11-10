@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -31,6 +32,7 @@ public class SlashCommandEvent extends ListenerAdapter {
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
 
+    //Language
     private static final ParserClass jsonParsers = new ParserClass();
 
     //LOGGER
@@ -115,6 +117,45 @@ public class SlashCommandEvent extends ListenerAdapter {
             event.reply(languageSet).queue();
             return;
         }
+
+        if (event.getName().equals("list")) {
+            List<Notice> noticeList = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
+            if (!noticeList.isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder();
+
+                for (Notice notice : noticeList) {
+                    if (stringBuilder.isEmpty()) {
+                        stringBuilder.append("<@").append(notice.getUserTrackingId()).append(">");
+                    } else {
+                        stringBuilder.append(", <@").append(notice.getUserTrackingId()).append(">");
+                    }
+                }
+                String subscription = String.format(jsonParsers.getTranslation("subscription", guildIdString), stringBuilder);
+                event.reply(subscription).queue();
+            } else {
+                String emptyList = jsonParsers.getTranslation("empty_list", guildIdString);
+                event.reply(emptyList).queue();
+            }
+            return;
+        }
+
+        if (event.getName().equals("unsub")) {
+            User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
+            if (userFromOptions == null) return;
+            Notice notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getIdLong());
+
+            if (notice == null) {
+                String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildIdString);
+                event.reply(dontFindUser).queue();
+            } else {
+                noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId());
+                String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
+                event.reply(successfullyDeleted).queue();
+            }
+            return;
+        }
+
+
 
 
 

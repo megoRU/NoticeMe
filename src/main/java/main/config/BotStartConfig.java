@@ -157,6 +157,13 @@ public class BotStartConfig {
                     .setGuildOnly(true)
                     .addOptions(notifications));
 
+            commands.addCommands(Commands.slash("list", "List of your subscriptions")
+                    .setGuildOnly(true));
+
+            commands.addCommands(Commands.slash("unsub", "Unsubscribe from the user")
+                    .setGuildOnly(true));
+
+
             commands.queue();
         } catch (Exception e) {
             e.printStackTrace();
