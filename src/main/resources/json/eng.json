@@ -4,10 +4,12 @@
   "yourself": "You can't choose yourself",
   "bot": "You can't choose a bot",
   "you_cannot_set_channel" :"You haven't set up a notification channel yet. Use: </setup:1039918668135534625>",
-  "now_you_will_receive": "Now you will receive a notification when the user:\n <@%s> will enter the voice channel",
+  "now_you_will_receive": "Now you will receive a notification when the user:\n<@%s> will enter the voice channel",
+  "now_bot_will_receive": "Now notifications will be sent to the channel: <#%s>\nDon't forget to make it public, and for the bot to have access to it.",
   "empty_list": "You don't have anyone in your subscriptions",
   "subscription": "Here's a list of everyone you've subscribed to:\n%s",
   "dont_find_user": "Couldn't find this user in your subscriptions!",
-  "successfully_deleted": "Successfully deleted this user: <@%s>\nin your subscriptions"
+  "successfully_deleted": "Successfully deleted this user: <@%s>\nin your subscriptions",
+  "delete_data": "Data deleted."
 
 }

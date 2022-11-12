@@ -1,6 +1,6 @@
 package main.model.repository;
 
-import main.model.entity.Notice;
+import main.model.entity.Subs;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,17 +10,17 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
-public interface NoticeRepository extends JpaRepository<Notice, Long> {
+public interface NoticeRepository extends JpaRepository<Subs, Long> {
 
-    @Query(value = "SELECT n FROM Notice n WHERE n.userId = :userId AND n.guildId.guildId = :guildId")
-    List<Notice> findAllByUserIdAndGuildId(Long userId, Long guildId);
+    @Query(value = "SELECT s FROM Subs s WHERE s.userId = :userId AND s.server.guildIdLong = :guildId")
+    List<Subs> findAllByUserIdAndGuildId(Long userId, Long guildId);
 
-    @Query(value = "SELECT n FROM Notice n WHERE n.userId = :userId AND n.guildId.guildId = :guildId AND n.userTrackingId = :userTrack")
-    Notice findTrackingUser(Long userId, Long guildId, Long userTrack);
+    @Query(value = "SELECT s FROM Subs s WHERE s.userId = :userId AND s.server.guildIdLong = :guildId AND s.userTrackingId = :userTrack")
+    Subs findTrackingUser(Long userId, Long guildId, Long userTrack);
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM Notice n WHERE n.userTrackingId = :userTrack")
+    @Query(value = "DELETE FROM Subs s WHERE s.userTrackingId = :userTrack")
     void deleteByUserTrackingId(Long userTrack);
 
 }

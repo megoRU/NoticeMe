@@ -12,16 +12,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "notice")
-public class Notice {
+@Table(name = "subs")
+public class Subs {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "guild_id", referencedColumnName = "guild_id", nullable = false)
-    private Guild guildId;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "guild_id", referencedColumnName = "guild_id_long", nullable = false)
+    private Server server;
 
     @Column(name = "user_id", nullable = false)
     private Long userId;

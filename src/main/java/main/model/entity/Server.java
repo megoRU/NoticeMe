@@ -5,22 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "guild")
-public class Guild {
+@Table(name = "server")
+public class Server {
 
     @Id
-    @Column(name = "guild_id", nullable = false)
-    private Long guildId;
+    @Column(name = "guild_id_long", nullable = false)
+    private Long guildIdLong;
 
     @Column(name = "channel_id", nullable = false)
     private Long textChannelId;

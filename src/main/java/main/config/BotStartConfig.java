@@ -4,9 +4,10 @@ import main.core.NoticeRegistry;
 import main.core.TrackingUser;
 import main.event.BotJoinToGuild;
 import main.event.UserJoinEvent;
+import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
-import main.model.entity.Notice;
+import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.LanguageRepository;
 import main.model.repository.NoticeRepository;
@@ -14,7 +15,10 @@ import main.event.slash.SlashCommandEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -23,7 +27,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -67,12 +70,12 @@ public class BotStartConfig {
     private final LanguageRepository languageRepository;
 
     //DataBase
-    @Value("${spring.datasource.url}")
-    private String URL_CONNECTION;
-    @Value("${spring.datasource.username}")
-    private String USER_CONNECTION;
-    @Value("${spring.datasource.password}")
-    private String PASSWORD_CONNECTION;
+//    @Value("${spring.datasource.url}")
+//    private String URL_CONNECTION;
+//    @Value("${spring.datasource.username}")
+//    private String USER_CONNECTION;
+//    @Value("${spring.datasource.password}")
+//    private String PASSWORD_CONNECTION;
 
     @Autowired
     public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository, LanguageRepository languageRepository) {
@@ -108,6 +111,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository));
             jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository));
             jdaBuilder.addEventListeners(new BotJoinToGuild());
+            jdaBuilder.addEventListeners(new ButtonEvent(guildRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -118,7 +122,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -130,39 +134,55 @@ public class BotStartConfig {
             language.add(new OptionData(STRING, "bot", "Setting the bot language")
                     .addChoice("english", Language.LanguageEnum.EN.name())
                     .addChoice("russian", Language.LanguageEnum.RU.name())
-                    .setRequired(true));
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка бота"));
 
             List<OptionData> setup = new ArrayList<>();
 
-            setup.add(new OptionData(CHANNEL, "text-channel", "Setting TextChannel for notification")
-                    .setRequired(true));
+            setup.add(new OptionData(CHANNEL, "text-channel", "Select TextChannel for notification")
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выберите текстовый канал для уведомления"));
 
             List<OptionData> notifications = new ArrayList<>();
 
             notifications.add(new OptionData(USER, "user", "Select a user to track")
-                    .setRequired(true));
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать пользователя для отслеживания"));
 
             commands.addCommands(Commands.slash("language", "Setting language")
                     .setGuildOnly(true)
-                    .addOptions(language));
+                    .addOptions(language)
+                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка"));
 
             commands.addCommands(Commands.slash("help", "Bot commands")
-                    .setGuildOnly(true));
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота"));
 
             commands.addCommands(Commands.slash("setup", "Set up a TextChannel for notifications")
                     .setGuildOnly(true)
-                    .addOptions(setup));
+                    .addOptions(setup)
+                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка текстового канала для уведомлений"));
 
-            commands.addCommands(Commands.slash("notice", "Configure Notifications")
+            commands.addCommands(Commands.slash("sub", "Configure Notifications")
                     .setGuildOnly(true)
-                    .addOptions(notifications));
+                    .addOptions(notifications)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка уведомлений"));
 
             commands.addCommands(Commands.slash("list", "List of your subscriptions")
-                    .setGuildOnly(true));
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список твоих подписок"));
 
             commands.addCommands(Commands.slash("unsub", "Unsubscribe from the user")
                     .setGuildOnly(true)
-                    .addOptions(notifications));
+                    .addOptions(notifications)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
+
+            commands.addCommands(Commands.slash("delete", "Delete all subscribers from the server")
+                    .setGuildOnly(true)
+                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера"));
 
             commands.queue();
         } catch (Exception e) {
@@ -195,9 +215,11 @@ public class BotStartConfig {
 
     private void setLanguages() {
         try {
-            String[] languages = {"rus", "eng"};
+            List<String> listLanguages = new ArrayList<>();
+            listLanguages.add("rus");
+            listLanguages.add("eng");
 
-            for (String listLanguage : languages) {
+            for (String listLanguage : listLanguages) {
                 InputStream inputStream = new ClassPathResource("json/" + listLanguage + ".json").getInputStream();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -235,11 +257,11 @@ public class BotStartConfig {
     }
 
     private void getAllUsers() {
-        List<Notice> noticeList = noticeRepository.findAll();
+        List<Subs> noticeList = noticeRepository.findAll();
         NoticeRegistry instance = NoticeRegistry.getInstance();
 
-        for (Notice notice : noticeList) {
-            String guildId = notice.getGuildId().getGuildId().toString();
+        for (Subs notice : noticeList) {
+            String guildId = notice.getServer().getGuildIdLong().toString();
             String userIdTracker = notice.getUserTrackingId().toString();
             String userId = notice.getUserId().toString();
 

@@ -2,10 +2,11 @@ package main.event.slash;
 
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
+import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
-import main.model.entity.Guild;
+import main.model.entity.Server;
 import main.model.entity.Language;
-import main.model.entity.Notice;
+import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.LanguageRepository;
 import main.model.repository.NoticeRepository;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -52,10 +54,12 @@ public class SlashCommandEvent extends ListenerAdapter {
         if (event.getName().equals("setup")) {
             GuildChannelUnion guildChannelUnion = event.getOption("text-channel", OptionMapping::getAsChannel);
             if (guildChannelUnion instanceof TextChannel) {
-                Guild guild = new Guild();
-                guild.setGuildId(guildId);
+                Server guild = new Server();
+                guild.setGuildIdLong(guildId);
                 guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong()); //NPE
                 guildRepository.save(guild);
+
+                System.out.println(jsonParsers.getTranslation("now_bot_will_receive", guildIdString));
 
                 String nowBotWillReceive = String.format(
                         jsonParsers.getTranslation("now_bot_will_receive", guildIdString),
@@ -68,7 +72,7 @@ public class SlashCommandEvent extends ListenerAdapter {
             return;
         }
 
-        if (event.getName().equals("notice")) {
+        if (event.getName().equals("sub")) {
             User userDest = event.getOption("user", OptionMapping::getAsUser);
             if (userDest == null) {
                 event.reply("user is null").queue();
@@ -83,10 +87,10 @@ public class SlashCommandEvent extends ListenerAdapter {
                 return;
             }
 
-            Optional<Guild> guildOptional = guildRepository.findById(guildId);
+            Optional<Server> guildOptional = guildRepository.findById(guildId);
             if (guildOptional.isPresent()) {
-                Notice notice = new Notice();
-                notice.setGuildId(guildOptional.get());
+                Subs notice = new Subs();
+                notice.setServer(guildOptional.get());
                 notice.setUserId(user.getIdLong());
                 notice.setUserTrackingId(userDest.getIdLong());
                 noticeRepository.save(notice);
@@ -119,11 +123,11 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("list")) {
-            List<Notice> noticeList = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
+            List<Subs> noticeList = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
             if (!noticeList.isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
 
-                for (Notice notice : noticeList) {
+                for (Subs notice : noticeList) {
                     if (stringBuilder.isEmpty()) {
                         stringBuilder.append("<@").append(notice.getUserTrackingId()).append(">");
                     } else {
@@ -142,7 +146,7 @@ public class SlashCommandEvent extends ListenerAdapter {
         if (event.getName().equals("unsub")) {
             User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
             if (userFromOptions == null) return;
-            Notice notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getIdLong());
+            Subs notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getIdLong());
 
             if (notice == null) {
                 String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildIdString);
@@ -152,6 +156,18 @@ public class SlashCommandEvent extends ListenerAdapter {
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
                 event.reply(successfullyDeleted).queue();
             }
+            return;
+        }
+
+        if (event.getName().equals("delete")) {
+            event.reply("""
+                            Это удалить все данные в базе данных для вашего сервера.
+                            Отменить это действие невозможно будет.
+                            Если вы действительно хотите, нажмите кнопку ниже.
+                            """)
+                    .setEphemeral(true)
+                    .setActionRow(Button.danger(ButtonEvent.BUTTON_DELETE, "Delete"))
+                    .queue();
             return;
         }
 

@@ -18,7 +18,7 @@ public class BotJoinToGuild extends ListenerAdapter {
             embedBuilder.addField("Help", "Use </help:1039918668135534624> to get information.", true);
             embedBuilder.addField("Language", "You can change Bot language: </language:1039918668135534623>", true);
             embedBuilder.addField("Notification Channel", "First you need to set up a channel for notifications: </setup:1039918668135534625>", true);
-            embedBuilder.addField("Subscribe to a user", "Setting up receiving notifications: </notice:1039918668571750420>", true);
+            embedBuilder.addField("Subscribe to a user", "Setting up receiving notifications: </sub:1040935591887519755>", true);
 
             DefaultGuildChannelUnion defaultChannel = event.getGuild().getDefaultChannel();
             if (defaultChannel != null) {

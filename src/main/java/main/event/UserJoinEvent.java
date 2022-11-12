@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.core.NoticeRegistry;
 import main.core.TrackingUser;
 import main.jsonparser.ParserClass;
+import main.model.entity.Server;
 import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -36,10 +37,10 @@ public class UserJoinEvent extends ListenerAdapter {
 
         if (trackingUserConcurrentMap == null || trackingUserConcurrentMap.get(user.getId()) == null) return;
         String userList = trackingUserConcurrentMap.get(user.getId()).getUserList();
-        Optional<main.model.entity.Guild> guildOptional = guildRepository.findById(guild.getIdLong());
+        Optional<Server> guildOptional = guildRepository.findById(guild.getIdLong());
 
         if (guildOptional.isPresent()) {
-            main.model.entity.Guild guildDB = guildOptional.get();
+            Server guildDB = guildOptional.get();
             TextChannel textChannel = event.getGuild().getTextChannelById(guildDB.getTextChannelId());
             if (textChannel != null) {
                 String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
