@@ -97,10 +97,10 @@ public class SlashCommandEvent extends ListenerAdapter {
                 noticeRepository.save(notice);
 
                 String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
-                event.reply(nowYouWillReceive).queue();
+                event.reply(nowYouWillReceive).setEphemeral(true).queue();
             } else {
                 String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
-                event.reply(youCannotSetChannel).queue();
+                event.reply(youCannotSetChannel).setEphemeral(true).queue();
             }
             return;
         }
@@ -136,10 +136,10 @@ public class SlashCommandEvent extends ListenerAdapter {
                     }
                 }
                 String subscription = String.format(jsonParsers.getTranslation("subscription", guildIdString), stringBuilder);
-                event.reply(subscription).queue();
+                event.reply(subscription).setEphemeral(true).queue();
             } else {
                 String emptyList = jsonParsers.getTranslation("empty_list", guildIdString);
-                event.reply(emptyList).queue();
+                event.reply(emptyList).setEphemeral(true).queue();
             }
             return;
         }
@@ -155,7 +155,7 @@ public class SlashCommandEvent extends ListenerAdapter {
             } else {
                 noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId());
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
-                event.reply(successfullyDeleted).queue();
+                event.reply(successfullyDeleted).setEphemeral(true).queue();
             }
             return;
         }
