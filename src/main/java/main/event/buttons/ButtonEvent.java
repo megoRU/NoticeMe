@@ -1,6 +1,7 @@
 package main.event.buttons;
 
 import lombok.AllArgsConstructor;
+import main.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -13,9 +14,7 @@ import java.util.Objects;
 public class ButtonEvent extends ListenerAdapter {
 
     public static final String BUTTON_DELETE = "BUTTON_DELETE";
-
     private static final ParserClass jsonParsers = new ParserClass();
-
     private final GuildRepository guildRepository;
 
     @Override
@@ -28,6 +27,7 @@ public class ButtonEvent extends ListenerAdapter {
         if (Objects.equals(event.getButton().getId(), BUTTON_DELETE)) {
             event.editButton(event.getButton().asDisabled()).queue();
             guildRepository.deleteById(GuildIdLong);
+            NoticeRegistry.getInstance().removeGuild(guildIdString);
             String deleteData = String.format(jsonParsers.getTranslation("delete_data", guildIdString));
             event.getHook().sendMessage(deleteData).setEphemeral(true).queue();
         }

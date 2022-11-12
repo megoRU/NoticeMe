@@ -10,6 +10,7 @@
   "subscription": "Here's a list of everyone you've subscribed to:\n%s",
   "dont_find_user": "Couldn't find this user in your subscriptions!",
   "successfully_deleted": "Successfully deleted this user: <@%s>\nin your subscriptions",
-  "delete_data": "Data deleted."
+  "delete_data": "Data deleted.",
+  "warning_delete_data": "Это удалить все данные в базе данных для вашего сервера.\nОтменить это действие невозможно будет.\nЕсли вы действительно хотите, нажмите кнопку ниже."
 
 }

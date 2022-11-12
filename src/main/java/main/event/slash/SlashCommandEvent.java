@@ -2,10 +2,11 @@ package main.event.slash;
 
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
+import main.core.NoticeRegistry;
 import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
-import main.model.entity.Server;
 import main.model.entity.Language;
+import main.model.entity.Server;
 import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.LanguageRepository;
@@ -160,19 +161,13 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("delete")) {
-            event.reply("""
-                            Это удалить все данные в базе данных для вашего сервера.
-                            Отменить это действие невозможно будет.
-                            Если вы действительно хотите, нажмите кнопку ниже.
-                            """)
+            String warningDeleteData = jsonParsers.getTranslation("warning_delete_data", guildIdString);
+            event.reply(warningDeleteData)
                     .setEphemeral(true)
                     .setActionRow(Button.danger(ButtonEvent.BUTTON_DELETE, "Delete"))
                     .queue();
             return;
         }
-
-
-
 
 
     }

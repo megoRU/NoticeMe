@@ -10,5 +10,6 @@
   "subscription": "Вот список всех на кого ты подписан:\n%s",
   "dont_find_user": "Не смог найти этого пользователя в ваших подписках!",
   "successfully_deleted": "Успешно удалил этого пользователя: <@%s>\nв ваших подписках",
-  "delete_data": "Данные удалены."
+  "delete_data": "Данные удалены.",
+  "warning_delete_data": "This will delete all the data in the database for your server.\nIt will be impossible to cancel this action.\nIf you really want to, click the button below."
 }

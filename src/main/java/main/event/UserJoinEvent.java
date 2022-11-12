@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
 
 @AllArgsConstructor
 public class UserJoinEvent extends ListenerAdapter {
@@ -33,10 +32,10 @@ public class UserJoinEvent extends ListenerAdapter {
         VoiceChannel voiceChannel = event.getChannelJoined().asVoiceChannel();
         NoticeRegistry instance = NoticeRegistry.getInstance();
 
-        ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = instance.getTrackingUserConcurrentMap().get(guild.getId());
+        TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
 
-        if (trackingUserConcurrentMap == null || trackingUserConcurrentMap.get(user.getId()) == null) return;
-        String userList = trackingUserConcurrentMap.get(user.getId()).getUserList();
+        if (instanceUser == null) return;
+        String userList = instanceUser.getUserList();
         Optional<Server> guildOptional = guildRepository.findById(guild.getIdLong());
 
         if (guildOptional.isPresent()) {

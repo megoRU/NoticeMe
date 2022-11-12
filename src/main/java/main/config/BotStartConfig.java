@@ -5,13 +5,13 @@ import main.core.TrackingUser;
 import main.event.BotJoinToGuild;
 import main.event.UserJoinEvent;
 import main.event.buttons.ButtonEvent;
+import main.event.slash.SlashCommandEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.LanguageRepository;
 import main.model.repository.NoticeRepository;
-import main.event.slash.SlashCommandEvent;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -264,27 +264,20 @@ public class BotStartConfig {
             String guildId = notice.getServer().getGuildIdLong().toString();
             String userIdTracker = notice.getUserTrackingId().toString();
             String userId = notice.getUserId().toString();
-
-            if (!instance.getTrackingUserConcurrentMap().containsKey(guildId)) {
+            if (!instance.hasGuild(guildId)) {
                 TrackingUser trackingUser = new TrackingUser();
                 trackingUser.putUser(notice.getUserId().toString());
-
                 ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = new ConcurrentHashMap<>();
                 trackingUserConcurrentMap.put(userIdTracker, trackingUser);
-
-                instance.getTrackingUserConcurrentMap().put(guildId, trackingUserConcurrentMap);
+                instance.save(guildId, trackingUserConcurrentMap);
             } else {
-                ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = instance.getTrackingUserConcurrentMap().get(guildId);
-
-                if (trackingUserConcurrentMap.get(userIdTracker) == null) {
-
+                TrackingUser trackingUserFromMap = instance.getUser(guildId, userIdTracker);
+                if (trackingUserFromMap == null) {
                     TrackingUser trackingUser = new TrackingUser();
                     trackingUser.putUser(notice.getUserId().toString());
-
-                    trackingUserConcurrentMap.put(userIdTracker, trackingUser);
-
+                    instance.saveTrackingUser(guildId, userIdTracker, trackingUser);
                 } else {
-                    trackingUserConcurrentMap.get(userIdTracker).putUser(userId);
+                    instance.get(guildId).get(userIdTracker).putUser(userId);
                 }
             }
         }
