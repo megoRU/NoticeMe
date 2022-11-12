@@ -122,7 +122,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -165,10 +165,10 @@ public class BotStartConfig {
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка текстового канала для уведомлений"));
 
-            commands.addCommands(Commands.slash("sub", "Configure Notifications")
+            commands.addCommands(Commands.slash("sub", "Subscribe to user")
                     .setGuildOnly(true)
                     .addOptions(notifications)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Настройка уведомлений"));
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Подписаться на пользователя"));
 
             commands.addCommands(Commands.slash("list", "List of your subscriptions")
                     .setGuildOnly(true)
