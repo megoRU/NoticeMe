@@ -48,4 +48,18 @@ public class NoticeRegistry {
     public void removeGuild(String guildId) {
         trackingUserConcurrentMap.remove(guildId);
     }
+
+    public void removeUserFromGuild(String guildId, String user) {
+        trackingUserConcurrentMap.get(guildId).remove(user);
+    }
+
+    public void removeUserFromAllGuild(String user) {
+        ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> listUsers = new ConcurrentHashMap<>(trackingUserConcurrentMap);
+        listUsers.forEach((guild, trackerUser) -> {
+            TrackingUser trackingUser = trackerUser.get(user);
+            if (trackingUser != null) {
+                removeUserFromGuild(guild, user);
+            }
+        });
+    }
 }

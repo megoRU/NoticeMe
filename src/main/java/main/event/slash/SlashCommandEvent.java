@@ -6,10 +6,12 @@ import main.core.NoticeRegistry;
 import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
+import main.model.entity.Lock;
 import main.model.entity.Server;
 import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.LanguageRepository;
+import main.model.repository.LockRepository;
 import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
@@ -34,6 +36,7 @@ public class SlashCommandEvent extends ListenerAdapter {
     private final NoticeRepository noticeRepository;
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
+    private final LockRepository lockRepository;
 
     //Language
     private static final ParserClass jsonParsers = new ParserClass();
@@ -85,6 +88,12 @@ public class SlashCommandEvent extends ListenerAdapter {
             } else if (user.isBot()) {
                 String bot = jsonParsers.getTranslation("bot", guildIdString);
                 event.reply(bot).queue();
+                return;
+            }
+
+            if (BotStartConfig.mapLocks.containsKey(userDest.getId())) {
+                String cannotSubToThisUser = jsonParsers.getTranslation("cannot_sub_to_this_user", guildIdString);
+                event.reply(cannotSubToThisUser).setEphemeral(true).queue();
                 return;
             }
 
@@ -153,7 +162,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildIdString);
                 event.reply(dontFindUser).queue();
             } else {
-                noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId());
+                noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId(), user.getIdLong());
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
                 event.reply(successfullyDeleted).setEphemeral(true).queue();
             }
@@ -166,6 +175,19 @@ public class SlashCommandEvent extends ListenerAdapter {
                     .setEphemeral(true)
                     .setActionRow(Button.danger(ButtonEvent.BUTTON_DELETE, "Delete"))
                     .queue();
+            return;
+        }
+
+        if (event.getName().equals("lock")) {
+            String lockString = jsonParsers.getTranslation("lock", guildIdString);
+            event.reply(lockString).setEphemeral(true).queue();
+            NoticeRegistry.getInstance().removeUserFromAllGuild(user.getId());
+            noticeRepository.deleteAllByUserTrackingId(user.getIdLong());
+
+            Lock lock = new Lock();
+            lock.setUserId(user.getIdLong());
+            lock.setLocked(Lock.Locked.LOCKED);
+            lockRepository.save(lock);
             return;
         }
 

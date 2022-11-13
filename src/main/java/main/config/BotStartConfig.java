@@ -8,9 +8,11 @@ import main.event.buttons.ButtonEvent;
 import main.event.slash.SlashCommandEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
+import main.model.entity.Lock;
 import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.LanguageRepository;
+import main.model.repository.LockRepository;
 import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -50,6 +52,7 @@ public class BotStartConfig {
 
     public static final String activity = "/help | ";
     public static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
+    public static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
@@ -68,6 +71,7 @@ public class BotStartConfig {
     private final NoticeRepository noticeRepository;
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
+    private final LockRepository lockRepository;
 
     //DataBase
 //    @Value("${spring.datasource.url}")
@@ -78,10 +82,11 @@ public class BotStartConfig {
 //    private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository, LanguageRepository languageRepository) {
+    public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository, LanguageRepository languageRepository, LockRepository lockRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
+        this.lockRepository = lockRepository;
     }
 
     @Bean
@@ -90,6 +95,7 @@ public class BotStartConfig {
             //Update
             setLanguages();
             getLanguages();
+            getLockStatus();
             getAllUsers();
 
             List<GatewayIntent> intents = new ArrayList<>(
@@ -108,7 +114,7 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository));
+            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository, lockRepository));
             jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository));
             jdaBuilder.addEventListeners(new BotJoinToGuild());
             jdaBuilder.addEventListeners(new ButtonEvent(guildRepository));
@@ -122,7 +128,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -251,6 +257,20 @@ public class BotStartConfig {
                 mapLanguages.put(language.getGuildId().toString(), language.getLanguage());
             }
             System.out.println("getLanguages()");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void getLockStatus() {
+        try {
+            List<Lock> lockList = lockRepository.findAll();
+            for (Lock lock : lockList) {
+                if (lock.getLocked().equals(Lock.Locked.LOCKED)) {
+                    mapLocks.put(lock.getUserId().toString(), Lock.Locked.LOCKED);
+                }
+            }
+            System.out.println("getLockStatus()");
         } catch (Exception e) {
             e.printStackTrace();
         }

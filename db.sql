@@ -28,3 +28,12 @@ CREATE TABLE `subs`
         FOREIGN KEY (`guild_id`)
             REFERENCES `server` (`guild_id_long`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `lock`;
+CREATE TABLE `lock`
+(
+    `user_id` bigint(30) NOT NULL,
+    `lock_status` enum ('LOCKED', 'UNLOCKED') not null,
+    PRIMARY KEY (`user_id`),
+    UNIQUE KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -21,6 +21,11 @@ public interface NoticeRepository extends JpaRepository<Subs, Long> {
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM Subs s WHERE s.userTrackingId = :userTrack")
-    void deleteByUserTrackingId(Long userTrack);
+    void deleteAllByUserTrackingId(Long userTrack);
+
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM Subs s WHERE s.userTrackingId = :userTrack AND s.userId = :userId")
+    void deleteByUserTrackingId(Long userTrack, Long userId);
 
 }
