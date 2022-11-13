@@ -29,8 +29,8 @@ CREATE TABLE `subs`
             REFERENCES `server` (`guild_id_long`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `lock`;
-CREATE TABLE `lock`
+DROP TABLE IF EXISTS `locks`;
+CREATE TABLE `locks`
 (
     `user_id` bigint(30) NOT NULL,
     `lock_status` enum ('LOCKED', 'UNLOCKED') not null,

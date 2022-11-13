@@ -12,7 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "lock")
+@Table(name = "locks")
 public class Lock {
 
     @Id
