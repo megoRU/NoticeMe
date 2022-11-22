@@ -4,7 +4,9 @@ import lombok.AllArgsConstructor;
 import main.core.NoticeRegistry;
 import main.core.TrackingUser;
 import main.jsonparser.ParserClass;
+import main.model.entity.Entries;
 import main.model.entity.Server;
+import main.model.repository.EntriesRepository;
 import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -15,6 +17,8 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -22,6 +26,8 @@ public class UserJoinEvent extends ListenerAdapter {
 
     private final GuildRepository guildRepository;
     private static final ParserClass jsonParsers = new ParserClass();
+    private final EntriesRepository entriesRepository;
+    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
@@ -33,8 +39,16 @@ public class UserJoinEvent extends ListenerAdapter {
 
         try {
             VoiceChannel voiceChannel = getAsChannel(event.getChannelJoined());
-            NoticeRegistry instance = NoticeRegistry.getInstance();
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
+            Entries entries = new Entries();
+            entries.setGuildId(guild.getIdLong());
+            entries.setChannelId(voiceChannel.getIdLong());
+            entries.setUserId(user.getIdLong());
+            entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
+            entriesRepository.save(entries);
+
+            NoticeRegistry instance = NoticeRegistry.getInstance();
             TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
 
             if (instanceUser == null) return;

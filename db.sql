@@ -37,3 +37,15 @@ CREATE TABLE `locks`
     PRIMARY KEY (`user_id`),
     UNIQUE KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `entries`;
+CREATE TABLE `entries`
+(
+    `id`                bigint(11) NOT NULL AUTO_INCREMENT,
+    `user_id`           bigint(11) NOT NULL,
+    `guild_id`          bigint(30) NOT NULL,
+    `channel_id`        bigint(30) NOT NULL,
+    `join_time`  		TIMESTAMP NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

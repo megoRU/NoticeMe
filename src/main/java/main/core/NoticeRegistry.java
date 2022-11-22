@@ -1,5 +1,6 @@
 package main.core;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -29,7 +30,9 @@ public class NoticeRegistry {
 
     //                                                        TrackingUser | Data
     public void saveTrackingUser(String guildId, String user, TrackingUser trackingUser) {
-        trackingUserConcurrentMap.get(guildId).put(user, trackingUser);
+        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+        if (stringTrackingUserConcurrentMap == null) throw new IllegalArgumentException("In this collection does not exist Guild: saveTrackingUser()");
+        stringTrackingUserConcurrentMap.put(user, trackingUser);
     }
 
     //TrackingUser | Data
@@ -37,8 +40,12 @@ public class NoticeRegistry {
         return trackingUserConcurrentMap.get(guildId);
     }
 
+
+    @Nullable
     public TrackingUser getUser(String guildId, String user) {
-        return trackingUserConcurrentMap.get(guildId).get(user);
+        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+        if (stringTrackingUserConcurrentMap == null) return null;
+        return stringTrackingUserConcurrentMap.get(user);
     }
 
     public boolean hasGuild(String guildId) {

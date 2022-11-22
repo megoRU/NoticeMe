@@ -10,10 +10,7 @@ import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Lock;
 import main.model.entity.Subs;
-import main.model.repository.GuildRepository;
-import main.model.repository.LanguageRepository;
-import main.model.repository.LockRepository;
-import main.model.repository.NoticeRepository;
+import main.model.repository.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -72,6 +69,7 @@ public class BotStartConfig {
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
+    private final EntriesRepository entriesRepository;
 
     //DataBase
 //    @Value("${spring.datasource.url}")
@@ -82,11 +80,16 @@ public class BotStartConfig {
 //    private String PASSWORD_CONNECTION;
 
     @Autowired
-    public BotStartConfig(NoticeRepository noticeRepository, GuildRepository guildRepository, LanguageRepository languageRepository, LockRepository lockRepository) {
+    public BotStartConfig(NoticeRepository noticeRepository,
+                          GuildRepository guildRepository,
+                          LanguageRepository languageRepository,
+                          LockRepository lockRepository,
+                          EntriesRepository entriesRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
+        this.entriesRepository = entriesRepository;
     }
 
     @Bean
@@ -115,7 +118,7 @@ public class BotStartConfig {
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository, lockRepository));
-            jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository));
+            jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository, entriesRepository));
             jdaBuilder.addEventListeners(new BotJoinToGuild());
             jdaBuilder.addEventListeners(new ButtonEvent(guildRepository));
 
