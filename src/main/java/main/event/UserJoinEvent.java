@@ -9,6 +9,7 @@ import main.model.entity.Server;
 import main.model.repository.EntriesRepository;
 import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -40,11 +42,13 @@ public class UserJoinEvent extends ListenerAdapter {
         try {
             VoiceChannel voiceChannel = getAsChannel(event.getChannelJoined());
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            List<Member> members = voiceChannel.getMembers();
 
             Entries entries = new Entries();
             entries.setGuildId(guild.getIdLong());
             entries.setChannelId(voiceChannel.getIdLong());
             entries.setUserId(user.getIdLong());
+            entries.setUsersInChannel(members);
             entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
             entriesRepository.save(entries);
 
@@ -68,7 +72,8 @@ public class UserJoinEvent extends ListenerAdapter {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
+            System.out.println("UserJoinEvent: " + e.getMessage());
         }
     }
 

@@ -27,6 +27,6 @@ public class Subs {
     private Long userId;
 
     @Column(name = "user_tracking_id", nullable = false)
-    private Long userTrackingId;
+    private String userTrackingId;
 
 }

@@ -5,14 +5,8 @@ import main.config.BotStartConfig;
 import main.core.NoticeRegistry;
 import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
-import main.model.entity.Language;
-import main.model.entity.Lock;
-import main.model.entity.Server;
-import main.model.entity.Subs;
-import main.model.repository.GuildRepository;
-import main.model.repository.LanguageRepository;
-import main.model.repository.LockRepository;
-import main.model.repository.NoticeRepository;
+import main.model.entity.*;
+import main.model.repository.*;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -21,12 +15,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -37,6 +34,7 @@ public class SlashCommandEvent extends ListenerAdapter {
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
+    private final EntriesRepository entriesRepository;
 
     //Language
     private static final ParserClass jsonParsers = new ParserClass();
@@ -102,7 +100,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 Subs notice = new Subs();
                 notice.setServer(guildOptional.get());
                 notice.setUserId(user.getIdLong());
-                notice.setUserTrackingId(userDest.getIdLong());
+                notice.setUserTrackingId(userDest.getId());
                 noticeRepository.save(notice);
 
                 String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
@@ -156,7 +154,7 @@ public class SlashCommandEvent extends ListenerAdapter {
         if (event.getName().equals("unsub")) {
             User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
             if (userFromOptions == null) return;
-            Subs notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getIdLong());
+            Subs notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getId());
 
             if (notice == null) {
                 String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildIdString);
@@ -182,7 +180,7 @@ public class SlashCommandEvent extends ListenerAdapter {
             String lockString = jsonParsers.getTranslation("lock", guildIdString);
             event.reply(lockString).setEphemeral(true).queue();
             NoticeRegistry.getInstance().removeUserFromAllGuild(user.getId());
-            noticeRepository.deleteAllByUserTrackingId(user.getIdLong());
+            noticeRepository.deleteAllByUserTrackingId(user.getId());
 
             Lock lock = new Lock();
             lock.setUserId(user.getIdLong());
@@ -191,6 +189,56 @@ public class SlashCommandEvent extends ListenerAdapter {
             return;
         }
 
+        if (event.getName().equals("suggestion")) {
+            List<Entries> allEntriesForSuggestion = entriesRepository.getAllEntriesForSuggestion(user.getIdLong(), guildId);
+            List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
+
+            List<String> collect = allEntriesForSuggestion
+                    .stream()
+                    .map(Entries::getUsersInChannel)
+                    .distinct()
+                    .filter(a -> allSubs.stream()
+                            .map(Subs::getUserTrackingId)
+                            .noneMatch(s -> s.contains(a)))
+                    .collect(Collectors.toList());
+
+            for (String s : collect) {
+                System.out.println(s);
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            List<Button> buttonsList = new ArrayList<>();
+
+            for (int i = 0; i < collect.size(); i++) {
+                if (stringBuilder.isEmpty()) {
+                    stringBuilder.append((i + 1)).append(". ").append("<@").append(collect.get(i)).append(">");
+                } else {
+                    stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(collect.get(i)).append(">");
+                }
+                if (buttonsList.size() <= 24) {
+                    buttonsList.add(Button.primary(ButtonEvent.BUTTON_ADD_USER + (i + 1), "Add User: " + (i + 1)));
+                }
+            }
+            buttonsList.add(Button.success(ButtonEvent.BUTTON_ALL_USERS, "Add all this USERS!"));
+
+            if (buttonsList.size() == 1) {
+                String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
+                event.reply(noSuggestions).setEphemeral(true).queue();
+                return;
+            }
+
+            ReplyCallbackAction replyCallbackAction = event.reply(stringBuilder.toString()).setEphemeral(true);
+
+            int second = Math.min(buttonsList.size(), 4);
+            int first = 0;
+            int ceil = (int) Math.ceil(buttonsList.size() / 5.0);
+            for (int i = 0; i < ceil; i++) {
+                replyCallbackAction.addActionRow(buttonsList.subList(first, second));
+                first = second;
+                second += 4;
+            }
+            replyCallbackAction.queue();
+        }
 
     }
 }

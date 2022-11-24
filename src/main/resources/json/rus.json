@@ -13,5 +13,9 @@
   "delete_data": "Данные удалены.",
   "warning_delete_data": "This will delete all the data in the database for your server.\nIt will be impossible to cancel this action.\nIf you really want to, click the button below.",
   "lock": "Теперь вас не смогут отслеживать.\nВсе подписки на вас были отменены.",
-  "cannot_sub_to_this_user": "Этот пользователь запретил отслеживать себя."
+  "cannot_sub_to_this_user": "Этот пользователь запретил отслеживать себя.",
+  "no_suggestions": "Для вас пока нет предложений",
+  "user_saved": "Сохранили пользователя",
+  "you_already_tracked": "Вы уже отслеживаете этого пользователя",
+  "users_saved": "Сохранил всех пользователей"
 }

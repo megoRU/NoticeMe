@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS `server`;
 CREATE TABLE `server`
 (
-    `guild_id_long`   bigint(30) NOT NULL,
-    `channel_id` bigint(30) NOT NULL,
+    `guild_id_long` bigint(30) NOT NULL,
+    `channel_id`    bigint(30) NOT NULL,
     PRIMARY KEY (`guild_id_long`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -21,7 +21,7 @@ CREATE TABLE `subs`
     `id`               bigint(11) NOT NULL AUTO_INCREMENT,
     `guild_id`         bigint(11) NOT NULL,
     `user_id`          bigint(30) NOT NULL,
-    `user_tracking_id` bigint(30) NOT NULL,
+    `user_tracking_id` varchar(255) NOT NULL,
     PRIMARY KEY (`id`),
     KEY                `FK9edsvtap9uhuikihdsv3c74rv` (`id`),
     CONSTRAINT `FK9edsvtap9uhuikihdsv3c74r5`
@@ -32,7 +32,7 @@ CREATE TABLE `subs`
 DROP TABLE IF EXISTS `locks`;
 CREATE TABLE `locks`
 (
-    `user_id` bigint(30) NOT NULL,
+    `user_id`     bigint(30) NOT NULL,
     `lock_status` enum ('LOCKED', 'UNLOCKED') not null,
     PRIMARY KEY (`user_id`),
     UNIQUE KEY `user_id` (`user_id`)
@@ -41,11 +41,12 @@ CREATE TABLE `locks`
 DROP TABLE IF EXISTS `entries`;
 CREATE TABLE `entries`
 (
-    `id`                bigint(11) NOT NULL AUTO_INCREMENT,
-    `user_id`           bigint(11) NOT NULL,
-    `guild_id`          bigint(30) NOT NULL,
-    `channel_id`        bigint(30) NOT NULL,
-    `join_time`  		TIMESTAMP NOT NULL,
+    `id`               bigint(11) NOT NULL AUTO_INCREMENT,
+    `user_id`          bigint(11) NOT NULL,
+    `guild_id`         bigint(30) NOT NULL,
+    `channel_id`       bigint(30) NOT NULL,
+    `users_in_channel` varchar(255),
+    `join_time`        TIMESTAMP NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

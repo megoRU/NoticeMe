@@ -117,10 +117,10 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository, lockRepository));
+            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository, lockRepository, entriesRepository));
             jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository, entriesRepository));
             jdaBuilder.addEventListeners(new BotJoinToGuild());
-            jdaBuilder.addEventListeners(new ButtonEvent(guildRepository));
+            jdaBuilder.addEventListeners(new ButtonEvent(guildRepository, noticeRepository));
 
             jda = jdaBuilder.build();
             jda.awaitReady();
@@ -131,7 +131,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -192,6 +192,10 @@ public class BotStartConfig {
                     .setGuildOnly(true)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера"));
+
+            commands.addCommands(Commands.slash("suggestion", "List of suggestions for tracking users")
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей"));
 
             commands.queue();
         } catch (Exception e) {

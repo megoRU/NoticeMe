@@ -13,5 +13,9 @@
   "delete_data": "Data deleted.",
   "warning_delete_data": "This will delete all the data in the database for your server.\nIt will be impossible to cancel this action.\nIf you really want to, click the button below.",
   "lock": "Now they won't be able to track you.\nAll subscriptions to you have been cancelled.",
-  "cannot_sub_to_this_user": "This user has forbidden tracking himself."
+  "cannot_sub_to_this_user": "This user has forbidden tracking himself.",
+  "no_suggestions": "There are no offers for you yet",
+  "user_saved": "Saved the user",
+  "you_already_tracked": "Are you already tracking this user",
+  "users_saved": "Сохранил всех пользователей"
 }
