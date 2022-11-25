@@ -20,9 +20,11 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -177,6 +179,7 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("lock")) {
+            BotStartConfig.mapLocks.put(user.getId(), Lock.Locked.LOCKED);
             String lockString = jsonParsers.getTranslation("lock", guildIdString);
             event.reply(lockString).setEphemeral(true).queue();
             NoticeRegistry.getInstance().removeUserFromAllGuild(user.getId());
@@ -186,6 +189,14 @@ public class SlashCommandEvent extends ListenerAdapter {
             lock.setUserId(user.getIdLong());
             lock.setLocked(Lock.Locked.LOCKED);
             lockRepository.save(lock);
+            return;
+        }
+
+        if (event.getName().equals("unlock")) {
+            BotStartConfig.mapLocks.remove(user.getId());
+            String unLockString = jsonParsers.getTranslation("unlock", guildIdString);
+            event.reply(unLockString).setEphemeral(true).queue();
+            lockRepository.deleteById(user.getIdLong());
             return;
         }
 
@@ -200,19 +211,23 @@ public class SlashCommandEvent extends ListenerAdapter {
                     .filter(a -> allSubs.stream()
                             .map(Subs::getUserTrackingId)
                             .noneMatch(s -> s.contains(a)))
+                    .filter(m -> !BotStartConfig.mapLocks.containsKey(m))
                     .collect(Collectors.joining(","));
 
-            if (!collect.isEmpty()) {
-                String[] split = collect.split(",");
+            List<String> stringList =
+                    Arrays.stream(collect.split(","))
+                            .filter(m -> !BotStartConfig.mapLocks.containsKey(m))
+                            .collect(Collectors.toList());
 
+            if (!collect.isEmpty() && !stringList.isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
                 List<Button> buttonsList = new ArrayList<>();
 
-                for (int i = 0; i < split.length; i++) {
+                for (int i = 0; i < stringList.size(); i++) {
                     if (stringBuilder.isEmpty()) {
-                        stringBuilder.append((i + 1)).append(". ").append("<@").append(split[i]).append(">");
+                        stringBuilder.append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
                     } else {
-                        stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(split[i]).append(">");
+                        stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
                     }
                     if (buttonsList.size() <= 24) {
                         buttonsList.add(Button.primary(ButtonEvent.BUTTON_ADD_USER + (i + 1), "Add User: " + (i + 1)));

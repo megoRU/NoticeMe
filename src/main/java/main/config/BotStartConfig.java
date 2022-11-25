@@ -131,7 +131,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -196,6 +196,14 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("suggestion", "List of suggestions for tracking users")
                     .setGuildOnly(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей"));
+
+            commands.addCommands(Commands.slash("lock", "Forbid tracking yourself on all servers")
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Запретить отслеживать себя на всех серверах"));
+
+            commands.addCommands(Commands.slash("unlock", "Allow tracking yourself on all servers")
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Разрешить отслеживать себя на всех серверах"));
 
             commands.queue();
         } catch (Exception e) {

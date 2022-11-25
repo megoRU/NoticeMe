@@ -1,20 +1,16 @@
 package main.event.buttons;
 
 import lombok.AllArgsConstructor;
+import main.config.BotStartConfig;
 import main.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
-import main.model.entity.Entries;
 import main.model.entity.Server;
 import main.model.entity.Subs;
 import main.model.repository.GuildRepository;
 import main.model.repository.NoticeRepository;
-import net.dv8tion.jda.api.entities.ISnowflake;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Mentions;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.apache.commons.collections4.Bag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -51,14 +47,20 @@ public class ButtonEvent extends ListenerAdapter {
 
         if (event.getButton().getId().contains(BUTTON_ADD_USER)) {
             event.editButton(event.getButton().asDisabled()).queue();
-
             List<User> members = event.getMessage().getMentions().getUsers();
+            int userNumber = Integer.parseInt(event.getButton().getId().replace("BUTTON_ADD_USER_", "")) - 1;
+            User userFromMSG = members.get(userNumber);
+
+            if (BotStartConfig.mapLocks.containsKey(userFromMSG.getId())) {
+                String cannotSubToThisUser = jsonParsers.getTranslation("cannot_sub_to_this_user", guildIdString);
+                event.getHook().sendMessage(cannotSubToThisUser).setEphemeral(true).queue();
+                return;
+            }
+
             Server serverId = guildRepository.getReferenceById(event.getGuild().getIdLong());
             Subs subs = new Subs();
             subs.setServer(serverId);
             subs.setUserId(event.getUser().getIdLong());
-            int userNumber = Integer.parseInt(event.getButton().getId().replace("BUTTON_ADD_USER_", "")) - 1;
-            User userFromMSG = members.get(userNumber);
             Subs isUserContains = noticeRepository.findAllByUserIdAndUserTrackingId(userFromMSG.getId(), event.getUser().getIdLong());
             if (isUserContains == null) {
                 subs.setUserTrackingId(user.getId());
@@ -81,10 +83,8 @@ public class ButtonEvent extends ListenerAdapter {
                     .filter(a -> allSubs.stream()
                             .map(Subs::getUserTrackingId)
                             .noneMatch(s -> s.contains(a.getId())))
+                    .filter(m -> !BotStartConfig.mapLocks.containsKey(m.getId()))
                     .collect(Collectors.toList());
-
-
-            System.out.println(collect.size());
 
             List<Subs> subsList = new ArrayList<>();
             Server serverId = guildRepository.getReferenceById(event.getGuild().getIdLong());
