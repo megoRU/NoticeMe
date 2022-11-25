@@ -193,51 +193,49 @@ public class SlashCommandEvent extends ListenerAdapter {
             List<Entries> allEntriesForSuggestion = entriesRepository.getAllEntriesForSuggestion(user.getIdLong(), guildId);
             List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
 
-            List<String> collect = allEntriesForSuggestion
+            String collect = allEntriesForSuggestion
                     .stream()
                     .map(Entries::getUsersInChannel)
                     .distinct()
                     .filter(a -> allSubs.stream()
                             .map(Subs::getUserTrackingId)
                             .noneMatch(s -> s.contains(a)))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.joining(","));
 
-            for (String s : collect) {
-                System.out.println(s);
-            }
+            if (!collect.isEmpty()) {
+                String[] split = collect.split(",");
 
-            StringBuilder stringBuilder = new StringBuilder();
-            List<Button> buttonsList = new ArrayList<>();
+                StringBuilder stringBuilder = new StringBuilder();
+                List<Button> buttonsList = new ArrayList<>();
 
-            for (int i = 0; i < collect.size(); i++) {
-                if (stringBuilder.isEmpty()) {
-                    stringBuilder.append((i + 1)).append(". ").append("<@").append(collect.get(i)).append(">");
-                } else {
-                    stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(collect.get(i)).append(">");
+                for (int i = 0; i < split.length; i++) {
+                    if (stringBuilder.isEmpty()) {
+                        stringBuilder.append((i + 1)).append(". ").append("<@").append(split[i]).append(">");
+                    } else {
+                        stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(split[i]).append(">");
+                    }
+                    if (buttonsList.size() <= 24) {
+                        buttonsList.add(Button.primary(ButtonEvent.BUTTON_ADD_USER + (i + 1), "Add User: " + (i + 1)));
+                    }
                 }
-                if (buttonsList.size() <= 24) {
-                    buttonsList.add(Button.primary(ButtonEvent.BUTTON_ADD_USER + (i + 1), "Add User: " + (i + 1)));
-                }
-            }
-            buttonsList.add(Button.success(ButtonEvent.BUTTON_ALL_USERS, "Add all this USERS!"));
+                buttonsList.add(Button.success(ButtonEvent.BUTTON_ALL_USERS, "Add all this USERS!"));
 
-            if (buttonsList.size() == 1) {
+                ReplyCallbackAction replyCallbackAction = event.reply(stringBuilder.toString()).setEphemeral(true);
+
+                int second = Math.min(buttonsList.size(), 4);
+                int first = 0;
+                int ceil = (int) Math.ceil(buttonsList.size() / 5.0);
+                for (int i = 0; i < ceil; i++) {
+                    replyCallbackAction.addActionRow(buttonsList.subList(first, second));
+                    first = second;
+                    second += 4;
+                }
+                replyCallbackAction.queue();
+            } else {
                 String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
                 event.reply(noSuggestions).setEphemeral(true).queue();
-                return;
             }
-
-            ReplyCallbackAction replyCallbackAction = event.reply(stringBuilder.toString()).setEphemeral(true);
-
-            int second = Math.min(buttonsList.size(), 4);
-            int first = 0;
-            int ceil = (int) Math.ceil(buttonsList.size() / 5.0);
-            for (int i = 0; i < ceil; i++) {
-                replyCallbackAction.addActionRow(buttonsList.subList(first, second));
-                first = second;
-                second += 4;
-            }
-            replyCallbackAction.queue();
+            return;
         }
 
     }
