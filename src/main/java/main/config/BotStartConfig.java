@@ -131,7 +131,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("17:25");
     }
 
