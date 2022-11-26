@@ -101,8 +101,8 @@ public class ButtonEvent extends ListenerAdapter {
             for (User value : collect) {
                 Subs subs = new Subs();
                 subs.setServer(serverId);
-                subs.setUserTrackingId(value.getId());
                 subs.setUserId(user.getIdLong());
+                subs.setUserTrackingId(value.getId());
 
                 subsList.add(subs);
 

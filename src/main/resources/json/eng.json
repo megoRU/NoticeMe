@@ -18,5 +18,8 @@
   "user_saved": "Saved the user",
   "you_already_tracked": "Are you already tracking this user",
   "users_saved": "Saved all users",
-  "unlock": "Now you can be tracked."
+  "unlock": "Now you can be tracked.",
+  "suggestion_text": "This is a list of users you can subscribe to,\nto track when they enter voice channels.\n\n%s",
+  "add_all": "Add all!",
+  "add_user": "Add User: %s"
 }

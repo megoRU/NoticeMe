@@ -238,13 +238,19 @@ public class SlashCommandEvent extends ListenerAdapter {
                     } else {
                         stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
                     }
-                    if (buttonsList.size() <= 24) {
-                        buttonsList.add(Button.primary(ButtonEvent.BUTTON_ADD_USER + (i + 1), "Add User: " + (i + 1)));
+                    if (buttonsList.size() <= 23) {
+                        String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), (i + 1));
+                        buttonsList.add(Button.primary(ButtonEvent.BUTTON_ADD_USER + (i + 1), addUser));
                     }
                 }
-                buttonsList.add(Button.success(ButtonEvent.BUTTON_ALL_USERS, "Add all this USERS!"));
 
-                ReplyCallbackAction replyCallbackAction = event.reply(stringBuilder.toString()).setEphemeral(true);
+                if (buttonsList.size() > 1) {
+                    String addAll = jsonParsers.getTranslation("add_all", guildIdString);
+                    buttonsList.add(Button.success(ButtonEvent.BUTTON_ALL_USERS, addAll));
+                }
+
+                String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
+                ReplyCallbackAction replyCallbackAction = event.reply(suggestionText).setEphemeral(true);
 
                 int second = Math.min(buttonsList.size(), 4);
                 int first = 0;
