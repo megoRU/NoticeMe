@@ -131,7 +131,7 @@ public class BotStartConfig {
         System.out.println(jda.retrieveCommands().complete());
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("17:25");
     }
 
@@ -297,24 +297,9 @@ public class BotStartConfig {
 
         for (Subs notice : noticeList) {
             String guildId = notice.getServer().getGuildIdLong().toString();
-            String userIdTracker = notice.getUserTrackingId().toString();
+            String userIdTracker = notice.getUserTrackingId();
             String userId = notice.getUserId().toString();
-            if (!instance.hasGuild(guildId)) {
-                TrackingUser trackingUser = new TrackingUser();
-                trackingUser.putUser(notice.getUserId().toString());
-                ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = new ConcurrentHashMap<>();
-                trackingUserConcurrentMap.put(userIdTracker, trackingUser);
-                instance.save(guildId, trackingUserConcurrentMap);
-            } else {
-                TrackingUser trackingUserFromMap = instance.getUser(guildId, userIdTracker);
-                if (trackingUserFromMap == null) {
-                    TrackingUser trackingUser = new TrackingUser();
-                    trackingUser.putUser(notice.getUserId().toString());
-                    instance.saveTrackingUser(guildId, userIdTracker, trackingUser);
-                } else {
-                    instance.get(guildId).get(userIdTracker).putUser(userId);
-                }
-            }
+            instance.save(guildId, userId, userIdTracker);
         }
 
     }

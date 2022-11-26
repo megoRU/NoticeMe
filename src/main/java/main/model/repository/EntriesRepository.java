@@ -15,7 +15,6 @@ public interface EntriesRepository extends JpaRepository<Entries, Long> {
             "LEFT JOIN Subs s ON s.userId = e.userId " +
             "WHERE e.guildId = :guildId " +
             "AND e.userId = :userId " +
-            "AND e.usersInChannel IS NOT NULL " +
-            "")
+            "AND e.usersInChannel IS NOT NULL")
     List<Entries> getAllEntriesForSuggestion(@Param("userId") Long userId, @Param("guildId") Long guildId);
 }

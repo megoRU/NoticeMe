@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -105,6 +104,9 @@ public class SlashCommandEvent extends ListenerAdapter {
                 notice.setUserTrackingId(userDest.getId());
                 noticeRepository.save(notice);
 
+                NoticeRegistry instance = NoticeRegistry.getInstance();
+                instance.save(guildIdString, user.getId(), userDest.getId());
+
                 String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
                 event.reply(nowYouWillReceive).setEphemeral(true).queue();
             } else {
@@ -132,6 +134,7 @@ public class SlashCommandEvent extends ListenerAdapter {
             return;
         }
 
+        //TODO: Возможно лучше искать локально в коллекциях
         if (event.getName().equals("list")) {
             List<Subs> noticeList = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
             if (!noticeList.isEmpty()) {
@@ -163,6 +166,10 @@ public class SlashCommandEvent extends ListenerAdapter {
                 event.reply(dontFindUser).queue();
             } else {
                 noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId(), user.getIdLong());
+
+                NoticeRegistry instance = NoticeRegistry.getInstance();
+                instance.unsub(guildIdString, userFromOptions.getId(), user.getId());
+
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
                 event.reply(successfullyDeleted).setEphemeral(true).queue();
             }
@@ -182,7 +189,10 @@ public class SlashCommandEvent extends ListenerAdapter {
             BotStartConfig.mapLocks.put(user.getId(), Lock.Locked.LOCKED);
             String lockString = jsonParsers.getTranslation("lock", guildIdString);
             event.reply(lockString).setEphemeral(true).queue();
-            NoticeRegistry.getInstance().removeUserFromAllGuild(user.getId());
+
+            NoticeRegistry instance = NoticeRegistry.getInstance();
+            instance.removeUserFromAllGuild(user.getId());
+
             noticeRepository.deleteAllByUserTrackingId(user.getId());
 
             Lock lock = new Lock();
@@ -211,7 +221,6 @@ public class SlashCommandEvent extends ListenerAdapter {
                     .filter(a -> allSubs.stream()
                             .map(Subs::getUserTrackingId)
                             .noneMatch(s -> s.contains(a)))
-                    .filter(m -> !BotStartConfig.mapLocks.containsKey(m))
                     .collect(Collectors.joining(","));
 
             List<String> stringList =

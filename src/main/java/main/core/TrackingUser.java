@@ -28,4 +28,7 @@ public class TrackingUser {
         return stringBuilder.toString();
     }
 
+    public void removeUserFromList(String userId) {
+        userList.remove(userId);
+    }
 }

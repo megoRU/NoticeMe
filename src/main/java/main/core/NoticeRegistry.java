@@ -24,22 +24,40 @@ public class NoticeRegistry {
         return noticeRegistry;
     }
 
-    public void save(String guildId, ConcurrentMap<String, TrackingUser> concurrentMap) {
+    private void save(String guildId, ConcurrentMap<String, TrackingUser> concurrentMap) {
         trackingUserConcurrentMap.put(guildId, concurrentMap);
     }
 
+    public void save(String guildId, String userId, String userIdTracker) {
+        if (!hasGuild(guildId)) {
+            TrackingUser trackingUser = new TrackingUser();
+            trackingUser.putUser(userId);
+            ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = new ConcurrentHashMap<>();
+            trackingUserConcurrentMap.put(userIdTracker, trackingUser);
+            save(guildId, trackingUserConcurrentMap);
+        } else {
+            TrackingUser trackingUserFromMap = getUser(guildId, userIdTracker);
+            if (trackingUserFromMap == null) {
+                TrackingUser trackingUser = new TrackingUser();
+                trackingUser.putUser(userId);
+                saveTrackingUser(guildId, userIdTracker, trackingUser);
+            } else {
+                get(guildId).get(userIdTracker).putUser(userId);
+            }
+        }
+    }
+
     //                                                        TrackingUser | Data
-    public void saveTrackingUser(String guildId, String user, TrackingUser trackingUser) {
+    private void saveTrackingUser(String guildId, String user, TrackingUser trackingUser) {
         ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
         if (stringTrackingUserConcurrentMap == null) throw new IllegalArgumentException("In this collection does not exist Guild: saveTrackingUser()");
         stringTrackingUserConcurrentMap.put(user, trackingUser);
     }
 
     //TrackingUser | Data
-    public ConcurrentMap<String, TrackingUser> get(String guildId) {
+    private ConcurrentMap<String, TrackingUser> get(String guildId) {
         return trackingUserConcurrentMap.get(guildId);
     }
-
 
     @Nullable
     public TrackingUser getUser(String guildId, String user) {
@@ -58,6 +76,13 @@ public class NoticeRegistry {
 
     public void removeUserFromGuild(String guildId, String user) {
         trackingUserConcurrentMap.get(guildId).remove(user);
+    }
+
+    public void unsub(String guildId, String trackingUserId, String userId) {
+        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+        if (stringTrackingUserConcurrentMap != null) {
+            stringTrackingUserConcurrentMap.get(trackingUserId).removeUserFromList(userId);
+        }
     }
 
     public void removeUserFromAllGuild(String user) {

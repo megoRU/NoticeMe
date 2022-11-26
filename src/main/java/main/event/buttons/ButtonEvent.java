@@ -32,6 +32,7 @@ public class ButtonEvent extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (event.getUser().isBot()) return;
         if (event.getGuild() == null) return;
+
         long guildIdLong = event.getGuild().getIdLong();
         String guildIdString = event.getGuild().getId();
         User user = event.getUser();
@@ -39,7 +40,10 @@ public class ButtonEvent extends ListenerAdapter {
         if (Objects.equals(event.getButton().getId(), BUTTON_DELETE)) {
             event.editButton(event.getButton().asDisabled()).queue();
             guildRepository.deleteById(guildIdLong);
-            NoticeRegistry.getInstance().removeGuild(guildIdString);
+
+            NoticeRegistry instance = NoticeRegistry.getInstance();
+            instance.removeGuild(guildIdString);
+
             String deleteData = String.format(jsonParsers.getTranslation("delete_data", guildIdString));
             event.getHook().sendMessage(deleteData).setEphemeral(true).queue();
             return;
@@ -57,16 +61,21 @@ public class ButtonEvent extends ListenerAdapter {
                 return;
             }
 
-            Server serverId = guildRepository.getReferenceById(event.getGuild().getIdLong());
-            Subs subs = new Subs();
-            subs.setServer(serverId);
-            subs.setUserId(event.getUser().getIdLong());
-            Subs isUserContains = noticeRepository.findAllByUserIdAndUserTrackingId(userFromMSG.getId(), event.getUser().getIdLong());
+            //TODO: Возможно быстрее проверять локально
+            Subs isUserContains = noticeRepository.findAllByUserIdAndUserTrackingId(guildIdLong, userFromMSG.getId(), event.getUser().getIdLong());
+
             if (isUserContains == null) {
-                subs.setUserTrackingId(user.getId());
+                Server serverId = guildRepository.getReferenceById(event.getGuild().getIdLong());
+                Subs subs = new Subs();
+                subs.setServer(serverId);
+                subs.setUserId(event.getUser().getIdLong());
+                subs.setUserTrackingId(userFromMSG.getId());
                 noticeRepository.save(subs);
                 String userSaved = jsonParsers.getTranslation("user_saved", guildIdString);
                 event.getHook().sendMessage(userSaved).setEphemeral(true).queue();
+
+                NoticeRegistry instance = NoticeRegistry.getInstance();
+                instance.save(guildIdString, user.getId(), userFromMSG.getId());
             } else {
                 String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
                 event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
@@ -96,6 +105,9 @@ public class ButtonEvent extends ListenerAdapter {
                 subs.setUserId(user.getIdLong());
 
                 subsList.add(subs);
+
+                NoticeRegistry instance = NoticeRegistry.getInstance();
+                instance.save(guildIdString, user.getId(), value.getId());
             }
             noticeRepository.saveAll(subsList);
             String usersSaved = jsonParsers.getTranslation("users_saved", guildIdString);
