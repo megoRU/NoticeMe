@@ -7,10 +7,12 @@ import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.*;
 import main.model.repository.*;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -19,6 +21,7 @@ import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -156,6 +159,35 @@ public class SlashCommandEvent extends ListenerAdapter {
             return;
         }
 
+        if (event.getName().equals("help")) {
+
+            EmbedBuilder info = new EmbedBuilder();
+            info.setColor(Color.GREEN);
+            info.setTitle("NoticeMe");
+
+            info.addField("Slash Commands",
+                    """
+                            </help:1039918668135534624> - All available commands and extended description
+                            </language:1039918668135534623> - Changing the language
+                            </setup:1039918668135534625> - Setting up a channel for notifications
+                            </list:1040218561261613157> - The list of users you are subscribed
+                            </unsub:1040218561261613158> - Unsubscribe from the user
+                            </sub:1040935591887519755> - Subscribe to a user
+                            </delete:1041093816620429385> - Delete all data from the database for your Guild
+                            </suggestion:1045316663718969357> - The bot will suggest whom to subscribe
+                            </lock:1045675151473254470> - Prohibit tracking yourself
+                            </unlock:1045675151473254471> - Allow yourself to be tracked
+                             """, false);
+            String messagesEventsLinks = jsonParsers.getTranslation("messages_events_links", guildIdString);
+            String messagesEventsSite = jsonParsers.getTranslation("messages_events_site", guildIdString);
+            String messagesEventsAddMeToOtherGuilds = jsonParsers.getTranslation("messages_events_add_me_to_other_guilds", guildIdString);
+            info.addField(messagesEventsLinks, messagesEventsSite + messagesEventsAddMeToOtherGuilds, false);
+            List<Button> buttons = new ArrayList<>();
+            buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
+            event.replyEmbeds(info.build()).setEphemeral(true).addActionRow(buttons).queue();
+            return;
+        }
+
         if (event.getName().equals("unsub")) {
             User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
             if (userFromOptions == null) return;
@@ -226,7 +258,7 @@ public class SlashCommandEvent extends ListenerAdapter {
             List<String> stringList =
                     Arrays.stream(collect.split(","))
                             .filter(m -> !BotStartConfig.mapLocks.containsKey(m))
-                            .collect(Collectors.toList());
+                            .toList();
 
             if (!collect.isEmpty() && !stringList.isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -265,7 +297,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
                 event.reply(noSuggestions).setEphemeral(true).queue();
             }
-            return;
+
         }
 
     }

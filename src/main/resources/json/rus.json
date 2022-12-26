@@ -11,7 +11,7 @@
   "dont_find_user": "Не смог найти этого пользователя в ваших подписках!",
   "successfully_deleted": "Успешно удалил этого пользователя: <@%s>\nв ваших подписках",
   "delete_data": "Данные удалены.",
-  "warning_delete_data": "This will delete all the data in the database for your server.\nIt will be impossible to cancel this action.\nIf you really want to, click the button below.",
+  "warning_delete_data": "Это приведет к удалению всех данных в базе данных вашего сервера.\nОтменить это действие будет невозможно.\nЕсли вы действительно этого хотите, нажмите на кнопку ниже.",
   "lock": "Теперь вас не смогут отслеживать.\nВсе подписки на вас были отменены.",
   "cannot_sub_to_this_user": "Этот пользователь запретил отслеживать себя.",
   "no_suggestions": "Для вас пока нет предложений",
@@ -21,5 +21,8 @@
   "unlock": "Теперь вас смогут отслеживать.",
   "suggestion_text": "Это список пользователей на которых вы можете подписаться,\nчтобы отслеживать когда они заходят в голосовые каналы.\n\n%s",
   "add_all": "Добавить всех!",
-  "add_user": "Добавить Пользователя: %s"
+  "add_user": "Добавить Пользователя: %s",
+  "messages_events_links": "Ссылки:",
+  "messages_events_site": ":zap: [megoru.ru](https://megoru.ru)\n",
+  "messages_events_add_me_to_other_guilds": ":robot: [Добавь меня в другие гильдии](https://discord.com/oauth2/authorize?client_id=1039911109911658557&scope=bot&permissions=2147706880)\n"
 }

@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class ButtonEvent extends ListenerAdapter {
@@ -49,7 +48,7 @@ public class ButtonEvent extends ListenerAdapter {
             return;
         }
 
-        if (event.getButton().getId().contains(BUTTON_ADD_USER)) {
+        if (event.getButton().getId() != null && event.getButton().getId().contains(BUTTON_ADD_USER)) {
             event.editButton(event.getButton().asDisabled()).queue();
             List<User> members = event.getMessage().getMentions().getUsers();
             int userNumber = Integer.parseInt(event.getButton().getId().replace("BUTTON_ADD_USER_", "")) - 1;
@@ -87,13 +86,15 @@ public class ButtonEvent extends ListenerAdapter {
             event.editButton(event.getButton().asDisabled()).queue();
             List<User> members = event.getMessage().getMentions().getUsers();
             List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildIdLong);
+
+            //TODO: Сделать однин filter
             List<User> collect = members
                     .stream()
                     .filter(a -> allSubs.stream()
                             .map(Subs::getUserTrackingId)
                             .noneMatch(s -> s.contains(a.getId())))
                     .filter(m -> !BotStartConfig.mapLocks.containsKey(m.getId()))
-                    .collect(Collectors.toList());
+                    .toList();
 
             List<Subs> subsList = new ArrayList<>();
             Server serverId = guildRepository.getReferenceById(event.getGuild().getIdLong());
@@ -112,7 +113,6 @@ public class ButtonEvent extends ListenerAdapter {
             noticeRepository.saveAll(subsList);
             String usersSaved = jsonParsers.getTranslation("users_saved", guildIdString);
             event.getHook().sendMessage(usersSaved).setEphemeral(true).queue();
-            return;
         }
 
     }

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -38,6 +39,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -128,7 +130,8 @@ public class BotStartConfig {
             e.printStackTrace();
         }
 
-        System.out.println(jda.retrieveCommands().complete());
+        List<Command> complete = jda.retrieveCommands().complete();
+        complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
 //        updateSlashCommands();
@@ -303,4 +306,9 @@ public class BotStartConfig {
         }
 
     }
+
+    public static Map<String, Language.LanguageEnum> getMapLanguages() {
+        return mapLanguages;
+    }
+
 }

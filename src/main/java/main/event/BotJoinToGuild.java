@@ -1,6 +1,8 @@
 package main.event;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -22,8 +24,15 @@ public class BotJoinToGuild extends ListenerAdapter {
 
             DefaultGuildChannelUnion defaultChannel = event.getGuild().getDefaultChannel();
             if (defaultChannel != null) {
-                TextChannel textChannel = defaultChannel.asTextChannel();
-                textChannel.sendMessageEmbeds(embedBuilder.build()).queue();
+                if (defaultChannel.getType() == ChannelType.TEXT) {
+                    TextChannel textChannel = defaultChannel.asTextChannel();
+                    if (event.getGuild().getSelfMember().hasPermission(textChannel,
+                            Permission.MESSAGE_SEND,
+                            Permission.VIEW_CHANNEL,
+                            Permission.MESSAGE_EMBED_LINKS)) {
+                        textChannel.sendMessageEmbeds(embedBuilder.build()).queue();
+                    }
+                }
             }
         } catch (Exception ignored) {
         }
