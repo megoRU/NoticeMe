@@ -15,7 +15,7 @@ public class ParserClass {
 
     public String getTranslation(String key, String guildId) {
         try {
-            Language.LanguageEnum languageEnum = BotStartConfig.mapLanguages.get(guildId);
+            Language.LanguageEnum languageEnum = BotStartConfig.getMapLanguages().get(guildId);
             if (languageEnum == null) languageEnum = Language.LanguageEnum.EN;
             if (languageEnum.equals(Language.LanguageEnum.EN)) {
                 return english.get(key);
