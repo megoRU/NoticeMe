@@ -9,10 +9,8 @@ import main.model.entity.*;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.NewsChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -59,7 +57,12 @@ public class SlashCommandEvent extends ListenerAdapter {
 
         if (event.getName().equals("setup")) {
             GuildChannelUnion guildChannelUnion = event.getOption("text-channel", OptionMapping::getAsChannel);
-            if (guildChannelUnion instanceof TextChannel) {
+            if (guildChannelUnion == null) {
+                event.reply("text-channel is NULL").queue();
+                return;
+            }
+
+            if (guildChannelUnion.getType() == ChannelType.TEXT) {
                 Server guild = new Server();
                 guild.setGuildIdLong(guildId);
                 guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong()); //NPE
@@ -71,7 +74,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                         jsonParsers.getTranslation("now_bot_will_receive", guildIdString),
                         guildChannelUnion.asTextChannel().getIdLong());
                 event.reply(nowBotWillReceive).queue();
-            } else if (guildChannelUnion instanceof NewsChannel) {
+            } else if (guildChannelUnion.getType() == ChannelType.NEWS) {
                 event.reply("It can't be a channel NewsChannel").queue();
                 return;
             }
@@ -93,7 +96,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 return;
             }
 
-            if (BotStartConfig.mapLocks.containsKey(userDest.getId())) {
+            if (BotStartConfig.getMapLanguages().containsKey(userDest.getId())) {
                 String cannotSubToThisUser = jsonParsers.getTranslation("cannot_sub_to_this_user", guildIdString);
                 event.reply(cannotSubToThisUser).setEphemeral(true).queue();
                 return;
@@ -131,7 +134,7 @@ public class SlashCommandEvent extends ListenerAdapter {
 
             languageRepository.save(language);
 
-            BotStartConfig.mapLanguages.put(guildIdString, languageEnum);
+            BotStartConfig.getMapLanguages().put(guildIdString, languageEnum);
             String languageSet = jsonParsers.getTranslation("language_set", guildIdString);
             event.reply(languageSet).queue();
             return;
@@ -231,14 +234,16 @@ public class SlashCommandEvent extends ListenerAdapter {
             lock.setUserId(user.getIdLong());
             lock.setLocked(Lock.Locked.LOCKED);
             lockRepository.save(lock);
+
+            event.reply(lockString).setEphemeral(true).queue();
             return;
         }
 
         if (event.getName().equals("unlock")) {
             BotStartConfig.mapLocks.remove(user.getId());
             String unLockString = jsonParsers.getTranslation("unlock", guildIdString);
-            event.reply(unLockString).setEphemeral(true).queue();
             lockRepository.deleteById(user.getIdLong());
+            event.reply(unLockString).setEphemeral(true).queue();
             return;
         }
 

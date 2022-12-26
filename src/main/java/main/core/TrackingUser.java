@@ -1,14 +1,12 @@
 package main.core;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TrackingUser {
 
-    private final Set<String> userList = new HashSet<>();
+    private final Set<String> userList = new ConcurrentSkipListSet<>();
 
     public void putUser(String userId) {
         userList.add(userId);
@@ -16,15 +14,13 @@ public class TrackingUser {
 
     public String getUserList() {
         StringBuilder stringBuilder = new StringBuilder();
-        List<String> localList = new ArrayList<>(userList);
-
-        for (String s : localList) {
+        userList.forEach(u -> {
             if (stringBuilder.isEmpty()) {
-                stringBuilder.append("<@").append(s).append(">");
+                stringBuilder.append("<@").append(u).append(">");
             } else {
-                stringBuilder.append(", <@").append(s).append(">");
+                stringBuilder.append(", <@").append(u).append(">");
             }
-        }
+        });
         return stringBuilder.toString();
     }
 
