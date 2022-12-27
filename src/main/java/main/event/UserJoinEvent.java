@@ -8,6 +8,7 @@ import main.model.entity.Entries;
 import main.model.entity.Server;
 import main.model.repository.EntriesRepository;
 import main.model.repository.GuildRepository;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -26,10 +27,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserJoinEvent extends ListenerAdapter {
 
-    private final GuildRepository guildRepository;
     private static final ParserClass jsonParsers = new ParserClass();
-    private final EntriesRepository entriesRepository;
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final GuildRepository guildRepository;
+    private final EntriesRepository entriesRepository;
 
     @Override
     public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
@@ -42,17 +43,15 @@ public class UserJoinEvent extends ListenerAdapter {
         try {
             VoiceChannel voiceChannel = getAsChannel(event.getChannelJoined());
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            List<Member> members = voiceChannel.getMembers();
+            List<Member> members = voiceChannel.getMembers(); //Always 1+ users
 
-            if (!members.isEmpty()) {
-                Entries entries = new Entries();
-                entries.setGuildId(guild.getIdLong());
-                entries.setChannelId(voiceChannel.getIdLong());
-                entries.setUserId(user.getIdLong());
-                entries.setUsersInChannel(members);
-                entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
-                entriesRepository.save(entries);
-            }
+            Entries entries = new Entries();
+            entries.setGuildId(guild.getIdLong());
+            entries.setChannelId(voiceChannel.getIdLong());
+            entries.setUserId(user.getIdLong());
+            entries.setUsersInChannel(members);
+            entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
+            entriesRepository.save(entries);
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
             TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
@@ -62,15 +61,18 @@ public class UserJoinEvent extends ListenerAdapter {
             Optional<Server> guildOptional = guildRepository.findById(guild.getIdLong());
 
             if (guildOptional.isPresent()) {
-                Server guildDB = guildOptional.get();
-                TextChannel textChannel = event.getGuild().getTextChannelById(guildDB.getTextChannelId());
-                if (textChannel != null) {
-                    String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
-                            user.getId(),
-                            voiceChannel.getId(),
-                            userList);
-
-                    textChannel.sendMessage(text).queue();
+                if (!instanceUser.hasUserJoin()) {
+                    Server guildDB = guildOptional.get();
+                    TextChannel textChannel = event.getGuild().getTextChannelById(guildDB.getTextChannelId());
+                    if (textChannel != null) {
+                        if (event.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
+                            String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
+                                    user.getId(),
+                                    voiceChannel.getId(),
+                                    userList);
+                            textChannel.sendMessage(text).queue();
+                        }
+                    }
                 }
             }
         } catch (Exception e) {

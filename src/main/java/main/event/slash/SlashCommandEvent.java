@@ -68,8 +68,6 @@ public class SlashCommandEvent extends ListenerAdapter {
                 guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong()); //NPE
                 guildRepository.save(guild);
 
-                System.out.println(jsonParsers.getTranslation("now_bot_will_receive", guildIdString));
-
                 String nowBotWillReceive = String.format(
                         jsonParsers.getTranslation("now_bot_will_receive", guildIdString),
                         guildChannelUnion.asTextChannel().getIdLong());
