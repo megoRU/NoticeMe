@@ -67,7 +67,7 @@ public class UserJoinEvent extends ListenerAdapter {
                     if (textChannel != null) {
                         if (event.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
                             String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
-                                    user.getId(),
+                                    user.getName(),
                                     voiceChannel.getId(),
                                     userList);
                             textChannel.sendMessage(text).queue();
