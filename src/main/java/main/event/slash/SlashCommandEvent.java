@@ -8,6 +8,7 @@ import main.jsonparser.ParserClass;
 import main.model.entity.*;
 import main.model.repository.*;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -80,17 +82,19 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("sub")) {
+            event.deferReply().setEphemeral(true).queue();
+
             User userDest = event.getOption("user", OptionMapping::getAsUser);
             if (userDest == null) {
-                event.reply("user is null").queue();
+                event.getHook().sendMessage("user is null").setEphemeral(true).queue();
                 return;
             } else if (userDest.getIdLong() == user.getIdLong()) {
                 String yourself = jsonParsers.getTranslation("yourself", guildIdString);
-                event.reply(yourself).queue();
+                event.getHook().sendMessage(yourself).setEphemeral(true).queue();
                 return;
             } else if (user.isBot()) {
                 String bot = jsonParsers.getTranslation("bot", guildIdString);
-                event.reply(bot).queue();
+                event.getHook().sendMessage(bot).setEphemeral(true).queue();
                 return;
             }
 
@@ -112,10 +116,10 @@ public class SlashCommandEvent extends ListenerAdapter {
                 instance.save(guildIdString, user.getId(), userDest.getId());
 
                 String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
-                event.reply(nowYouWillReceive).setEphemeral(true).queue();
+                event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();
             } else {
                 String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
-                event.reply(youCannotSetChannel).setEphemeral(true).queue();
+                event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
             }
             return;
         }
@@ -140,6 +144,8 @@ public class SlashCommandEvent extends ListenerAdapter {
 
         //TODO: Возможно лучше искать локально в коллекциях
         if (event.getName().equals("list")) {
+            event.deferReply().setEphemeral(true).queue();
+
             List<Subs> noticeList = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
             if (!noticeList.isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -152,10 +158,10 @@ public class SlashCommandEvent extends ListenerAdapter {
                     }
                 }
                 String subscription = String.format(jsonParsers.getTranslation("subscription", guildIdString), stringBuilder);
-                event.reply(subscription).setEphemeral(true).queue();
+                event.getHook().sendMessage(subscription).setEphemeral(true).queue();
             } else {
                 String emptyList = jsonParsers.getTranslation("empty_list", guildIdString);
-                event.reply(emptyList).setEphemeral(true).queue();
+                event.getHook().sendMessage(emptyList).setEphemeral(true).queue();
             }
             return;
         }
@@ -166,22 +172,37 @@ public class SlashCommandEvent extends ListenerAdapter {
             info.setColor(Color.GREEN);
             info.setTitle("NoticeMe");
 
-            info.addField("Slash Commands",
+            String help = jsonParsers.getTranslation("help", guildIdString);
+            String language = jsonParsers.getTranslation("language", guildIdString);
+            String setup = jsonParsers.getTranslation("setup", guildIdString);
+            String list = jsonParsers.getTranslation("list", guildIdString);
+            String unsub = jsonParsers.getTranslation("unsub", guildIdString);
+            String sub = jsonParsers.getTranslation("sub", guildIdString);
+            String delete = jsonParsers.getTranslation("delete", guildIdString);
+            String suggestion = jsonParsers.getTranslation("suggestion", guildIdString);
+            String helpLock = jsonParsers.getTranslation("help_lock", guildIdString);
+            String helpUnlock = jsonParsers.getTranslation("help_unlock", guildIdString);
+
+            String text = String.format(
                     """
-                            </help:1039918668135534624> - All available commands and extended description
-                            </language:1039918668135534623> - Changing the language
-                            </setup:1039918668135534625> - Setting up a channel for notifications
-                            </list:1040218561261613157> - The list of users you are subscribed
-                            </unsub:1040218561261613158> - Unsubscribe from the user
-                            </sub:1040935591887519755> - Subscribe to a user
-                            </delete:1041093816620429385> - Delete all data from the database for your Guild
-                            </suggestion:1045316663718969357> - The bot will suggest whom to subscribe
-                            </lock:1045675151473254470> - Prohibit tracking yourself
-                            </unlock:1045675151473254471> - Allow yourself to be tracked
-                             """, false);
+                            </help:1039918668135534624> - %s
+                            </language:1039918668135534623> - %s
+                            </setup:1039918668135534625> - %s
+                            </list:1040218561261613157> - %s
+                            </unsub:1040218561261613158> - %s
+                            </sub:1040935591887519755> - %s
+                            </delete:1041093816620429385> - %s
+                            </suggestion:1045316663718969357> - %s
+                            </lock:1045675151473254470> - %s
+                            </unlock:1045675151473254471> - %s
+                            """, help, language, setup, list, unsub, sub, delete, suggestion, helpLock, helpUnlock);
+
+            String slashCommands = jsonParsers.getTranslation("slash_commands", guildIdString);
             String messagesEventsLinks = jsonParsers.getTranslation("messages_events_links", guildIdString);
             String messagesEventsSite = jsonParsers.getTranslation("messages_events_site", guildIdString);
             String messagesEventsAddMeToOtherGuilds = jsonParsers.getTranslation("messages_events_add_me_to_other_guilds", guildIdString);
+
+            info.addField(slashCommands, text, false);
             info.addField(messagesEventsLinks, messagesEventsSite + messagesEventsAddMeToOtherGuilds, false);
             List<Button> buttons = new ArrayList<>();
             buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
@@ -246,6 +267,8 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("suggestion")) {
+            event.deferReply().setEphemeral(true).queue();
+
             List<Entries> allEntriesForSuggestion = entriesRepository.getAllEntriesForSuggestion(user.getIdLong(), guildId);
             List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
 
@@ -285,20 +308,20 @@ public class SlashCommandEvent extends ListenerAdapter {
                 }
 
                 String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
-                ReplyCallbackAction replyCallbackAction = event.reply(suggestionText).setEphemeral(true);
+                WebhookMessageCreateAction<Message> messageWebhookMessageCreateAction = event.getHook().sendMessage(suggestionText).setEphemeral(true);
 
                 int second = Math.min(buttonsList.size(), 4);
                 int first = 0;
                 int ceil = (int) Math.ceil(buttonsList.size() / 5.0);
                 for (int i = 0; i < ceil; i++) {
-                    replyCallbackAction.addActionRow(buttonsList.subList(first, second));
+                    messageWebhookMessageCreateAction.addActionRow(buttonsList.subList(first, second));
                     first = second;
                     second += 4;
                 }
-                replyCallbackAction.queue();
+                messageWebhookMessageCreateAction.queue();
             } else {
                 String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
-                event.reply(noSuggestions).setEphemeral(true).queue();
+                event.getHook().sendMessage(noSuggestions).setEphemeral(true).queue();
             }
 
         }

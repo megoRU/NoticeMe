@@ -24,5 +24,17 @@
   "add_user": "Добавить Пользователя: %s",
   "messages_events_links": "Ссылки:",
   "messages_events_site": ":zap: [megoru.ru](https://megoru.ru)\n",
-  "messages_events_add_me_to_other_guilds": ":robot: [Добавь меня в другие гильдии](https://discord.com/oauth2/authorize?client_id=1039911109911658557&scope=bot&permissions=2147706880)\n"
+  "messages_events_add_me_to_other_guilds": ":robot: [Добавь меня в другие гильдии](https://discord.com/oauth2/authorize?client_id=1039911109911658557&scope=bot&permissions=2147706880)\n",
+  "help": "Все доступные команды и расширенное описание",
+  "language": "Изменение языка Бота",
+  "setup": "Настройка канала для уведомлений",
+  "list": "Список пользователей, на которых вы подписаны",
+  "unsub": "Отписаться от пользователя",
+  "sub": "Подписаться на пользователя",
+  "delete": "Удаление всех данных из базы данных вашей гильдии",
+  "suggestion": "Бот предложит, на кого подписаться",
+  "help_lock": "Запретить отслеживать себя",
+  "help_unlock": "Разрешить себя отслеживать",
+  "slash_commands": "Слэш Команды"
+
 }
