@@ -3,6 +3,7 @@ package main.event.slash;
 import lombok.RequiredArgsConstructor;
 import main.config.BotStartConfig;
 import main.core.NoticeRegistry;
+import main.event.ChecksClass;
 import main.event.buttons.ButtonEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.*;
@@ -17,7 +18,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -58,26 +58,48 @@ public class SlashCommandEvent extends ListenerAdapter {
         LOGGER.info(String.format("\nSlash Command name: %s", event.getName()));
 
         if (event.getName().equals("setup")) {
+            event.deferReply().setEphemeral(true).queue();
+
             GuildChannelUnion guildChannelUnion = event.getOption("text-channel", OptionMapping::getAsChannel);
+
             if (guildChannelUnion == null) {
-                event.reply("text-channel is NULL").queue();
+                event.getHook().sendMessage("text-channel is NULL").queue();
                 return;
             }
 
-            if (guildChannelUnion.getType() == ChannelType.TEXT) {
+            if (guildChannelUnion.getType() == ChannelType.NEWS) {
+                String canNotBeChannel = String.format(jsonParsers.getTranslation("can_not_be_channel", guildIdString), "NewsChannel");
+                event.getHook().sendMessage(canNotBeChannel).queue();
+                return;
+            } else if (guildChannelUnion.getType() == ChannelType.VOICE) {
+                String canNotBeChannel = String.format(jsonParsers.getTranslation("can_not_be_channel", guildIdString), "VoiceChannel");
+                event.getHook().sendMessage(canNotBeChannel).queue();
+            } else if (guildChannelUnion.getType() == ChannelType.STAGE) {
+                String canNotBeChannel = String.format(jsonParsers.getTranslation("can_not_be_channel", guildIdString), "Stage");
+                event.getHook().sendMessage(canNotBeChannel).queue();
+            } else if (guildChannelUnion.getType() == ChannelType.FORUM) {
+                String canNotBeChannel = String.format(jsonParsers.getTranslation("can_not_be_channel", guildIdString), "Forum");
+                event.getHook().sendMessage(canNotBeChannel).queue();
+            } else if (guildChannelUnion.getType() == ChannelType.GUILD_PUBLIC_THREAD
+                    || guildChannelUnion.getType() == ChannelType.GUILD_NEWS_THREAD
+                    || guildChannelUnion.getType() == ChannelType.GUILD_PRIVATE_THREAD) {
+                String canNotBeChannel = String.format(jsonParsers.getTranslation("can_not_be_channel", guildIdString), "THREAD");
+                event.getHook().sendMessage(canNotBeChannel).queue();
+            } else if (guildChannelUnion.getType() == ChannelType.TEXT) {
+                boolean bool = ChecksClass.canSend(guildChannelUnion, event);
+                if (!bool) return;
+
                 Server guild = new Server();
                 guild.setGuildIdLong(guildId);
-                guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong()); //NPE
+                guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong());
                 guildRepository.save(guild);
 
                 String nowBotWillReceive = String.format(
                         jsonParsers.getTranslation("now_bot_will_receive", guildIdString),
                         guildChannelUnion.asTextChannel().getIdLong());
-                event.reply(nowBotWillReceive).queue();
-            } else if (guildChannelUnion.getType() == ChannelType.NEWS) {
-                event.reply("It can't be a channel NewsChannel").queue();
-                return;
+                event.getHook().sendMessage(nowBotWillReceive).setEphemeral(true).queue();
             }
+
             return;
         }
 

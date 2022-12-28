@@ -73,14 +73,6 @@ public class BotStartConfig {
     private final LockRepository lockRepository;
     private final EntriesRepository entriesRepository;
 
-    //DataBase
-//    @Value("${spring.datasource.url}")
-//    private String URL_CONNECTION;
-//    @Value("${spring.datasource.username}")
-//    private String USER_CONNECTION;
-//    @Value("${spring.datasource.password}")
-//    private String PASSWORD_CONNECTION;
-
     @Autowired
     public BotStartConfig(NoticeRepository noticeRepository,
                           GuildRepository guildRepository,
@@ -135,7 +127,7 @@ public class BotStartConfig {
 
         //Обновить команды
 //        updateSlashCommands();
-        System.out.println("17:25");
+        System.out.println("14:42");
     }
 
     private void updateSlashCommands() {
