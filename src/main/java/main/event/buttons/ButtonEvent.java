@@ -87,7 +87,7 @@ public class ButtonEvent extends ListenerAdapter {
             List<User> members = event.getMessage().getMentions().getUsers();
             List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildIdLong);
 
-            //TODO: Сделать однин filter
+            //TODO: Сделать в один filter
             List<User> collect = members
                     .stream()
                     .filter(a -> allSubs.stream()

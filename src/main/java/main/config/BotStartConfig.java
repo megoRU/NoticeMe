@@ -1,7 +1,6 @@
 package main.config;
 
 import main.core.NoticeRegistry;
-import main.core.TrackingUser;
 import main.event.BotJoinToGuild;
 import main.event.UserJoinEvent;
 import main.event.buttons.ButtonEvent;
@@ -287,16 +286,20 @@ public class BotStartConfig {
     }
 
     private void getAllUsers() {
-        List<Subs> noticeList = noticeRepository.findAll();
-        NoticeRegistry instance = NoticeRegistry.getInstance();
+        try {
+            List<Subs> noticeList = noticeRepository.findAll();
+            NoticeRegistry instance = NoticeRegistry.getInstance();
 
-        for (Subs notice : noticeList) {
-            String guildId = notice.getServer().getGuildIdLong().toString();
-            String userIdTracker = notice.getUserTrackingId();
-            String userId = notice.getUserId().toString();
-            instance.save(guildId, userId, userIdTracker);
+            for (Subs notice : noticeList) {
+                String guildId = notice.getServer().getGuildIdLong().toString();
+                String userIdTracker = notice.getUserTrackingId();
+                String userId = notice.getUserId().toString();
+                instance.save(guildId, userId, userIdTracker);
+            }
+            System.out.println("getAllUsers()");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
     }
 
     public static Map<String, Language.LanguageEnum> getMapLanguages() {

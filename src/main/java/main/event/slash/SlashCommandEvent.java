@@ -122,7 +122,7 @@ public class SlashCommandEvent extends ListenerAdapter {
 
             if (BotStartConfig.getMapLanguages().containsKey(userDest.getId())) {
                 String cannotSubToThisUser = jsonParsers.getTranslation("cannot_sub_to_this_user", guildIdString);
-                event.reply(cannotSubToThisUser).setEphemeral(true).queue();
+                event.getHook().sendMessage(cannotSubToThisUser).setEphemeral(true).queue();
                 return;
             }
 
@@ -147,6 +147,8 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("language")) {
+            event.deferReply().setEphemeral(true).queue();
+
             String languageAsString = event.getOption("bot", OptionMapping::getAsString);
             if (languageAsString == null) return;
 
@@ -160,7 +162,7 @@ public class SlashCommandEvent extends ListenerAdapter {
 
             BotStartConfig.getMapLanguages().put(guildIdString, languageEnum);
             String languageSet = jsonParsers.getTranslation("language_set", guildIdString);
-            event.reply(languageSet).queue();
+            event.getHook().sendMessage(languageSet).queue();
             return;
         }
 
@@ -233,13 +235,14 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("unsub")) {
+            event.deferReply().setEphemeral(true).queue();
             User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
             if (userFromOptions == null) return;
             Subs notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getId());
 
             if (notice == null) {
                 String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildIdString);
-                event.reply(dontFindUser).queue();
+                event.getHook().sendMessage(dontFindUser).queue();
             } else {
                 noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId(), user.getIdLong());
 
@@ -247,7 +250,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 instance.unsub(guildIdString, userFromOptions.getId(), user.getId());
 
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
-                event.reply(successfullyDeleted).setEphemeral(true).queue();
+                event.getHook().sendMessage(successfullyDeleted).setEphemeral(true).queue();
             }
             return;
         }
@@ -262,13 +265,13 @@ public class SlashCommandEvent extends ListenerAdapter {
         }
 
         if (event.getName().equals("lock")) {
+            event.deferReply().setEphemeral(true).queue();
+
             BotStartConfig.mapLocks.put(user.getId(), Lock.Locked.LOCKED);
             String lockString = jsonParsers.getTranslation("lock", guildIdString);
-            event.reply(lockString).setEphemeral(true).queue();
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
             instance.removeUserFromAllGuild(user.getId());
-
             noticeRepository.deleteAllByUserTrackingId(user.getId());
 
             Lock lock = new Lock();
@@ -276,15 +279,16 @@ public class SlashCommandEvent extends ListenerAdapter {
             lock.setLocked(Lock.Locked.LOCKED);
             lockRepository.save(lock);
 
-            event.reply(lockString).setEphemeral(true).queue();
+            event.getHook().sendMessage(lockString).setEphemeral(true).queue();
             return;
         }
 
         if (event.getName().equals("unlock")) {
+            event.deferReply().setEphemeral(true).queue();
             BotStartConfig.mapLocks.remove(user.getId());
             String unLockString = jsonParsers.getTranslation("unlock", guildIdString);
-            lockRepository.deleteById(user.getIdLong());
-            event.reply(unLockString).setEphemeral(true).queue();
+            lockRepository.deleteLockByUserId(user.getIdLong());
+            event.getHook().sendMessage(unLockString).setEphemeral(true).queue();
             return;
         }
 
