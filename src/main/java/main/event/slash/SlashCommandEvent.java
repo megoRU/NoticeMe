@@ -23,11 +23,10 @@ import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Service
@@ -298,21 +297,18 @@ public class SlashCommandEvent extends ListenerAdapter {
             List<Entries> allEntriesForSuggestion = entriesRepository.getAllEntriesForSuggestion(user.getIdLong(), guildId);
             List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
 
-            String collect = allEntriesForSuggestion
+            List<String> stringList = allEntriesForSuggestion
                     .stream()
                     .map(Entries::getUsersInChannel)
+                    .flatMap(string -> Stream.of(string.split(",")))
                     .distinct()
+                    .filter(a -> !BotStartConfig.mapLocks.containsKey(a))
                     .filter(a -> allSubs.stream()
                             .map(Subs::getUserTrackingId)
                             .noneMatch(s -> s.contains(a)))
-                    .collect(Collectors.joining(","));
+                    .toList();
 
-            List<String> stringList =
-                    Arrays.stream(collect.split(","))
-                            .filter(m -> !BotStartConfig.mapLocks.containsKey(m))
-                            .toList();
-
-            if (!collect.isEmpty() && !stringList.isEmpty()) {
+            if (!stringList.isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
                 List<Button> buttonsList = new ArrayList<>();
 

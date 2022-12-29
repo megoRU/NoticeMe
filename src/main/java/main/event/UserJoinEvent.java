@@ -45,6 +45,15 @@ public class UserJoinEvent extends ListenerAdapter {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             List<Member> members = voiceChannel.getMembers(); //Always 1+ users
 
+            //Это должно быть тут
+            Entries entries = new Entries();
+            entries.setGuildId(guild.getIdLong());
+            entries.setChannelId(voiceChannel.getIdLong());
+            entries.setUserId(user.getIdLong());
+            entries.setUsersInChannel(members);
+            entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
+            entriesRepository.save(entries);
+
             NoticeRegistry instance = NoticeRegistry.getInstance();
             TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
 
@@ -68,14 +77,6 @@ public class UserJoinEvent extends ListenerAdapter {
                     }
                 }
             }
-
-            Entries entries = new Entries();
-            entries.setGuildId(guild.getIdLong());
-            entries.setChannelId(voiceChannel.getIdLong());
-            entries.setUserId(user.getIdLong());
-            entries.setUsersInChannel(members);
-            entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
-            entriesRepository.save(entries);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("UserJoinEvent: " + e.getMessage());
