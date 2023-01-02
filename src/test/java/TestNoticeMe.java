@@ -28,7 +28,7 @@ public class TestNoticeMe {
 
     @Test
     @Order(4)
-    @DisplayName("Проверяем lock")
+    @DisplayName("Проверяем запрет на отслеживание")
     void testLock() {
         //Добавляем вторую гильдию
         instance.sub("600", "2000", "4000");
@@ -44,6 +44,7 @@ public class TestNoticeMe {
     }
 
     @Test
+    @DisplayName("Проверяем сохранение для другой Guild")
     void testSaveAnotherUser() {
         instance.sub("500", "2500", "4000");
     }
