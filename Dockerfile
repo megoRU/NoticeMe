@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN ["mvn", "install"]
+RUN ["mvn", "test", "install"]
 
 ENTRYPOINT ["java", "-jar", "./target/noticeme-0.0.1-SNAPSHOT.jar"]
