@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN maven test
+RUN ["mvn", "test"]
 
-RUN maven install
+RUN ["mvn", "install"]
 
 ENTRYPOINT ["java", "-jar", "./target/noticeme-0.0.1-SNAPSHOT.jar"]
