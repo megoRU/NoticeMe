@@ -9,8 +9,7 @@
 
 # Folders
 .idea
-.target/
-.target
+/target
 
 # Package Files #
 *.jar

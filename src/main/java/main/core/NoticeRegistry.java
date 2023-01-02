@@ -28,7 +28,7 @@ public class NoticeRegistry {
         trackingUserConcurrentMap.put(guildId, concurrentMap);
     }
 
-    public void save(String guildId, String userId, String userIdTracker) {
+    public void sub(String guildId, String userId, String userIdTracker) {
         if (!hasGuild(guildId)) {
             TrackingUser trackingUser = new TrackingUser();
             trackingUser.putUser(userId);

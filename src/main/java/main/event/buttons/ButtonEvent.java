@@ -74,7 +74,7 @@ public class ButtonEvent extends ListenerAdapter {
                 event.getHook().sendMessage(userSaved).setEphemeral(true).queue();
 
                 NoticeRegistry instance = NoticeRegistry.getInstance();
-                instance.save(guildIdString, user.getId(), userFromMSG.getId());
+                instance.sub(guildIdString, user.getId(), userFromMSG.getId());
             } else {
                 String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
                 event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
@@ -108,7 +108,7 @@ public class ButtonEvent extends ListenerAdapter {
                 subsList.add(subs);
 
                 NoticeRegistry instance = NoticeRegistry.getInstance();
-                instance.save(guildIdString, user.getId(), value.getId());
+                instance.sub(guildIdString, user.getId(), value.getId());
             }
             noticeRepository.saveAll(subsList);
             String usersSaved = jsonParsers.getTranslation("users_saved", guildIdString);

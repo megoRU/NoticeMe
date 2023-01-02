@@ -134,7 +134,7 @@ public class SlashCommandEvent extends ListenerAdapter {
                 noticeRepository.save(notice);
 
                 NoticeRegistry instance = NoticeRegistry.getInstance();
-                instance.save(guildIdString, user.getId(), userDest.getId());
+                instance.sub(guildIdString, user.getId(), userDest.getId());
 
                 String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
                 event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();

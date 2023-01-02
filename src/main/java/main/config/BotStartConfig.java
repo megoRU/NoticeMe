@@ -294,7 +294,7 @@ public class BotStartConfig {
                 String guildId = notice.getServer().getGuildIdLong().toString();
                 String userIdTracker = notice.getUserTrackingId();
                 String userId = notice.getUserId().toString();
-                instance.save(guildId, userId, userIdTracker);
+                instance.sub(guildId, userId, userIdTracker);
             }
             System.out.println("getAllUsers()");
         } catch (Exception e) {
