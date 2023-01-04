@@ -37,5 +37,6 @@
   "help_unlock": "Allow yourself to be tracked",
   "slash_commands": "Slash Commands",
   "can_not_be_channel": "It can't be a channel: `%s`",
-  "check_permissions": "Bot don't have in <#%s>\n%s"
+  "check_permissions": "Bot don't have in <#%s>\n%s",
+  "connect_to": "Connect to: \uD83D\uDD0A %s"
 }

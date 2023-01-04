@@ -25,6 +25,10 @@ public class TrackingUser {
         return stringBuilder.toString();
     }
 
+    public int getUserCount() {
+        return userList.size();
+    }
+
     public void removeUserFromList(String userId) {
         userList.remove(userId);
     }

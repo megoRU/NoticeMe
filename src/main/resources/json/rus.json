@@ -37,5 +37,6 @@
   "help_unlock": "Разрешить себя отслеживать",
   "slash_commands": "Слэш Команды",
   "can_not_be_channel": "Это не может быть каналом: `%s`",
-  "check_permissions": "У бота нет в <#%s>\n%s"
+  "check_permissions": "У бота нет в <#%s>\n%s",
+  "connect_to": "Подключиться к: \uD83D\uDD0A %s"
 }
