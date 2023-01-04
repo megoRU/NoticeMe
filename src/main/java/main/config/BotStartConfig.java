@@ -125,7 +125,7 @@ public class BotStartConfig {
         complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("14:42");
     }
 
@@ -161,6 +161,10 @@ public class BotStartConfig {
             commands.addCommands(Commands.slash("help", "Bot commands")
                     .setGuildOnly(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота"));
+
+            commands.addCommands(Commands.slash("donate", "Send a donation")
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отправить пожертвование"));
 
             commands.addCommands(Commands.slash("setup", "Set up a TextChannel for notifications")
                     .setGuildOnly(true)

@@ -346,6 +346,21 @@ public class SlashCommandEvent extends ListenerAdapter {
                 event.getHook().sendMessage(noSuggestions).setEphemeral(true).queue();
             }
 
+            return;
+        }
+
+        if (event.getName().equals("donate")) {
+            String donate = jsonParsers.getTranslation("donate", guildIdString);
+
+            Button tinkoff = Button.link("https://www.tinkoff.ru/rm/savin.yuriy8/DyrGO46875", "Tinkoff");
+            Button qiwi = Button.link("https://qiwi.com/n/MEGORU", "QIWI");
+            Button boosty = Button.link("https://boosty.to/megoru", "Boosty");
+
+            EmbedBuilder embedBuilder = new EmbedBuilder();
+            embedBuilder.setTitle("Donate");
+            embedBuilder.setColor(Color.YELLOW);
+            embedBuilder.appendDescription(donate);
+            event.replyEmbeds(embedBuilder.build()).addActionRow(tinkoff, qiwi, boosty).queue();
         }
 
     }

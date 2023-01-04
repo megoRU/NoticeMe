@@ -38,5 +38,6 @@
   "slash_commands": "Slash Commands",
   "can_not_be_channel": "It can't be a channel: `%s`",
   "check_permissions": "Bot don't have in <#%s>\n%s",
-  "connect_to": "Connect to: \uD83D\uDD0A %s"
+  "connect_to": "Connect to: \uD83D\uDD0A %s",
+  "donate": "If you want to support the developer financially,\nbelow you can choose a convenient donation service for you."
 }
