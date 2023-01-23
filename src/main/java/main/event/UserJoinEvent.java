@@ -95,7 +95,9 @@ public class UserJoinEvent extends ListenerAdapter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            if (!e.getMessage().contains("is not a VoiceChannel")) {
+                e.printStackTrace();
+            }
             System.out.println("UserJoinEvent: " + e.getMessage());
         }
     }
