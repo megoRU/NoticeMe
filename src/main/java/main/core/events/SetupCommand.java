@@ -70,6 +70,5 @@ public class SetupCommand {
                     guildChannelUnion.asTextChannel().getIdLong());
             event.getHook().sendMessage(nowBotWillReceive).setEphemeral(true).queue();
         }
-
     }
 }

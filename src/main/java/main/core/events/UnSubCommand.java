@@ -14,6 +14,7 @@ import java.util.Objects;
 
 @Service
 public class UnSubCommand {
+
     private static final ParserClass jsonParsers = new ParserClass();
 
     private final NoticeRepository noticeRepository;

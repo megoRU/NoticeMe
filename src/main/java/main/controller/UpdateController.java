@@ -2,6 +2,7 @@ package main.controller;
 
 import lombok.Getter;
 import main.core.ButtonImpl;
+import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
 import main.model.repository.*;
@@ -69,6 +70,9 @@ public class UpdateController {
     private void slashEvent(@NotNull SlashCommandInteractionEvent event) {
         if (event.getUser().isBot()) return;
 
+        boolean canSend = ChecksClass.canSend(event.getGuildChannel(), event);
+        if (!canSend) return;
+
         switch (event.getName()) {
             case "help" -> {
                 HelpCommand helpCommand = new HelpCommand();
@@ -120,6 +124,9 @@ public class UpdateController {
     private void buttonEvent(@NotNull ButtonInteractionEvent event) {
         if (event.getUser().isBot()) return;
         if (event.getGuild() == null) return;
+
+        boolean canSend = ChecksClass.canSend(event.getGuildChannel(), event);
+        if (!canSend) return;
 
         if (Objects.equals(event.getButton().getId(), ButtonImpl.BUTTON_DELETE)) {
             DeleteButton deleteButton = new DeleteButton(guildRepository);
