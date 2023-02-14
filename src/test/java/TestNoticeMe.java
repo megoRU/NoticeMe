@@ -11,7 +11,7 @@ public class TestNoticeMe {
     @Test
     @Order(6)
     @DisplayName("Проверяем удаление отписывание")
-    void testUnsubFromUser(){
+    void testUnsubFromUser() {
         TrackingUser user = instance.getUser("500", "3000");
         Assertions.assertNotNull(user);
         Assertions.assertEquals("<@2000>, <@2500>", user.getUserList());
@@ -82,6 +82,4 @@ public class TestNoticeMe {
         Assertions.assertFalse(first);
         Assertions.assertTrue(second);
     }
-
 }
-
