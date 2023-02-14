@@ -61,17 +61,6 @@ public class TestNoticeMe {
     }
 
     @Test
-    @Order(1)
-    @DisplayName("Проверяем вывод при одном подписчике")
-    void testOneUser() {
-        instance.sub("500", "2000", "3000");
-        //Пользователь 2000 подписан на пользователя 3000
-        TrackingUser user = instance.getUser("500", "3000");
-        Assertions.assertNotNull(user);
-        Assertions.assertEquals("<@2000>", user.getUserList());
-    }
-
-    @Test
     @Order(2)
     @DisplayName("Проверяем метод hasUserJoin()")
     void testHasUserJoin() {
@@ -81,5 +70,16 @@ public class TestNoticeMe {
         boolean second = user.hasUserJoin();
         Assertions.assertFalse(first);
         Assertions.assertTrue(second);
+    }
+
+    @Test
+    @Order(1)
+    @DisplayName("Проверяем вывод при одном подписчике")
+    void testOneUser() {
+        instance.sub("500", "2000", "3000");
+        //Пользователь 2000 подписан на пользователя 3000
+        TrackingUser user = instance.getUser("500", "3000");
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals("<@2000>", user.getUserList());
     }
 }
