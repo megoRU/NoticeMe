@@ -1,5 +1,5 @@
-import main.core.NoticeRegistry;
-import main.core.TrackingUser;
+import main.core.core.NoticeRegistry;
+import main.core.core.TrackingUser;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 

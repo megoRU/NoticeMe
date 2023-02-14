@@ -1,8 +1,7 @@
-package main.event;
+package main.core.events;
 
-import lombok.AllArgsConstructor;
-import main.core.NoticeRegistry;
-import main.core.TrackingUser;
+import main.core.core.NoticeRegistry;
+import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
 import main.model.entity.Entries;
 import main.model.entity.Server;
@@ -17,9 +16,10 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -28,19 +28,22 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-@AllArgsConstructor
-public class UserJoinEvent extends ListenerAdapter {
+@Service
+public class UserJoinEvent {
 
     private static final ParserClass jsonParsers = new ParserClass();
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     private final GuildRepository guildRepository;
     private final EntriesRepository entriesRepository;
 
-    @Override
-    public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
-        if (event.getMember().getUser().isBot()) return;
-        if (event.getChannelJoined() == null) return;
+    @Autowired
+    public UserJoinEvent(GuildRepository guildRepository, EntriesRepository entriesRepository) {
+        this.guildRepository = guildRepository;
+        this.entriesRepository = entriesRepository;
+    }
 
+    public void userJoin(@NotNull GuildVoiceUpdateEvent event) {
         Guild guild = event.getGuild();
         User user = event.getMember().getUser();
 

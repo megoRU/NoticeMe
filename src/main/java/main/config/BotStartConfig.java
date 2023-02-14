@@ -1,10 +1,8 @@
 package main.config;
 
-import main.core.NoticeRegistry;
-import main.event.BotJoinToGuild;
-import main.event.UserJoinEvent;
-import main.event.buttons.ButtonEvent;
-import main.event.slash.SlashCommandEvent;
+import main.controller.UpdateController;
+import main.core.CoreBot;
+import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Lock;
@@ -72,17 +70,20 @@ public class BotStartConfig {
     private final LockRepository lockRepository;
     private final EntriesRepository entriesRepository;
 
+    private final UpdateController updateController;
+
     @Autowired
     public BotStartConfig(NoticeRepository noticeRepository,
                           GuildRepository guildRepository,
                           LanguageRepository languageRepository,
                           LockRepository lockRepository,
-                          EntriesRepository entriesRepository) {
+                          EntriesRepository entriesRepository, UpdateController updateController) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
         this.entriesRepository = entriesRepository;
+        this.updateController = updateController;
     }
 
     @Bean
@@ -110,10 +111,7 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new SlashCommandEvent(noticeRepository, guildRepository, languageRepository, lockRepository, entriesRepository));
-            jdaBuilder.addEventListeners(new UserJoinEvent(guildRepository, entriesRepository));
-            jdaBuilder.addEventListeners(new BotJoinToGuild());
-            jdaBuilder.addEventListeners(new ButtonEvent(guildRepository, noticeRepository));
+            jdaBuilder.addEventListeners(new CoreBot(updateController));
 
             jda = jdaBuilder.build();
             jda.awaitReady();

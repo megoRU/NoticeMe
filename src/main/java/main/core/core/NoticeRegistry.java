@@ -1,4 +1,4 @@
-package main.core;
+package main.core.core;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,7 +66,7 @@ public class NoticeRegistry {
         return stringTrackingUserConcurrentMap.get(user);
     }
 
-    public boolean hasGuild(String guildId) {
+    private boolean hasGuild(String guildId) {
         return trackingUserConcurrentMap.containsKey(guildId);
     }
 
@@ -74,7 +74,7 @@ public class NoticeRegistry {
         trackingUserConcurrentMap.remove(guildId);
     }
 
-    public void removeUserFromGuild(String guildId, String user) {
+    private void removeUserFromGuild(String guildId, String user) {
         trackingUserConcurrentMap.get(guildId).remove(user);
     }
 
