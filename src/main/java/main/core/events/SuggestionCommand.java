@@ -8,6 +8,7 @@ import main.model.entity.Subs;
 import main.model.repository.EntriesRepository;
 import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
@@ -66,8 +67,10 @@ public class SuggestionCommand {
                     stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
                 }
                 if (buttonsList.size() <= 23) {
-                    String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), (i + 1));
-                    buttonsList.add(Button.primary(ButtonImpl.BUTTON_ADD_USER + (i + 1), addUser));
+                    User userFromBD = BotStartConfig.jda.retrieveUserById(stringList.get(i)).complete();
+                    String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getName());
+
+                    buttonsList.add(Button.primary(ButtonImpl.BUTTON_ADD_USER + stringList.get(i), addUser));
                 }
             }
 
