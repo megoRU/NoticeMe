@@ -128,19 +128,21 @@ public class UpdateController {
         boolean canSend = ChecksClass.canSend(event.getGuildChannel(), event);
         if (!canSend) return;
 
-        if (Objects.equals(event.getButton().getId(), ButtonImpl.BUTTON_DELETE)) {
+        String buttonId = event.getButton().getId();
+
+        if (Objects.equals(buttonId, ButtonImpl.BUTTON_DELETE)) {
             DeleteButton deleteButton = new DeleteButton(guildRepository);
             deleteButton.delete(event);
             return;
         }
 
-        if (event.getButton().getId() != null && event.getButton().getId().contains(ButtonImpl.BUTTON_ADD_USER)) {
+        if (buttonId != null && buttonId.contains(ButtonImpl.BUTTON_ADD_USER)) {
             AddUserButton addUserButton = new AddUserButton(guildRepository, noticeRepository);
             addUserButton.addUser(event);
             return;
         }
 
-        if (Objects.equals(event.getButton().getId(), ButtonImpl.BUTTON_ALL_USERS)) {
+        if (Objects.equals(buttonId, ButtonImpl.BUTTON_ALL_USERS)) {
             AddAllUsersButton addAllUsersButton = new AddAllUsersButton(guildRepository, noticeRepository);
             addAllUsersButton.addAllUsers(event);
         }

@@ -13,9 +13,12 @@ public class TestNoticeMe {
     @DisplayName("Проверяем удаление отписывание")
     void testUnsubFromUser() {
         TrackingUser user = instance.getUser("500", "3000");
+
         Assertions.assertNotNull(user);
         Assertions.assertEquals("<@2000>, <@2500>", user.getUserList());
+
         instance.unsub("500", "3000", "2500");
+
         Assertions.assertEquals("<@2000>", user.getUserList());
     }
 
@@ -24,6 +27,10 @@ public class TestNoticeMe {
     @DisplayName("Проверяем удаление Guild")
     void testDeleteGuild() {
         instance.removeGuild("4000");
+
+        TrackingUser user = instance.getUser("4000", "2500");
+
+        Assertions.assertNull(user);
     }
 
     @Test
@@ -47,6 +54,10 @@ public class TestNoticeMe {
     @DisplayName("Проверяем сохранение для другой Guild")
     void testSaveAnotherUser() {
         instance.sub("500", "2500", "4000");
+        TrackingUser user = instance.getUser("500", "4000");
+
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals("<@2500>", user.getUserList());
     }
 
     @Test

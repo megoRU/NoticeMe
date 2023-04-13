@@ -48,5 +48,4 @@ public class TrackingUser {
     private void setTimeJoin() {
         timeJoin = LocalDateTime.now().plusMinutes(15);
     }
-
 }
