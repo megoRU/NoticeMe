@@ -8,9 +8,8 @@ on:
 jobs:
 
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
-
       #     Run Tests:
       - uses: actions/checkout@v1
       - name: set up JDK 17
@@ -20,17 +19,18 @@ jobs:
       - name: Run Tests
         run: mvn -B test
 
-      #     Build Docker image:
+      # Загрузка исходного кода:
       - uses: actions/checkout@v2
+
+      # Сборка и тегирование Docker-образа:
       - name: Build and tag image
         run: |
-          docker build -t megoru/noticeme .
-      #     Login to Docker Hub:
+          docker build -t docker.megoru.ru/notice-me-bot .
+
+      # Вход в Docker Registry:
       - name: Docker login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_LOGIN }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      #     Push image to Docker Hub:
+        run: docker login docker.megoru.ru -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      # Отправка образа в Docker Registry:
       - name: Publish image
-        run: docker push megoru/noticeme
+        run: docker push docker.megoru.ru/notice-me-bot:latest

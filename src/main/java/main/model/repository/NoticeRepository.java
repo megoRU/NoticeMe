@@ -31,5 +31,4 @@ public interface NoticeRepository extends JpaRepository<Subs, Long> {
 
     @Query(value = "SELECT s FROM Subs s WHERE s.server.guildIdLong = :guildId AND s.userTrackingId = :userTrack AND s.userId = :userId")
     Subs findAllByUserIdAndUserTrackingId(@Param("guildId") Long guildId, @Param("userTrack") String userTrack, @Param("userId") Long userId);
-
 }

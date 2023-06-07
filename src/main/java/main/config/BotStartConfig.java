@@ -65,24 +65,19 @@ public class BotStartConfig {
 
     //REPOSITORY
     private final NoticeRepository noticeRepository;
-    private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
-    private final EntriesRepository entriesRepository;
 
     private final UpdateController updateController;
 
     @Autowired
     public BotStartConfig(NoticeRepository noticeRepository,
-                          GuildRepository guildRepository,
                           LanguageRepository languageRepository,
                           LockRepository lockRepository,
-                          EntriesRepository entriesRepository, UpdateController updateController) {
+                          UpdateController updateController) {
         this.noticeRepository = noticeRepository;
-        this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
-        this.entriesRepository = entriesRepository;
         this.updateController = updateController;
     }
 
