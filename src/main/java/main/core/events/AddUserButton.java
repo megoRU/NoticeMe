@@ -50,9 +50,16 @@ public class AddUserButton {
         Subs isUserContains = noticeRepository.findAllByUserIdAndUserTrackingId(guildIdLong, userFromButton, user.getIdLong());
 
         if (isUserContains == null) {
-            Server serverId = guildRepository.getReferenceById(event.getGuild().getIdLong());
+            Server server = guildRepository.findServerByGuildIdLong(event.getGuild().getIdLong());
+
+            if (server == null) {
+                String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
+                event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
+                return;
+            }
+
             Subs subs = new Subs();
-            subs.setServer(serverId);
+            subs.setServer(server);
             subs.setUserId(event.getUser().getIdLong());
             subs.setUserTrackingId(userFromButton);
             noticeRepository.save(subs);

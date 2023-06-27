@@ -52,11 +52,17 @@ public class AddAllUsersButton {
                 .toList();
 
         List<Subs> subsList = new ArrayList<>();
-        Server serverId = guildRepository.getReferenceById(guildIdLong);
+        Server server = guildRepository.findServerByGuildIdLong(guildIdLong);
+
+        if (server == null) {
+            String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
+            event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
+            return;
+        }
 
         for (User value : collect) {
             Subs subs = new Subs();
-            subs.setServer(serverId);
+            subs.setServer(server);
             subs.setUserId(user.getIdLong());
             subs.setUserTrackingId(value.getId());
 
