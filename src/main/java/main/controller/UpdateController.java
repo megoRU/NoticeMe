@@ -1,7 +1,7 @@
 package main.controller;
 
 import lombok.Getter;
-import main.core.ButtonImpl;
+import main.core.NoticeMeUtils;
 import main.core.ChecksClass;
 import main.core.CoreBot;
 import main.core.events.*;
@@ -130,19 +130,19 @@ public class UpdateController {
 
         String buttonId = event.getButton().getId();
 
-        if (Objects.equals(buttonId, ButtonImpl.BUTTON_DELETE)) {
+        if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_DELETE)) {
             DeleteButton deleteButton = new DeleteButton(guildRepository);
             deleteButton.delete(event);
             return;
         }
 
-        if (buttonId != null && buttonId.contains(ButtonImpl.BUTTON_ADD_USER)) {
+        if (buttonId != null && buttonId.contains(NoticeMeUtils.BUTTON_ADD_USER)) {
             AddUserButton addUserButton = new AddUserButton(guildRepository, noticeRepository);
             addUserButton.addUser(event);
             return;
         }
 
-        if (Objects.equals(buttonId, ButtonImpl.BUTTON_ALL_USERS)) {
+        if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_ALL_USERS)) {
             AddAllUsersButton addAllUsersButton = new AddAllUsersButton(guildRepository, noticeRepository);
             addAllUsersButton.addAllUsers(event);
         }

@@ -1,7 +1,7 @@
 package main.core.events;
 
 import main.config.BotStartConfig;
-import main.core.ButtonImpl;
+import main.core.NoticeMeUtils;
 import main.jsonparser.ParserClass;
 import main.model.entity.Entries;
 import main.model.entity.Subs;
@@ -70,13 +70,13 @@ public class SuggestionCommand {
                     User userFromBD = BotStartConfig.jda.retrieveUserById(stringList.get(i)).complete();
                     String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getName());
 
-                    buttonsList.add(Button.primary(ButtonImpl.BUTTON_ADD_USER + stringList.get(i), addUser));
+                    buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + stringList.get(i), addUser));
                 }
             }
 
             if (buttonsList.size() > 1) {
                 String addAll = jsonParsers.getTranslation("add_all", guildIdString);
-                buttonsList.add(Button.success(ButtonImpl.BUTTON_ALL_USERS, addAll));
+                buttonsList.add(Button.success(NoticeMeUtils.BUTTON_ALL_USERS, addAll));
             }
 
             String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);

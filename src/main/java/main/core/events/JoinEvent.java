@@ -26,7 +26,6 @@ public class JoinEvent {
             embedBuilder.addField("Notification Channel", "First you need to set up a channel for notifications: </setup:1039918668135534625>", true);
             embedBuilder.addField("Subscribe to a user", "Setting up receiving notifications: </sub:1040935591887519755>", true);
 
-
             MessageChannel messageChannel = null;
             ChannelType type = defaultChannel.getType();
             if (type == ChannelType.NEWS) {

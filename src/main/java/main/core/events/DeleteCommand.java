@@ -1,6 +1,6 @@
 package main.core.events;
 
-import main.core.ButtonImpl;
+import main.core.NoticeMeUtils;
 import main.jsonparser.ParserClass;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -20,7 +20,7 @@ public class DeleteCommand {
         String warningDeleteData = jsonParsers.getTranslation("warning_delete_data", guildIdString);
         event.reply(warningDeleteData)
                 .setEphemeral(true)
-                .setActionRow(Button.danger(ButtonImpl.BUTTON_DELETE, "Delete"))
+                .setActionRow(Button.danger(NoticeMeUtils.BUTTON_DELETE, "Delete"))
                 .queue();
     }
 }
