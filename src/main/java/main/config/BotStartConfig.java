@@ -21,6 +21,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.boticordjava.api.entity.bot.stats.BotStats;
+import org.boticordjava.api.impl.BotiCordAPI;
+import org.boticordjava.api.io.UnsuccessfulHttpException;
+import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -53,15 +58,14 @@ public class BotStartConfig {
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
     //API
-//    private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-//            .token(Config.getTopGgApiToken())
-//            .botId(Config.getBotId())
-//            .build();
+    private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
+            .token(Config.getTopGgApiToken())
+            .botId(Config.getBotId())
+            .build();
 
-//    private final BotiCordAPI api = new BotiCordAPI.Builder()
-//            .tokenEnum(TokenEnum.BOT)
-//            .token(System.getenv("BOTICORD"))
-//            .build();
+    private final BotiCordAPI api = new BotiCordAPI.Builder()
+            .token(System.getenv("BOTICORD"))
+            .build();
 
     //REPOSITORY
     private final NoticeRepository noticeRepository;
@@ -207,17 +211,18 @@ public class BotStartConfig {
         if (!Config.isIsDev()) {
             try {
                 int serverCount = BotStartConfig.jda.getGuilds().size();
-//                TOP_GG_API.setStats(serverCount);
+                TOP_GG_API.setStats(serverCount);
                 BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
-//                AtomicInteger usersCount = new AtomicInteger();
-//                jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
+                AtomicInteger usersCount = new AtomicInteger();
+                jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
 
-//                try {
-//                    api.setStats(serverCount, 1, usersCount.get());
-//                } catch (UnsuccessfulHttpException un) {
-//                    System.out.println(un.getMessage());
-//                }
+                try {
+                    BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
+                    api.setBotStats(Config.getBotId(), botStats);
+                } catch (UnsuccessfulHttpException un) {
+                    un.printStackTrace();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
