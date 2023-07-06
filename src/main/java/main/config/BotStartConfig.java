@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -37,10 +38,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -212,13 +210,14 @@ public class BotStartConfig {
             try {
                 int serverCount = BotStartConfig.jda.getGuilds().size();
                 TOP_GG_API.setStats(serverCount);
-                BotStartConfig.jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
+                jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
-                AtomicInteger usersCount = new AtomicInteger();
-                jda.getGuilds().forEach(g -> usersCount.addAndGet(g.getMembers().size()));
-
+                int countMembers = jda.getGuilds().stream()
+                        .map(Guild::getMembers)
+                        .mapToInt(Collection::size)
+                        .sum();
                 try {
-                    BotStats botStats = new BotStats(usersCount.get(), serverCount, 1);
+                    BotStats botStats = new BotStats(countMembers, serverCount, 1);
                     api.setBotStats(Config.getBotId(), botStats);
                 } catch (UnsuccessfulHttpException un) {
                     un.printStackTrace();
