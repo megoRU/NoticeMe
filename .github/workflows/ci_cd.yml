@@ -15,7 +15,6 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '17'
-          cache: 'maven'
       #     Run Tests:
       - uses: actions/checkout@v1
       - name: Run Tests
