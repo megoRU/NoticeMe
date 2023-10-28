@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.2</version>
+        <version>3.1.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.noticeme</groupId>
@@ -16,25 +16,19 @@
     <properties>
         <java.version>20</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.github.megoRU</groupId>
             <artifactId>boticordjava</artifactId>
-            <version>v5.3</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-autoconfigure -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>3.1.2</version>
+            <version>v5.4.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${project.parent.version}</version>
+            <version>3.1.5</version>
         </dependency>
 
         <dependency>
@@ -66,7 +60,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.13</version>
+            <version>5.0.0-beta.16</version>
             <exclusions>
                 <exclusion>
                     <groupId>club.minnced</groupId>
