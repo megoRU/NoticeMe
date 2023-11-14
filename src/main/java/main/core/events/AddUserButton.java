@@ -34,8 +34,6 @@ public class AddUserButton {
         String buttonId = event.getButton().getId();
         if (buttonId == null) return;
 
-        System.out.println("buttonId " + buttonId);
-
         event.editButton(event.getButton().asDisabled()).queue();
 
         String userFromButton = buttonId.replaceAll("BUTTON_ADD_USER_", "");

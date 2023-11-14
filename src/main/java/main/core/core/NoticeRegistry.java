@@ -1,5 +1,7 @@
 package main.core.core;
 
+import main.model.entity.Server;
+
 import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -8,6 +10,7 @@ public class NoticeRegistry {
 
     //Guild | List: userTrackerId | TrackingUser
     private static final ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Server> serverListMap = new ConcurrentHashMap<>();
     private static volatile NoticeRegistry noticeRegistry;
 
     private NoticeRegistry() {
@@ -57,6 +60,19 @@ public class NoticeRegistry {
     //TrackingUser | Data
     private ConcurrentMap<String, TrackingUser> get(String guildId) {
         return trackingUserConcurrentMap.get(guildId);
+    }
+
+    public void putServer(String serverId, Server server) {
+        serverListMap.put(serverId, server);
+    }
+
+    public void removeServer(String serverId) {
+        serverListMap.remove(serverId);
+    }
+
+    @Nullable
+    public Server getServer(String serverId) {
+        return serverListMap.get(serverId);
     }
 
     @Nullable

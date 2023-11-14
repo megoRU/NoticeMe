@@ -157,7 +157,7 @@ public class UpdateController {
         if (event.getMember().getUser().isBot()) return;
         if (event.getChannelJoined() == null) return;
 
-        UserJoinEvent userJoinEvent = new UserJoinEvent(guildRepository, entriesRepository);
+        UserJoinEvent userJoinEvent = new UserJoinEvent(entriesRepository);
         userJoinEvent.userJoin(event);
     }
 }

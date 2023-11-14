@@ -6,7 +6,6 @@ import main.jsonparser.ParserClass;
 import main.model.entity.Entries;
 import main.model.entity.Server;
 import main.model.repository.EntriesRepository;
-import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -34,12 +32,10 @@ public class UserJoinEvent {
     private static final ParserClass jsonParsers = new ParserClass();
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    private final GuildRepository guildRepository;
     private final EntriesRepository entriesRepository;
 
     @Autowired
-    public UserJoinEvent(GuildRepository guildRepository, EntriesRepository entriesRepository) {
-        this.guildRepository = guildRepository;
+    public UserJoinEvent(EntriesRepository entriesRepository) {
         this.entriesRepository = entriesRepository;
     }
 
@@ -52,14 +48,16 @@ public class UserJoinEvent {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             List<Member> members = voiceChannel.getMembers(); //Always 1+ users
 
-            //Это должно быть тут
-            Entries entries = new Entries();
-            entries.setGuildId(guild.getIdLong());
-            entries.setChannelId(voiceChannel.getIdLong());
-            entries.setUserId(user.getIdLong());
-            entries.setUsersInChannel(members);
-            entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
-            entriesRepository.save(entries);
+            if (members.size() > 1) {
+                //Это должно быть тут
+                Entries entries = new Entries();
+                entries.setGuildId(guild.getIdLong());
+                entries.setChannelId(voiceChannel.getIdLong());
+                entries.setUserId(user.getIdLong());
+                entries.setUsersInChannel(members);
+                entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
+                new Thread(() -> entriesRepository.save(entries)).start();
+            }
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
             TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
@@ -67,12 +65,10 @@ public class UserJoinEvent {
             if (instanceUser == null) return;
             String userList = instanceUser.getUserList();
             //TODO: Возможно переделать на локальный. Это ускорит при большой нагрузке
-            Optional<Server> guildOptional = guildRepository.findById(guild.getIdLong());
-
-            if (guildOptional.isPresent()) {
-                if (!instanceUser.hasUserJoin()) {
-                    Server guildDB = guildOptional.get();
-                    TextChannel textChannel = event.getGuild().getTextChannelById(guildDB.getTextChannelId());
+            if (!instanceUser.hasUserJoin()) {
+                Server server = instance.getServer(guild.getId());
+                if (server != null) {
+                    TextChannel textChannel = event.getGuild().getTextChannelById(server.getTextChannelId());
                     if (textChannel != null) {
                         if (event.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
                             String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),

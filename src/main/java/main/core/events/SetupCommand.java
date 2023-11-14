@@ -1,6 +1,7 @@
 package main.core.events;
 
 import main.core.ChecksClass;
+import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
 import main.model.repository.GuildRepository;
@@ -64,6 +65,9 @@ public class SetupCommand {
             guild.setGuildIdLong(guildId);
             guild.setTextChannelId(guildChannelUnion.asTextChannel().getIdLong());
             guildRepository.save(guild);
+
+            NoticeRegistry instance = NoticeRegistry.getInstance();
+            instance.putServer(guildIdString, guild);
 
             String nowBotWillReceive = String.format(
                     jsonParsers.getTranslation("now_bot_will_receive", guildIdString),

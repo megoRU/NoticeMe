@@ -6,8 +6,12 @@ import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Lock;
+import main.model.entity.Server;
 import main.model.entity.Subs;
-import main.model.repository.*;
+import main.model.repository.GuildRepository;
+import main.model.repository.LanguageRepository;
+import main.model.repository.LockRepository;
+import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -25,7 +29,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
 import org.boticordjava.api.io.UnsuccessfulHttpException;
-import org.discordbots.api.client.DiscordBotListAPI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,6 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -55,12 +57,6 @@ public class BotStartConfig {
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
-    //API
-    private final DiscordBotListAPI TOP_GG_API = new DiscordBotListAPI.Builder()
-            .token(Config.getTopGgApiToken())
-            .botId(Config.getBotId())
-            .build();
-
     private final BotiCordAPI api = new BotiCordAPI.Builder()
             .token(System.getenv("BOTICORD"))
             .build();
@@ -69,6 +65,7 @@ public class BotStartConfig {
     private final NoticeRepository noticeRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
+    private final GuildRepository guildRepository;
 
     private final UpdateController updateController;
 
@@ -76,10 +73,12 @@ public class BotStartConfig {
     public BotStartConfig(NoticeRepository noticeRepository,
                           LanguageRepository languageRepository,
                           LockRepository lockRepository,
+                          GuildRepository guildRepository,
                           UpdateController updateController) {
         this.noticeRepository = noticeRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
+        this.guildRepository = guildRepository;
         this.updateController = updateController;
     }
 
@@ -89,6 +88,7 @@ public class BotStartConfig {
             //Update
             setLanguages();
             getLanguages();
+            getAllServers();
             getLockStatus();
             getAllUsers();
 
@@ -209,7 +209,6 @@ public class BotStartConfig {
         if (!Config.isIsDev()) {
             try {
                 int serverCount = BotStartConfig.jda.getGuilds().size();
-                TOP_GG_API.setStats(serverCount);
                 jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
                 int countMembers = jda.getGuilds().stream()
@@ -286,6 +285,20 @@ public class BotStartConfig {
         }
     }
 
+    private void getAllServers() {
+        try {
+            NoticeRegistry instance = NoticeRegistry.getInstance();
+            List<Server> serverList = guildRepository.findAll();
+            for (Server server : serverList) {
+                String serverId = server.getGuildIdLong().toString();
+                instance.putServer(serverId, server);
+            }
+            System.out.println("getAllServers()");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getAllUsers() {
         try {
             List<Subs> noticeList = noticeRepository.findAll();
@@ -306,5 +319,4 @@ public class BotStartConfig {
     public static Map<String, Language.LanguageEnum> getMapLanguages() {
         return mapLanguages;
     }
-
 }
