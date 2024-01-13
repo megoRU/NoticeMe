@@ -1,8 +1,8 @@
 package main.core.core;
 
 import main.model.entity.Server;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 

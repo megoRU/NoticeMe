@@ -1,5 +1,7 @@
 package main.config;
 
+import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
@@ -28,9 +30,8 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
-import org.boticordjava.api.io.UnsuccessfulHttpException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,17 +50,18 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
 @Configuration
 @EnableScheduling
+@AllArgsConstructor
 public class BotStartConfig {
 
     public static final String activity = "/help | ";
+
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     public static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
+
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
-    private final BotiCordAPI api = new BotiCordAPI.Builder()
-            .token(System.getenv("BOTICORD"))
-            .build();
+    private final BotiCordAPI api = new BotiCordAPI.Builder().token(System.getenv("BOTICORD")).build();
 
     //REPOSITORY
     private final NoticeRepository noticeRepository;
@@ -69,21 +71,8 @@ public class BotStartConfig {
 
     private final UpdateController updateController;
 
-    @Autowired
-    public BotStartConfig(NoticeRepository noticeRepository,
-                          LanguageRepository languageRepository,
-                          LockRepository lockRepository,
-                          GuildRepository guildRepository,
-                          UpdateController updateController) {
-        this.noticeRepository = noticeRepository;
-        this.languageRepository = languageRepository;
-        this.lockRepository = lockRepository;
-        this.guildRepository = guildRepository;
-        this.updateController = updateController;
-    }
-
-    @Bean
-    public void startBot() {
+    @PostConstruct
+    private void startBot() {
         try {
             //Update
             setLanguages();
@@ -215,12 +204,9 @@ public class BotStartConfig {
                         .map(Guild::getMembers)
                         .mapToInt(Collection::size)
                         .sum();
-                try {
-                    BotStats botStats = new BotStats(countMembers, serverCount, 1);
-                    api.setBotStats(Config.getBotId(), botStats);
-                } catch (UnsuccessfulHttpException un) {
-                    un.printStackTrace();
-                }
+
+                BotStats botStats = new BotStats(countMembers, serverCount, 1);
+                api.setBotStats(Config.getBotId(), botStats);
             } catch (Exception e) {
                 e.printStackTrace();
                 Thread.currentThread().interrupt();
@@ -238,15 +224,13 @@ public class BotStartConfig {
                 InputStream inputStream = new ClassPathResource("json/" + listLanguage + ".json").getInputStream();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                JSONObject jsonObject = (JSONObject) new JSONParser().parse(reader);
+                JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
 
-                for (Object o : jsonObject.keySet()) {
-                    String key = (String) o;
-
+                for (String o : jsonObject.keySet()) {
                     if (listLanguage.equals("rus")) {
-                        ParserClass.russian.put(key, String.valueOf(jsonObject.get(key)));
+                        ParserClass.russian.put(o, String.valueOf(jsonObject.get(o)));
                     } else {
-                        ParserClass.english.put(key, String.valueOf(jsonObject.get(key)));
+                        ParserClass.english.put(o, String.valueOf(jsonObject.get(o)));
                     }
                 }
                 reader.close();
