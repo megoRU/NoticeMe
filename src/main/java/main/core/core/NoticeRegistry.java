@@ -31,6 +31,9 @@ public class NoticeRegistry {
         trackingUserConcurrentMap.put(guildId, concurrentMap);
     }
 
+    /*
+        userId этот тот кто подписан на userIdTracker
+     */
     public void sub(String guildId, String userId, String userIdTracker) {
         if (!hasGuild(guildId)) {
             TrackingUser trackingUser = new TrackingUser();
@@ -53,7 +56,8 @@ public class NoticeRegistry {
     //                                                        TrackingUser | Data
     private void saveTrackingUser(String guildId, String user, TrackingUser trackingUser) {
         ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
-        if (stringTrackingUserConcurrentMap == null) throw new IllegalArgumentException("In this collection does not exist Guild: saveTrackingUser()");
+        if (stringTrackingUserConcurrentMap == null)
+            throw new IllegalArgumentException("In this collection does not exist Guild: saveTrackingUser()");
         stringTrackingUserConcurrentMap.put(user, trackingUser);
     }
 
@@ -97,7 +101,8 @@ public class NoticeRegistry {
     public void unsub(String guildId, String trackingUserId, String userId) {
         ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
         if (stringTrackingUserConcurrentMap != null) {
-            stringTrackingUserConcurrentMap.get(trackingUserId).removeUserFromList(userId);
+            TrackingUser trackingUser = stringTrackingUserConcurrentMap.get(trackingUserId);
+            if (trackingUser != null) trackingUser.removeUserFromList(userId);
         }
     }
 
