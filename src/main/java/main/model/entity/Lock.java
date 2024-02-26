@@ -26,5 +26,4 @@ public class Lock {
         LOCKED,
         UNLOCKED
     }
-
 }

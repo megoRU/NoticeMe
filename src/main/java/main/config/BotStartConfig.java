@@ -32,8 +32,6 @@ import org.boticordjava.api.entity.bot.stats.BotStats;
 import org.boticordjava.api.impl.BotiCordAPI;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
