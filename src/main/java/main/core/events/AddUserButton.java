@@ -61,7 +61,7 @@ public class AddUserButton {
             subs.setUserId(event.getUser().getIdLong());
             subs.setUserTrackingId(userFromButton);
             noticeRepository.save(subs);
-            String userSaved = jsonParsers.getTranslation("user_saved", guildIdString);
+            String userSaved = String.format(jsonParsers.getTranslation("user_saved", guildIdString), userFromButton);
             event.getHook().sendMessage(userSaved).setEphemeral(true).queue();
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
