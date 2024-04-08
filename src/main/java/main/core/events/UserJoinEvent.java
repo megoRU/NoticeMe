@@ -1,5 +1,6 @@
 package main.core.events;
 
+import jakarta.annotation.Nullable;
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
@@ -45,6 +46,7 @@ public class UserJoinEvent {
 
         try {
             VoiceChannel voiceChannel = getAsChannel(event.getChannelJoined());
+            if (voiceChannel == null) return;
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             List<Member> members = voiceChannel.getMembers(); //Always 1+ users
 
@@ -101,8 +103,12 @@ public class UserJoinEvent {
         }
     }
 
+    @Nullable
     private VoiceChannel getAsChannel(AudioChannelUnion audioChannelUnion) {
         if (audioChannelUnion instanceof VoiceChannel) return audioChannelUnion.asVoiceChannel();
-        else throw new IllegalArgumentException(audioChannelUnion.getName() + " is not a VoiceChannel!");
+        else {
+            System.out.println(audioChannelUnion.getName() + " is not a VoiceChannel!");
+            return null;
+        }
     }
 }
