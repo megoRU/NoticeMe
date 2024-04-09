@@ -1,9 +1,12 @@
-FROM maven:3.9.6-amazoncorretto-21-debian
-
+# Этап сборки приложения
+FROM maven:3.9.6-amazoncorretto-21-al2023 AS builder
 WORKDIR /app
-
 COPY . .
-
 RUN ["mvn", "install", "-Dmaven.test.skip=true"]
 
-ENTRYPOINT ["java", "-jar", "./target/noticeme-0.0.1-SNAPSHOT.jar"]
+# Этап запуска приложения
+FROM openjdk:23-oraclelinux8
+ENV LANG=C.UTF-8
+WORKDIR /app
+COPY --from=builder /app/target/noticeme-0.0.1-SNAPSHOT.jar .
+ENTRYPOINT ["java", "-jar", "./noticeme-0.0.1-SNAPSHOT.jar"]
