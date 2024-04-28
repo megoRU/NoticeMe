@@ -85,15 +85,15 @@ public class BotStartConfig {
                             GatewayIntent.GUILD_MESSAGES));
 
             jdaBuilder.disableCache(
-                    CacheFlag.ACTIVITY,
-                    CacheFlag.VOICE_STATE,
-                    CacheFlag.EMOJI,
-                    CacheFlag.STICKER,
+                    CacheFlag.ONLINE_STATUS,
                     CacheFlag.CLIENT_STATUS,
                     CacheFlag.MEMBER_OVERRIDES,
+                    CacheFlag.ACTIVITY,
+
+                    CacheFlag.EMOJI,
+                    CacheFlag.STICKER,
                     CacheFlag.ROLE_TAGS,
                     CacheFlag.FORUM_TAGS,
-                    CacheFlag.ONLINE_STATUS,
                     CacheFlag.SCHEDULED_EVENTS
             );
 
