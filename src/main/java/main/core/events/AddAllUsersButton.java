@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class AddAllUsersButton {
@@ -42,13 +44,15 @@ public class AddAllUsersButton {
         List<User> members = event.getMessage().getMentions().getUsers();
         List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildIdLong);
 
-        //TODO: Сделать в один filter
-        List<User> collect = members
+        // Получение идентификаторов всех подписок в виде Map
+        Map<String, String> userSubsMap = allSubs
                 .stream()
-                .filter(a -> allSubs.stream()
-                        .map(Subs::getUserTrackingId)
-                        .noneMatch(s -> s.contains(a.getId())))
-                .filter(m -> !BotStartConfig.mapLocks.containsKey(m.getId()))
+                .collect(Collectors.toMap(Subs::getUserTrackingId, Subs::getUserTrackingId));
+
+        // Фильтрация и сборка упомянутых пользователей
+        List<User> collect = members.stream()
+                .parallel() // Параллельная обработка
+                .filter(u -> !userSubsMap.containsKey(u.getId()) && !BotStartConfig.mapLocks.containsKey(u.getId()))
                 .toList();
 
         List<Subs> subsList = new ArrayList<>();

@@ -45,7 +45,7 @@ public class AddUserButton {
         }
 
         //TODO: Возможно быстрее проверять локально
-        Subs isUserContains = noticeRepository.findAllByUserIdAndUserTrackingId(guildIdLong, userFromButton, user.getIdLong());
+        Subs isUserContains = noticeRepository.findTrackingUser(user.getIdLong(), guildIdLong, userFromButton);
 
         if (isUserContains == null) {
             Server server = guildRepository.findServerByGuildIdLong(event.getGuild().getIdLong());
@@ -58,7 +58,7 @@ public class AddUserButton {
 
             Subs subs = new Subs();
             subs.setServer(server);
-            subs.setUserId(event.getUser().getIdLong());
+            subs.setUserId(user.getIdLong());
             subs.setUserTrackingId(userFromButton);
             noticeRepository.save(subs);
             String userSaved = String.format(jsonParsers.getTranslation("user_saved", guildIdString), userFromButton);

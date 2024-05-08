@@ -39,6 +39,7 @@ public class SubCommand {
         event.deferReply().setEphemeral(true).queue();
 
         User userDest = event.getOption("user", OptionMapping::getAsUser);
+
         if (userDest == null) {
             event.getHook().sendMessage("user is null").setEphemeral(true).queue();
             return;
@@ -46,7 +47,7 @@ public class SubCommand {
             String yourself = jsonParsers.getTranslation("yourself", guildIdString);
             event.getHook().sendMessage(yourself).setEphemeral(true).queue();
             return;
-        } else if (user.isBot()) {
+        } else if (userDest.isBot()) {
             String bot = jsonParsers.getTranslation("bot", guildIdString);
             event.getHook().sendMessage(bot).setEphemeral(true).queue();
             return;
@@ -60,17 +61,24 @@ public class SubCommand {
 
         Optional<Server> guildOptional = guildRepository.findById(guildId);
         if (guildOptional.isPresent()) {
-            Subs notice = new Subs();
-            notice.setServer(guildOptional.get());
-            notice.setUserId(user.getIdLong());
-            notice.setUserTrackingId(userDest.getId());
-            noticeRepository.save(notice);
+            Subs trackingUser = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userDest.getId());
 
-            NoticeRegistry instance = NoticeRegistry.getInstance();
-            instance.sub(guildIdString, user.getId(), userDest.getId());
+            if (trackingUser == null) {
+                Subs notice = new Subs();
+                notice.setServer(guildOptional.get());
+                notice.setUserId(user.getIdLong());
+                notice.setUserTrackingId(userDest.getId());
+                noticeRepository.save(notice);
 
-            String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
-            event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();
+                NoticeRegistry instance = NoticeRegistry.getInstance();
+                instance.sub(guildIdString, user.getId(), userDest.getId());
+
+                String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
+                event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();
+            } else {
+                String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
+                event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
+            }
         } else {
             String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
             event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
