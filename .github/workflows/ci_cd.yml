@@ -33,15 +33,8 @@ jobs:
           java-version: '20'
           distribution: 'oracle'
           cache: 'maven'
-
-      # Вход в Docker Registry:
-      - name: Docker login
-        run: docker login docker.megoru.ru -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASSWORD }}
-
-      # Сборка и тегирование Docker-образа:
-      - name: Build and tag image
-        run: docker build -t docker.megoru.ru/notice-me-bot:latest .
-
-      # Отправка образа в Docker Registry:
-      - name: Publish image
-        run: docker push docker.megoru.ru/notice-me-bot:latest
+      - name: Docker login and push
+        run: |
+          docker login docker.megoru.ru -u ${{ secrets.DOCKER_LOGIN }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker build -t docker.megoru.ru/notice-me-bot:latest .
+          docker push docker.megoru.ru/notice-me-bot:latest
