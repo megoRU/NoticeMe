@@ -9,14 +9,12 @@ import main.model.entity.Server;
 import main.model.repository.EntriesRepository;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,14 +22,15 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class UserJoinEvent {
 
     private static final ParserClass jsonParsers = new ParserClass();
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
 
     private final EntriesRepository entriesRepository;
 
@@ -66,40 +65,24 @@ public class UserJoinEvent {
 
             if (instanceUser == null) return;
             String userList = instanceUser.getUserList();
-            //TODO: Возможно переделать на локальный. Это ускорит при большой нагрузке
             if (!instanceUser.hasUserJoin()) {
                 Server server = instance.getServer(guild.getId());
                 if (server != null) {
                     TextChannel textChannel = event.getGuild().getTextChannelById(server.getTextChannelId());
                     if (textChannel != null) {
-                        if (event.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
+                        Member selfMember = event.getGuild().getSelfMember();
+                        if (selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
                             String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
                                     user.getName(),
                                     voiceChannel.getId(),
                                     userList);
-
-                            if (event.getGuild().getSelfMember().hasPermission(voiceChannel, Permission.CREATE_INSTANT_INVITE)) {
-                                String connectTo = String.format(jsonParsers.getTranslation("connect_to", guild.getId()), voiceChannel.getName());
-                                CompletableFuture<Invite> submit = voiceChannel
-                                        .createInvite()
-                                        .setMaxUses(instanceUser.getUserCount())
-                                        .setMaxAge(1L, TimeUnit.HOURS)
-                                        .submit();
-
-                                Button url = Button.link(submit.get().getUrl(), connectTo);
-                                textChannel.sendMessage(text).setActionRow(url).queue();
-                            } else {
-                                textChannel.sendMessage(text).queue();
-                            }
+                            textChannel.sendMessage(text).queue();
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            if (!e.getMessage().contains("is not a VoiceChannel")) {
-                e.printStackTrace();
-            }
-            System.out.println("UserJoinEvent: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "UserJoinEvent: ", e);
         }
     }
 
@@ -107,7 +90,7 @@ public class UserJoinEvent {
     private VoiceChannel getAsChannel(AudioChannelUnion audioChannelUnion) {
         if (audioChannelUnion instanceof VoiceChannel) return audioChannelUnion.asVoiceChannel();
         else {
-            System.out.println(audioChannelUnion.getName() + " is not a VoiceChannel!");
+            LOGGER.info(audioChannelUnion.getName() + " is not a VoiceChannel!");
             return null;
         }
     }

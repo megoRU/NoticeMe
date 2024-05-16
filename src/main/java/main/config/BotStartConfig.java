@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
+import main.core.events.UserJoinEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.Language;
 import main.model.entity.Lock;
@@ -43,6 +44,8 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -52,6 +55,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class BotStartConfig {
 
     public static final String activity = "/help | ";
+    private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     public static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
@@ -107,7 +111,7 @@ public class BotStartConfig {
             jda = jdaBuilder.build();
             jda.awaitReady();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Starting Bot error", e);
         }
 
         List<Command> complete = jda.retrieveCommands().complete();
@@ -194,7 +198,7 @@ public class BotStartConfig {
 
             commands.queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Slash error", e);
         }
     }
 
@@ -244,7 +248,7 @@ public class BotStartConfig {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "setLanguages", e);
         }
     }
 
@@ -256,7 +260,7 @@ public class BotStartConfig {
             }
             System.out.println("getLanguages()");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "getLanguages", e);
         }
     }
 
@@ -270,7 +274,7 @@ public class BotStartConfig {
             }
             System.out.println("getLockStatus()");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "getLockStatus", e);
         }
     }
 
@@ -284,7 +288,7 @@ public class BotStartConfig {
             }
             System.out.println("getAllServers()");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "getAllServers", e);
         }
     }
 
@@ -301,7 +305,7 @@ public class BotStartConfig {
             }
             System.out.println("getAllUsers()");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "getAllUsers", e);
         }
     }
 
