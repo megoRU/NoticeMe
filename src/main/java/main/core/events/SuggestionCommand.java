@@ -67,8 +67,8 @@ public class SuggestionCommand {
                     stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
                 }
                 if (buttonsList.size() <= 23) {
-                    User userFromBD = BotStartConfig.jda.retrieveUserById(stringList.get(i)).complete();
-                    String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getName());
+                    User userFromBD = event.getJDA().retrieveUserById(stringList.get(i)).complete();
+                    String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getGlobalName());
 
                     buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + stringList.get(i), addUser));
                 }
