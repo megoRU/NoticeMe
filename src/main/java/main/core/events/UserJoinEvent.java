@@ -42,10 +42,17 @@ public class UserJoinEvent {
     public void userJoin(@NotNull GuildVoiceUpdateEvent event) {
         Guild guild = event.getGuild();
         User user = event.getMember().getUser();
+        Member selfMember = guild.getSelfMember();
 
         try {
             VoiceChannel voiceChannel = getAsChannel(event.getChannelJoined());
             if (voiceChannel == null) return;
+
+            String name = voiceChannel.getName();
+            boolean hasPermissionViewChannel = selfMember.hasPermission(voiceChannel, Permission.VIEW_CHANNEL);
+
+            if (!hasPermissionViewChannel || name.contains("AFK")) return;
+
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             List<Member> members = voiceChannel.getMembers(); //Always 1+ users
 
@@ -68,9 +75,8 @@ public class UserJoinEvent {
             if (!instanceUser.hasUserJoin()) {
                 Server server = instance.getServer(guild.getId());
                 if (server != null) {
-                    TextChannel textChannel = event.getGuild().getTextChannelById(server.getTextChannelId());
+                    TextChannel textChannel = guild.getTextChannelById(server.getTextChannelId());
                     if (textChannel != null) {
-                        Member selfMember = event.getGuild().getSelfMember();
                         if (selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
                             String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
                                     user.getName(),

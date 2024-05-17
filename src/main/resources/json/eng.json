@@ -24,7 +24,7 @@
   "add_user": "Add: %s",
   "messages_events_links": "Links:",
   "messages_events_site": ":zap: [megoru.ru](https://megoru.ru)\n",
-  "messages_events_add_me_to_other_guilds": ":robot: [Add me to other guilds](https://discord.com/oauth2/authorize?client_id=1039911109911658557&scope=bot&permissions=2147706880)\n",
+  "messages_events_add_me_to_other_guilds": ":robot: [Add me to other guilds](https://discord.com/oauth2/authorize?client_id=1039911109911658557)\n",
   "help": "All available commands and extended description",
   "language": "Changing the language",
   "setup": "Setting up a channel for notifications",
@@ -39,5 +39,6 @@
   "can_not_be_channel": "It can't be a channel: `%s`",
   "check_permissions": "Bot don't have in <#%s>\n%s",
   "connect_to": "Connect to: \uD83D\uDD0A %s",
-  "donate": "If you want to support the developer financially,\nbelow you can choose a convenient donation service for you."
+  "donate": "If you want to support the developer financially,\nbelow you can choose a convenient donation service for you.",
+  "help_ps": "1. After notifying about a user's entry into a voice channel, the bot will not notify the same user again within the next 10 minutes.\n2. The bot will ignore channels if their name contains the word 'AFK' or if there is no permission to View channel."
 }

@@ -9,10 +9,6 @@ public class TrackingUser {
     private final Set<String> userList = new ConcurrentSkipListSet<>();
     private LocalDateTime timeJoin = null;
 
-    public void putUser(String userId) {
-        userList.add(userId);
-    }
-
     public String getUserList() {
         StringBuilder stringBuilder = new StringBuilder();
         userList.forEach(u -> {
@@ -23,14 +19,6 @@ public class TrackingUser {
             }
         });
         return stringBuilder.toString();
-    }
-
-    public int getUserCount() {
-        return userList.size();
-    }
-
-    public void removeUserFromList(String userId) {
-        userList.remove(userId);
     }
 
     public boolean hasUserJoin() {
@@ -45,7 +33,19 @@ public class TrackingUser {
         }
     }
 
+    public int getUserCount() {
+        return userList.size();
+    }
+
+    public void putUser(String userId) {
+        userList.add(userId);
+    }
+
+    public void removeUserFromList(String userId) {
+        userList.remove(userId);
+    }
+
     private void setTimeJoin() {
-        timeJoin = LocalDateTime.now().plusMinutes(15);
+        timeJoin = LocalDateTime.now().plusMinutes(10);
     }
 }
