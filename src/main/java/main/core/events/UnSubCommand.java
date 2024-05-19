@@ -25,24 +25,43 @@ public class UnSubCommand {
 
     public void unsub(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
-        var guildId = event.getGuild().getIdLong();
         var user = event.getUser();
 
         event.deferReply().setEphemeral(true).queue();
         User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
         if (userFromOptions == null) return;
-        Subs notice = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userFromOptions.getId());
+
+        unsub(user.getId(), guildIdString, userFromOptions.getId(), event);
+    }
+
+    public void unsub_v2(@NotNull SlashCommandInteractionEvent event) {
+        var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var user = event.getUser();
+
+        event.deferReply().setEphemeral(true).queue();
+
+        Long userFromOptions = event.getOption("user_id", OptionMapping::getAsLong);
+        if (userFromOptions == null) return;
+
+        unsub(user.getId(), guildIdString, userFromOptions.toString(), event);
+    }
+
+    private void unsub(String userId, String guildId, String userFromOptions, @NotNull SlashCommandInteractionEvent event) {
+        long userIdLong = Long.parseLong(userId);
+        long guildIdLong = Long.parseLong(guildId);
+
+        Subs notice = noticeRepository.findTrackingUser(userIdLong, guildIdLong, userFromOptions);
 
         if (notice == null) {
-            String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildIdString);
+            String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId);
             event.getHook().sendMessage(dontFindUser).queue();
         } else {
-            noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId(), user.getIdLong());
+            noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId(), userIdLong);
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
-            instance.unsub(guildIdString, userFromOptions.getId(), user.getId());
+            instance.unsub(guildId, userFromOptions, userId);
 
-            String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildIdString), notice.getUserTrackingId());
+            String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId), notice.getUserTrackingId());
             event.getHook().sendMessage(successfullyDeleted).setEphemeral(true).queue();
         }
     }

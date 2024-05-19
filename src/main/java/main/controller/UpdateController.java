@@ -118,6 +118,14 @@ public class UpdateController {
                 UnSubCommand unSubCommand = new UnSubCommand(noticeRepository);
                 unSubCommand.unsub(event);
             }
+            case "unsub-v2" -> {
+                UnSubCommand unSubCommand = new UnSubCommand(noticeRepository);
+                unSubCommand.unsub_v2(event);
+            }
+            case "check" -> {
+                Check check = new Check(guildRepository);
+                check.permission(event);
+            }
         }
     }
 

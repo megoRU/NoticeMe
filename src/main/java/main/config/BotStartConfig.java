@@ -118,7 +118,7 @@ public class BotStartConfig {
         complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("14:42");
     }
 
@@ -174,10 +174,31 @@ public class BotStartConfig {
                     .setGuildOnly(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список твоих подписок"));
 
+            List<OptionData> unsub = new ArrayList<>();
+
+            unsub.add(new OptionData(USER, "user", "Unsubscribe from a user")
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
+
             commands.addCommands(Commands.slash("unsub", "Unsubscribe from the user")
                     .setGuildOnly(true)
-                    .addOptions(notifications)
+                    .addOptions(unsub)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
+
+            List<OptionData> unsub_v2 = new ArrayList<>();
+
+            unsub_v2.add(new OptionData(INTEGER, "user_id", "Unsubscribe from a user by User ID")
+                    .setRequired(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID"));
+
+            commands.addCommands(Commands.slash("unsub-v2", "Unsubscribe from the user")
+                    .setGuildOnly(true)
+                    .addOptions(unsub_v2)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
+
+            commands.addCommands(Commands.slash("check", "Checking the bot's permissions")
+                    .setGuildOnly(true)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Проверка разрешений бота"));
 
             commands.addCommands(Commands.slash("delete", "Delete all subscribers from the server")
                     .setGuildOnly(true)
