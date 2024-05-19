@@ -118,7 +118,7 @@ public class BotStartConfig {
         complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
-        updateSlashCommands();
+//        updateSlashCommands();
         System.out.println("14:42");
     }
 
