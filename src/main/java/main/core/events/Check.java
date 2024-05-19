@@ -5,6 +5,7 @@ import main.jsonparser.ParserClass;
 import main.model.entity.Server;
 import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -22,15 +23,16 @@ public class Check {
     private static final ParserClass jsonParsers = new ParserClass();
 
     public void permission(@NotNull SlashCommandInteractionEvent event) {
-        if (event.getGuild() == null) return;
+        Guild guild = event.getGuild();
+        if (guild == null) return;
         event.deferReply().setEphemeral(true).queue();
 
-        Long guildId = event.getGuild().getIdLong();
-        Member selfMember = event.getGuild().getSelfMember();
+        Long guildId = guild.getIdLong();
+        Member selfMember = guild.getSelfMember();
         Server server = guildRepository.findServerByGuildIdLong(guildId);
+        String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildId.toString());
 
         if (server == null) {
-            String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildId.toString());
             event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
             return;
         }
@@ -39,27 +41,32 @@ public class Check {
         String acceptToVoiceChannel = jsonParsers.getTranslation("accept_to_voice_channel", guildId.toString());
 
         Long textChannelId = server.getTextChannelId();
-        TextChannel textChannel = event.getGuild().getTextChannelById(textChannelId);
+        TextChannel textChannel = guild.getTextChannelById(textChannelId);
+
+        if (textChannel == null) {
+            event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
+            return;
+        }
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(channelNotification);
 
         if (!selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
-            stringBuilder.append("❌");
+            String format = String.format(channelNotification, textChannel.getId(), "❌");
+            stringBuilder.append(format);
         } else {
-            stringBuilder.append("✅");
+            String format = String.format(channelNotification, textChannel.getId(), "✅");
+            stringBuilder.append(format);
         }
 
         stringBuilder.append("\n\n");
         stringBuilder.append(acceptToVoiceChannel);
-        stringBuilder.append("\n\n");
+        stringBuilder.append("\n");
 
-        List<VoiceChannel> voiceChannelList = event.getGuild().getVoiceChannels();
+        List<VoiceChannel> voiceChannelList = guild.getVoiceChannels();
 
         voiceChannelList.forEach(voiceChannel -> {
             boolean hasPermission = selfMember.hasPermission(voiceChannel, Permission.VIEW_CHANNEL);
-            String name = voiceChannel.getName();
-            stringBuilder.append(name).append(": ");
+            stringBuilder.append("<#").append(voiceChannel.getId()).append(">").append(": ");
             if (hasPermission) {
                 stringBuilder.append("✅");
             } else {
@@ -68,6 +75,6 @@ public class Check {
             stringBuilder.append("\n");
         });
 
-        event.getHook().sendMessage(stringBuilder.toString()).setEphemeral(true).queue();
+        event.getHook().sendMessage(stringBuilder.toString()).queue();
     }
 }
