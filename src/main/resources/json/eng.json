@@ -42,5 +42,6 @@
   "donate": "If you want to support the developer financially,\nbelow you can choose a convenient donation service for you.",
   "help_ps": "1. After notifying about a user's entry into a voice channel, the bot will not notify the same user again within the next 10 minutes.\n2. The bot will ignore channels if their name contains the word 'AFK' or if there is no permission to View channel.",
   "channel_notification": "Notification channel: ",
-  "accept_to_voice_channel": "Access to voice channels:"
+  "accept_to_voice_channel": "Access to voice channels:",
+  "check": "Checking the bot's permission"
 }

@@ -35,6 +35,7 @@ public class HelpCommand {
         String helpLock = jsonParsers.getTranslation("help_lock", guildIdString);
         String helpUnlock = jsonParsers.getTranslation("help_unlock", guildIdString);
         String helpPs = jsonParsers.getTranslation("help_ps", guildIdString);
+        String check = jsonParsers.getTranslation("check", guildIdString);
 
         String text = String.format(
                 """
@@ -48,10 +49,11 @@ public class HelpCommand {
                         </suggestion:1045316663718969357> - %s
                         </lock:1045675151473254470> - %s
                         </unlock:1045675151473254471> - %s
+                        </check:1241705257822847012> - %s
                         
                         P. S.:
                         %s
-                        """, help, language, setup, list, unsub, sub, delete, suggestion, helpLock, helpUnlock, helpPs);
+                        """, help, language, setup, list, unsub, sub, delete, suggestion, helpLock, helpUnlock, check, helpPs);
 
         String slashCommands = jsonParsers.getTranslation("slash_commands", guildIdString);
         String messagesEventsLinks = jsonParsers.getTranslation("messages_events_links", guildIdString);
