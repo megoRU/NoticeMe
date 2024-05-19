@@ -118,7 +118,7 @@ public class BotStartConfig {
         complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("14:42");
     }
 
@@ -187,7 +187,7 @@ public class BotStartConfig {
 
             List<OptionData> unsub_v2 = new ArrayList<>();
 
-            unsub_v2.add(new OptionData(INTEGER, "user_id", "Unsubscribe from a user by User ID")
+            unsub_v2.add(new OptionData(STRING, "user_id", "Unsubscribe from a user by User ID")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID"));
 

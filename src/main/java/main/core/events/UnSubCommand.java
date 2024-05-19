@@ -40,10 +40,11 @@ public class UnSubCommand {
 
         event.deferReply().setEphemeral(true).queue();
 
-        Long userFromOptions = event.getOption("user_id", OptionMapping::getAsLong);
+        String userFromOptions = event.getOption("user_id", OptionMapping::getAsString);
         if (userFromOptions == null) return;
+        if (!userFromOptions.matches("[0-9]+")) return;
 
-        unsub(user.getId(), guildIdString, userFromOptions.toString(), event);
+        unsub(user.getId(), guildIdString, userFromOptions, event);
     }
 
     private void unsub(String userId, String guildId, String userFromOptions, @NotNull SlashCommandInteractionEvent event) {
