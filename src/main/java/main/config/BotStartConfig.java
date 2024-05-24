@@ -7,14 +7,8 @@ import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
 import main.core.events.UserJoinEvent;
 import main.jsonparser.ParserClass;
-import main.model.entity.Language;
-import main.model.entity.Lock;
-import main.model.entity.Server;
-import main.model.entity.Subs;
-import main.model.repository.GuildRepository;
-import main.model.repository.LanguageRepository;
-import main.model.repository.LockRepository;
-import main.model.repository.NoticeRepository;
+import main.model.entity.*;
+import main.model.repository.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -59,6 +53,7 @@ public class BotStartConfig {
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     public static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
+    public static final ConcurrentMap<String, Advertisement.Status> advStatus = new ConcurrentHashMap<>();
 
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -70,6 +65,7 @@ public class BotStartConfig {
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final GuildRepository guildRepository;
+    private final AdvertisementRepository advertisementRepository;
 
     private final UpdateController updateController;
 
@@ -82,6 +78,7 @@ public class BotStartConfig {
             getAllServers();
             getLockStatus();
             getAllUsers();
+            getAds();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -282,6 +279,20 @@ public class BotStartConfig {
             System.out.println("getLanguages()");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "getLanguages", e);
+        }
+    }
+
+    private void getAds() {
+        try {
+            List<Advertisement> advertisementList = advertisementRepository.findAll();
+            for (Advertisement advertisement : advertisementList) {
+                Advertisement.Status status = advertisement.getStatus();
+                Long guildId = advertisement.getGuildId();
+                advStatus.put(guildId.toString(), status);
+            }
+            System.out.println("getAds()");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "getAds", e);
         }
     }
 
