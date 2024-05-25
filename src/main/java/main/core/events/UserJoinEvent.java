@@ -106,7 +106,7 @@ public class UserJoinEvent {
 
         if (languageEnum == Language.LanguageEnum.RU && status != Advertisement.Status.DISABLED) {
             Button vpnLink = Button.link("https://t.me/mego_vpn_bot?start=227729655", "Наш приватный VPN");
-            Button disableAds = Button.danger(NoticeMeUtils.DISABLE_ADS, "Отключить рекламу");
+            Button disableAds = Button.secondary(NoticeMeUtils.DISABLE_ADS, "Отключить рекламу");
             channel.sendMessage(message).addActionRow(List.of(vpnLink, disableAds)).queue();
         } else {
             channel.sendMessage(message).queue();
