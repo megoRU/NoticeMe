@@ -48,7 +48,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 @AllArgsConstructor
 public class BotStartConfig {
 
-    public static final String activity = "/help | ";
+    public static final String activity = "/sub | ";
     private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
