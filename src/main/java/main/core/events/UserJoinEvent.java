@@ -3,6 +3,7 @@ package main.core.events;
 import jakarta.annotation.Nullable;
 import main.config.BotStartConfig;
 import main.core.NoticeMeUtils;
+import main.core.core.MessageData;
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
@@ -14,6 +15,7 @@ import main.model.repository.EntriesRepository;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
@@ -27,8 +29,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,8 +89,18 @@ public class UserJoinEvent {
                                     user.getName(),
                                     voiceChannel.getId(),
                                     userList);
-                            sendMessage(textChannel, text);
+                            sendMessage(textChannel, text, voiceChannel.getId(), user.getName(), user.getId());
                         }
+                    }
+                }
+            }
+
+            Server server = instance.getServer(guild.getId());
+            if (server != null) {
+                TextChannel textChannel = guild.getTextChannelById(server.getTextChannelId());
+                if (textChannel != null) {
+                    if (selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
+                        updateMessage(textChannel, user.getId());
                     }
                 }
             }
@@ -99,7 +109,7 @@ public class UserJoinEvent {
         }
     }
 
-    private void sendMessage(TextChannel channel, String message) {
+    private void sendMessage(TextChannel channel, String message, String voiceChannelId, String userName, String userId) {
         String guildId = channel.getGuild().getId();
         Advertisement.Status status = BotStartConfig.advStatus.get(guildId);
         Language.LanguageEnum languageEnum = BotStartConfig.getMapLanguages().get(guildId);
@@ -107,9 +117,55 @@ public class UserJoinEvent {
         if (languageEnum == Language.LanguageEnum.RU && status != Advertisement.Status.DISABLED) {
             Button vpnLink = Button.link("https://t.me/mego_vpn_bot?start=227729655", "Наш приватный VPN");
             Button disableAds = Button.secondary(NoticeMeUtils.DISABLE_ADS, "Отключить рекламу");
-            channel.sendMessage(message).addActionRow(List.of(vpnLink, disableAds)).queue();
+            channel.sendMessage(message)
+                    .addActionRow(List.of(vpnLink, disableAds))
+                    .queue(m -> saveMessageData(m, voiceChannelId, userName, userId));
         } else {
-            channel.sendMessage(message).queue();
+            channel.sendMessage(message)
+                    .queue(m -> saveMessageData(m, voiceChannelId, userName, userId));
+        }
+    }
+
+    private void saveMessageData(Message message, String voiceChannelId, String userName, String userId) {
+        NoticeRegistry instance = NoticeRegistry.getInstance();
+
+        String messageId = message.getId();
+        List<User> userList = message.getMentions().getUsers();
+        String guildId = message.getGuild().getId();
+
+        MessageData.MessageDataBuilder builder = MessageData.builder();
+        builder.messageId(messageId);
+        builder.guildId(guildId);
+        builder.userList(userList);
+        builder.voiceChannelId(voiceChannelId);
+        builder.userName(userName);
+
+        instance.saveMessageData(userId, builder.build());
+    }
+
+    private void updateMessage(TextChannel channel, String userId) {
+        String guildId = channel.getGuild().getId();
+        Advertisement.Status status = BotStartConfig.advStatus.get(guildId);
+        Language.LanguageEnum languageEnum = BotStartConfig.getMapLanguages().get(guildId);
+        NoticeRegistry instance = NoticeRegistry.getInstance();
+
+        MessageData messageData = instance.getMessageData(userId, guildId);
+        if (messageData == null) return;
+
+        //Удаляем его из списка
+        messageData.removeUserFromList(userId);
+
+        String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guildId),
+                messageData.getUserName(),
+                messageData.getVoiceChannelId(),
+                messageData.getUserList());
+
+        if (languageEnum == Language.LanguageEnum.RU && status != Advertisement.Status.DISABLED) {
+            Button vpnLink = Button.link("https://t.me/mego_vpn_bot?start=227729655", "Наш приватный VPN");
+            Button disableAds = Button.secondary(NoticeMeUtils.DISABLE_ADS, "Отключить рекламу");
+            channel.editMessageById(messageData.getMessageId(), text).setActionRow(List.of(vpnLink, disableAds)).queue();
+        } else {
+            channel.editMessageById(messageData.getMessageId(), text).queue();
         }
     }
 

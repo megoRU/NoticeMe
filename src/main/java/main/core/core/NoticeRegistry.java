@@ -3,6 +3,7 @@ package main.core.core;
 import main.model.entity.Server;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -11,6 +12,10 @@ public class NoticeRegistry {
     //Guild | List: userTrackerId | TrackingUser
     private static final ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Server> serverListMap = new ConcurrentHashMap<>();
+
+    //UserId
+    private static final ConcurrentMap<String, MessageData> messageDataMap = new ConcurrentHashMap<>();
+
     private static volatile NoticeRegistry noticeRegistry;
 
     private NoticeRegistry() {
@@ -29,6 +34,22 @@ public class NoticeRegistry {
 
     private void save(String guildId, ConcurrentMap<String, TrackingUser> concurrentMap) {
         trackingUserConcurrentMap.put(guildId, concurrentMap);
+    }
+
+    public void saveMessageData(String userId, MessageData messageData) {
+        messageDataMap.put(userId, messageData);
+    }
+
+    @Nullable
+    public MessageData getMessageData(String userId, String guildId) {
+        Collection<MessageData> values = messageDataMap.values();
+
+        for (MessageData messageData : values) {
+            boolean userHere = messageData.isUserHere(userId, guildId);
+            System.out.println(userHere + " " + messageData.getUserList());
+            if (userHere) return messageData;
+        }
+        return null;
     }
 
     /*
