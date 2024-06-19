@@ -91,7 +91,6 @@ public class BotStartConfig {
                     CacheFlag.CLIENT_STATUS,
                     CacheFlag.MEMBER_OVERRIDES,
                     CacheFlag.ACTIVITY,
-
                     CacheFlag.EMOJI,
                     CacheFlag.STICKER,
                     CacheFlag.ROLE_TAGS,
