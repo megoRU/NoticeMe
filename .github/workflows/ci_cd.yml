@@ -11,10 +11,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 20
+      - name: Set up JDK 21
         uses: actions/setup-java@v4.2.1
         with:
-          java-version: '20'
+          java-version: '21'
           distribution: 'oracle'
           cache: 'maven'
       - name: Run Tests
@@ -27,10 +27,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 20
+      - name: Set up JDK 21
         uses: actions/setup-java@v4.2.1
         with:
-          java-version: '20'
+          java-version: '21'
           distribution: 'oracle'
           cache: 'maven'
       - name: Docker login and push

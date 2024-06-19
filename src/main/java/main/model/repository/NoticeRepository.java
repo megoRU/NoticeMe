@@ -2,6 +2,8 @@ package main.model.repository;
 
 import jakarta.transaction.Transactional;
 import main.model.entity.Subs;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +30,9 @@ public interface NoticeRepository extends JpaRepository<Subs, Long> {
     @Modifying
     @Query(value = "DELETE FROM Subs s WHERE s.userTrackingId = :userTrack AND s.userId = :userId")
     void deleteByUserTrackingId(@Param("userTrack") String userTrack, @Param("userId") Long userId);
+
+    @Override
+    @NotNull
+    @EntityGraph(attributePaths = {"server"})
+    List<Subs> findAll();
 }

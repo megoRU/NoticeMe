@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.3.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.noticeme</groupId>
@@ -13,8 +13,9 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>noticeme</name>
     <description>Discord NoticeMe Bot</description>
+
     <properties>
-        <java.version>20</java.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencies>
@@ -102,8 +103,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.12.1</version>
                 <configuration>
-                    <source>20</source>
-                    <target>20</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,9 +1,8 @@
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 
-@TestMethodOrder(OrderAnnotation.class)
+@DisplayName("TestNoticeMe")
 public class TestNoticeMe {
 
     private static final NoticeRegistry instance = NoticeRegistry.getInstance();
@@ -73,10 +72,12 @@ public class TestNoticeMe {
     @DisplayName("Проверяем вывод при двух подписчиках")
     void testSaveMultiUsers() {
         instance.sub("500", "2500", "3000");
+        instance.sub("500", "2600", "3000");
+
         //Пользователь 2500 и 2000 подписаны на пользователя 3000
         TrackingUser user = instance.getUser("500", "3000");
         Assertions.assertNotNull(user);
-        Assertions.assertEquals("<@2500>", user.getUserList());
+        Assertions.assertEquals("<@2500>, <@2600>", user.getUserList());
     }
 
     @Test
