@@ -115,7 +115,7 @@ public class BotStartConfig {
         complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("14:42");
     }
 
@@ -128,6 +128,7 @@ public class BotStartConfig {
             language.add(new OptionData(STRING, "bot", "Setting the bot language")
                     .addChoice("english", Language.LanguageEnum.EN.name())
                     .addChoice("russian", Language.LanguageEnum.RU.name())
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "бот")
                     .setRequired(true)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка бота"));
 
@@ -135,25 +136,29 @@ public class BotStartConfig {
 
             setup.add(new OptionData(CHANNEL, "text-channel", "Select TextChannel for notification")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "текстовой-канал")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выберите текстовый канал для уведомления"));
 
             List<OptionData> notifications = new ArrayList<>();
 
             notifications.add(new OptionData(USER, "user", "Select a user to track")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать пользователя для отслеживания"));
 
             List<OptionData> unsub = new ArrayList<>();
 
             unsub.add(new OptionData(USER, "user", "Unsubscribe from a user")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
 
             List<OptionData> unsub_v2 = new ArrayList<>();
 
             unsub_v2.add(new OptionData(STRING, "user_id", "Unsubscribe from a user by User ID")
                     .setRequired(true)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID"));
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "id_пользователя")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по ID Пользователя"));
 
             /*
              * Команды
@@ -162,61 +167,74 @@ public class BotStartConfig {
             CommandData languageCommand = Commands.slash("language", "Setting language")
                     .setGuildOnly(true)
                     .addOptions(language)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "язык")
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка");
 
             CommandData helpCommand = Commands.slash("help", "Bot commands")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "помощь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота");
 
             CommandData donateCommand = Commands.slash("donate", "Send a donation")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "донат")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отправить пожертвование");
 
             CommandData setupCommand = Commands.slash("setup", "Set up a TextChannel for notifications")
                     .setGuildOnly(true)
                     .addOptions(setup)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "настройка")
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка текстового канала для уведомлений");
 
             CommandData subCommand = Commands.slash("sub", "Subscribe to user")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "подписаться")
                     .addOptions(notifications)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Подписаться на пользователя");
 
             CommandData listCommand = Commands.slash("list", "List of your subscriptions")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "список")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список твоих подписок");
 
             CommandData unsubCommand = Commands.slash("unsub", "Unsubscribe from the user")
                     .setGuildOnly(true)
                     .addOptions(unsub)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "отписаться")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
 
             CommandData unsubV2Command = Commands.slash("unsub-v2", "Unsubscribe from the user")
                     .setGuildOnly(true)
                     .addOptions(unsub_v2)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "отписаться-v2")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
 
             CommandData checkCommand = Commands.slash("check", "Checking the bot's permissions")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "проверка")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Проверка разрешений бота");
 
             CommandData deleteCommand = Commands.slash("delete", "Delete all subscribers from the server")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "удалить")
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера");
 
             CommandData suggestionCommand = Commands.slash("suggestion", "List of suggestions for tracking users")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "предложения")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей");
 
             CommandData lockCommand = Commands.slash("lock", "Forbid tracking yourself on all servers")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "запретить")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Запретить отслеживать себя на всех серверах");
 
             CommandData unlockCommand = Commands.slash("unlock", "Allow tracking yourself on all servers")
                     .setGuildOnly(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "разблокировка")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Разрешить отслеживать себя на всех серверах");
 
             commands.addCommands(
