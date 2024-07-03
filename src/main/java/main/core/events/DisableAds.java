@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 
@@ -44,8 +45,8 @@ public class DisableAds {
         advertisement.setStatus(Advertisement.Status.DISABLED);
         advertisementRepository.save(advertisement);
 
-        ConcurrentMap<String, Advertisement.Status> advStatus = BotStartConfig.advStatus;
-        advStatus.put(guildIdString, advertisement.getStatus());
+        Map<String, Advertisement.Status> mapAdvertisements = BotStartConfig.getMapAdvertisements();
+        mapAdvertisements.put(guildIdString, advertisement.getStatus());
 
         event.getHook().sendMessage("Реклама отключена. Помните что бесплатные проекты не могут жить вечно :)")
                 .setEphemeral(true)

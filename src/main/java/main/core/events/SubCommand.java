@@ -53,7 +53,7 @@ public class SubCommand {
             return;
         }
 
-        if (BotStartConfig.getMapLanguages().containsKey(userDest.getId())) {
+        if (BotStartConfig.getMapLocks().containsKey(userDest.getId())) {
             String cannotSubToThisUser = jsonParsers.getTranslation("cannot_sub_to_this_user", guildIdString);
             event.getHook().sendMessage(cannotSubToThisUser).setEphemeral(true).queue();
             return;

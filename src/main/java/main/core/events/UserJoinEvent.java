@@ -27,8 +27,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -101,7 +99,7 @@ public class UserJoinEvent {
 
     private void sendMessage(TextChannel channel, String message) {
         String guildId = channel.getGuild().getId();
-        Advertisement.Status status = BotStartConfig.advStatus.get(guildId);
+        Advertisement.Status status = BotStartConfig.getMapAdvertisements().get(guildId);
         Language.LanguageEnum languageEnum = BotStartConfig.getMapLanguages().get(guildId);
 
         if (languageEnum == Language.LanguageEnum.RU && status != Advertisement.Status.DISABLED) {

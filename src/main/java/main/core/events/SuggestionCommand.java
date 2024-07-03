@@ -50,7 +50,7 @@ public class SuggestionCommand {
                 .map(Entries::getUsersInChannel)
                 .flatMap(string -> Stream.of(string.split(",")))
                 .distinct()
-                .filter(a -> !BotStartConfig.mapLocks.containsKey(a))
+                .filter(a -> !BotStartConfig.getMapLocks().containsKey(a))
                 .filter(a -> allSubs.stream()
                         .map(Subs::getUserTrackingId)
                         .noneMatch(s -> s.contains(a)))

@@ -27,7 +27,7 @@ public class UnlockCommand {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
 
         event.deferReply().setEphemeral(true).queue();
-        BotStartConfig.mapLocks.remove(user.getId());
+        BotStartConfig.getMapLocks().remove(user.getId());
         String unLockString = jsonParsers.getTranslation("unlock", guildIdString);
         lockRepository.deleteLockByUserId(user.getIdLong());
 

@@ -53,8 +53,8 @@ public class BotStartConfig {
     private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
-    public static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
-    public static final ConcurrentMap<String, Advertisement.Status> advStatus = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Advertisement.Status> advStatus = new ConcurrentHashMap<>();
 
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -362,5 +362,13 @@ public class BotStartConfig {
 
     public static Map<String, Language.LanguageEnum> getMapLanguages() {
         return mapLanguages;
+    }
+
+    public static Map<String, Advertisement.Status> getMapAdvertisements() {
+        return advStatus;
+    }
+
+    public static Map<String, Lock.Locked> getMapLocks() {
+        return mapLocks;
     }
 }

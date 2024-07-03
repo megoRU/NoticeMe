@@ -38,7 +38,7 @@ public class AddUserButton {
 
         String userFromButton = buttonId.replaceAll("BUTTON_ADD_USER_", "");
 
-        if (BotStartConfig.mapLocks.containsKey(userFromButton)) {
+        if (BotStartConfig.getMapLocks().containsKey(userFromButton)) {
             String cannotSubToThisUser = jsonParsers.getTranslation("cannot_sub_to_this_user", guildIdString);
             event.getHook().sendMessage(cannotSubToThisUser).setEphemeral(true).queue();
             return;
