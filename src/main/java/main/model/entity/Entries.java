@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import main.config.BotStartConfig;
 import net.dv8tion.jda.api.entities.Member;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -39,15 +41,18 @@ public class Entries {
 
     public void setUsersInChannel(List<Member> listMembers) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Member listMember : listMembers) {
-            if (listMember.getUser().getIdLong() != userId) {
-                if (stringBuilder.isEmpty()) {
-                    stringBuilder.append(listMember.getUser().getId());
-                } else {
-                    stringBuilder.append(",").append(listMember.getUser().getId());
-                }
-            }
-        }
+        Map<String, Lock.Locked> mapLocks = BotStartConfig.getMapLocks();
+        listMembers.stream()
+                .filter(member -> member.getUser().getIdLong() != userId)
+                .filter(member -> !mapLocks.containsKey(member.getUser().getId()))
+                .forEach(member -> {
+                            if (stringBuilder.isEmpty()) {
+                                stringBuilder.append(member.getUser().getId());
+                            } else {
+                                stringBuilder.append(",").append(member.getUser().getId());
+                            }
+                        }
+                );
         if (stringBuilder.isEmpty()) this.usersInChannel = null;
         else this.usersInChannel = stringBuilder.toString();
     }
