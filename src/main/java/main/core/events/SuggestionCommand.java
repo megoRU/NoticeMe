@@ -7,18 +7,19 @@ import main.model.entity.Entries;
 import main.model.entity.Subs;
 import main.model.repository.EntriesRepository;
 import main.model.repository.NoticeRepository;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -56,41 +57,37 @@ public class SuggestionCommand {
                         .noneMatch(s -> s.contains(a)))
                 .toList();
 
-        if (!stringList.isEmpty()) {
+        Map<String, Long> frequencyMap = stringList.stream()
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        List<String> top5Users = frequencyMap.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(5)
+                .map(Map.Entry::getKey)
+                .toList();
+
+        if (!top5Users.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             List<Button> buttonsList = new ArrayList<>();
 
-            for (int i = 0; i < stringList.size(); i++) {
+            for (int i = 0; i < top5Users.size(); i++) {
                 if (stringBuilder.isEmpty()) {
-                    stringBuilder.append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
+                    stringBuilder.append((i + 1)).append(". ").append("<@").append(top5Users.get(i)).append(">");
                 } else {
-                    stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(stringList.get(i)).append(">");
+                    stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(top5Users.get(i)).append(">");
                 }
-                if (buttonsList.size() <= 23) {
-                    User userFromBD = event.getJDA().retrieveUserById(stringList.get(i)).complete();
-                    String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getGlobalName());
+                User userFromBD = event.getJDA().retrieveUserById(top5Users.get(i)).complete();
+                String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getGlobalName());
 
-                    buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + stringList.get(i), addUser));
-                }
-            }
-
-            if (buttonsList.size() > 1) {
-                String addAll = jsonParsers.getTranslation("add_all", guildIdString);
-                buttonsList.add(Button.success(NoticeMeUtils.BUTTON_ALL_USERS, addAll));
+                buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
             }
 
             String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
-            WebhookMessageCreateAction<Message> messageWebhookMessageCreateAction = event.getHook().sendMessage(suggestionText).setEphemeral(true);
 
-            int second = Math.min(buttonsList.size(), 4);
-            int first = 0;
-            int ceil = (int) Math.ceil(buttonsList.size() / 5.0);
-            for (int i = 0; i < ceil; i++) {
-                messageWebhookMessageCreateAction.addActionRow(buttonsList.subList(first, second));
-                first = second;
-                second += 4;
-            }
-            messageWebhookMessageCreateAction.queue();
+            event.getHook().sendMessage(suggestionText)
+                    .setActionRow(buttonsList)
+                    .setEphemeral(true)
+                    .queue();
         } else {
             String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
             event.getHook().sendMessage(noSuggestions).setEphemeral(true).queue();
