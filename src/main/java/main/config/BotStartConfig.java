@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
-import main.core.events.UserJoinEvent;
 import main.jsonparser.ParserClass;
 import main.model.entity.*;
 import main.model.repository.*;
@@ -50,7 +49,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class BotStartConfig {
 
     public static final String activity = "/sub | ";
-    private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(BotStartConfig.class.getName());
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
@@ -115,7 +114,7 @@ public class BotStartConfig {
         complete.forEach(command -> System.out.println(command.toString()));
 
         //Обновить команды
-//        updateSlashCommands();
+        updateSlashCommands();
         System.out.println("14:42");
     }
 

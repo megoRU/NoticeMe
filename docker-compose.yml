@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  hangman:
+    container_name: notice_me_bot
+    image: megoru/noticeme:latest
+    restart: always
+    environment:
+      PROD_TOKEN: YOUR_BOT_TOKEN #see https://discord.com/developers/applications
+      DATABASE_URL_DEV: jdbc:mariadb:// IP :3306/ YOUR_USER ?useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+      DATABASE_PASS: YOUR_PASSWORD
+      DATABASE_USER_DEV: YOUR_USER
+
+# YOUR_IP and YOUR_USER don't forget to remove the spaces
