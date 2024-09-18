@@ -1,6 +1,5 @@
 # NoticeMe
 
-# HangmanDiscordBot
 [![Java CI](https://github.com/megoRU/NoticeMe/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/megoRU/HangmanDiscordBot/actions/workflows/ci_cd.yml)
 [![Discord](https://img.shields.io/discord/779317239722672128?label=Discord)](https://discord.gg/UrWG3R683d)
 [![Docker Pulls](https://badgen.net/docker/pulls/megoru/noticeme?icon=docker&label=pulls)](https://hub.docker.com/r/megoru/noticeme/)
