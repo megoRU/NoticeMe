@@ -58,8 +58,6 @@ public class BotStartConfig {
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
 
-    private final BotiCordAPI api = new BotiCordAPI.Builder().token(System.getenv("BOTICORD")).build();
-
     //REPOSITORY
     private final NoticeRepository noticeRepository;
     private final LanguageRepository languageRepository;
@@ -242,6 +240,7 @@ public class BotStartConfig {
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
+                if (System.getenv("BOTICORD") == null) return;
                 int serverCount = BotStartConfig.jda.getGuilds().size();
                 jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
 
@@ -251,6 +250,11 @@ public class BotStartConfig {
                         .sum();
 
                 BotStats botStats = new BotStats(countMembers, serverCount, 1);
+
+                BotiCordAPI api = new BotiCordAPI.Builder()
+                        .token(System.getenv("BOTICORD"))
+                        .build();
+
                 api.setBotStats(Config.getBotId(), botStats);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "topGG", e);
