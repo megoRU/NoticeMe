@@ -6,8 +6,14 @@ import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
-import main.model.entity.*;
-import main.model.repository.*;
+import main.model.entity.Language;
+import main.model.entity.Lock;
+import main.model.entity.Server;
+import main.model.entity.Subs;
+import main.model.repository.GuildRepository;
+import main.model.repository.LanguageRepository;
+import main.model.repository.LockRepository;
+import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -53,7 +59,6 @@ public class BotStartConfig {
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<String, Advertisement.Status> advStatus = new ConcurrentHashMap<>();
 
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -63,7 +68,6 @@ public class BotStartConfig {
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final GuildRepository guildRepository;
-    private final AdvertisementRepository advertisementRepository;
 
     private final UpdateController updateController;
 
@@ -76,7 +80,6 @@ public class BotStartConfig {
             getAllServers();
             getLockStatus();
             getAllUsers();
-            getAds();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -304,20 +307,6 @@ public class BotStartConfig {
         }
     }
 
-    private void getAds() {
-        try {
-            List<Advertisement> advertisementList = advertisementRepository.findAll();
-            for (Advertisement advertisement : advertisementList) {
-                Advertisement.Status status = advertisement.getStatus();
-                Long guildId = advertisement.getGuildId();
-                advStatus.put(guildId.toString(), status);
-            }
-            System.out.println("getAds()");
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "getAds", e);
-        }
-    }
-
     private void getLockStatus() {
         try {
             List<Lock> lockList = lockRepository.findAll();
@@ -365,10 +354,6 @@ public class BotStartConfig {
 
     public static Map<String, Language.LanguageEnum> getMapLanguages() {
         return mapLanguages;
-    }
-
-    public static Map<String, Advertisement.Status> getMapAdvertisements() {
-        return advStatus;
     }
 
     public static Map<String, Lock.Locked> getMapLocks() {
