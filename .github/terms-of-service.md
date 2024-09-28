@@ -7,4 +7,4 @@ Mailing a message when a user logged into the channel
 Discord restrictions: 13+ <br>
 
 ## Privacy Policy
-See here: [Press to open](https://github.com/megoRU/NoticeMe/blob/main/privacy.md)
+See here: [Press to open](https://github.com/megoRU/NoticeMe/blob/main/.github/privacy.md)
