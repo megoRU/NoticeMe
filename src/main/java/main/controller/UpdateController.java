@@ -26,7 +26,6 @@ public class UpdateController {
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final EntriesRepository entriesRepository;
-    private final AdvertisementRepository advertisementRepository;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -39,14 +38,12 @@ public class UpdateController {
                             GuildRepository guildRepository,
                             LanguageRepository languageRepository,
                             LockRepository lockRepository,
-                            EntriesRepository entriesRepository,
-                            AdvertisementRepository advertisementRepository) {
+                            EntriesRepository entriesRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
         this.entriesRepository = entriesRepository;
-        this.advertisementRepository = advertisementRepository;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -137,12 +134,6 @@ public class UpdateController {
         if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_DELETE)) {
             DeleteButton deleteButton = new DeleteButton(guildRepository);
             deleteButton.delete(event);
-            return;
-        }
-
-        if (Objects.equals(buttonId, NoticeMeUtils.DISABLE_ADS)) {
-            DisableAds disableAds = new DisableAds(advertisementRepository);
-            disableAds.disable(event);
             return;
         }
 
