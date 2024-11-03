@@ -22,6 +22,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-22.04
+    needs: test
     steps:
 
       #     Build Docker image:
