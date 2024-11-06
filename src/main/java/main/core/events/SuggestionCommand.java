@@ -37,7 +37,7 @@ public class SuggestionCommand {
 
         event.deferReply().setEphemeral(true).queue();
 
-        List<Suggestions> suggestionsList = suggestionsRepository.findAllByUserId(user.getIdLong());
+        List<Suggestions> suggestionsList = suggestionsRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
         List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
 
         List<String> stringList = suggestionsList

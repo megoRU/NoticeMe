@@ -10,4 +10,6 @@ import java.util.List;
 public interface SuggestionsRepository extends JpaRepository<Suggestions, Long> {
 
     List<Suggestions> findAllByUserId(Long userId);
+
+    List<Suggestions> findAllByUserIdAndGuildId(long userId, long guildId);
 }
