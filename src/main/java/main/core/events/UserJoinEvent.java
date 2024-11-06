@@ -1,12 +1,13 @@
 package main.core.events;
 
 import jakarta.annotation.Nullable;
+import lombok.AllArgsConstructor;
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
-import main.model.entity.Entries;
 import main.model.entity.Server;
-import main.model.repository.EntriesRepository;
+import main.model.entity.Suggestions;
+import main.model.repository.SuggestionsRepository;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -16,29 +17,23 @@ import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
+@AllArgsConstructor
 public class UserJoinEvent {
 
     private static final ParserClass jsonParsers = new ParserClass();
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
+    private final static NoticeRegistry noticeRegistry = NoticeRegistry.getInstance();
 
-    private final EntriesRepository entriesRepository;
-
-    @Autowired
-    public UserJoinEvent(EntriesRepository entriesRepository) {
-        this.entriesRepository = entriesRepository;
-    }
+    private final SuggestionsRepository suggestionsRepository;
 
     public void userJoin(@NotNull GuildVoiceUpdateEvent event) {
         Guild guild = event.getGuild();
@@ -54,18 +49,10 @@ public class UserJoinEvent {
 
             if (!hasPermissionViewChannel || name.contains("AFK")) return;
 
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             List<Member> members = voiceChannel.getMembers(); //Always 1+ users
 
             if (members.size() > 1) {
-                //Это должно быть тут
-                Entries entries = new Entries();
-                entries.setGuildId(guild.getIdLong());
-                entries.setChannelId(voiceChannel.getIdLong());
-                entries.setUserId(user.getIdLong());
-                entries.setUsersInChannel(members);
-                entries.setJoinTime(Timestamp.valueOf(simpleDateFormat.format(timestamp)));
-                CompletableFuture.runAsync(() -> entriesRepository.save(entries));
+                CompletableFuture.runAsync(() -> updateUserSuggestions(user.getId(), members, guild.getIdLong()));
             }
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
@@ -101,5 +88,49 @@ public class UserJoinEvent {
             LOGGER.info(audioChannelUnion.getName() + " is not a VoiceChannel!");
             return null;
         }
+    }
+
+    private void updateUserSuggestions(String userId, List<Member> members, long guildId) {
+        Set<String> currentSuggestions = noticeRegistry.getSuggestions(userId);
+
+        if (currentSuggestions == null) {
+            List<Suggestions> dbSuggestions = suggestionsRepository.findAllByUserId(Long.parseLong(userId));
+            addBotSuggestions(userId, members);
+
+            if (dbSuggestions.isEmpty()) {
+                noticeRegistry.getSuggestions(userId).forEach(suggestion -> saveSuggestion(userId, suggestion, guildId));
+            } else {
+                List<Long> dbSuggestionIds = dbSuggestions.stream()
+                        .map(Suggestions::getSuggestionUserId)
+                        .toList();
+
+                members.stream()
+                        .filter(member -> !dbSuggestionIds.contains(member.getUser().getIdLong()))
+                        .filter(member -> !member.getUser().isBot())
+                        .forEach(member -> saveSuggestion(userId, member.getUser().getId(), guildId));
+            }
+        } else {
+            members.stream()
+                    .filter(member -> !currentSuggestions.contains(member.getUser().getId()))
+                    .filter(member -> !member.getUser().isBot())
+                    .forEach(member -> {
+                        noticeRegistry.addUserSuggestions(userId, member.getUser().getId());
+                        saveSuggestion(userId, member.getUser().getId(), guildId);
+                    });
+        }
+    }
+
+    private void addBotSuggestions(String userId, List<Member> members) {
+        members.stream()
+                .filter(member -> member.getUser().isBot())
+                .forEach(member -> noticeRegistry.addUserSuggestions(userId, member.getUser().getId()));
+    }
+
+    private void saveSuggestion(String userId, String suggestionUserId, long guildId) {
+        Suggestions suggestion = new Suggestions();
+        suggestion.setUserId(Long.parseLong(userId));
+        suggestion.setGuildId(guildId);
+        suggestion.setSuggestionUserId(Long.parseLong(suggestionUserId));
+        suggestionsRepository.save(suggestion);
     }
 }

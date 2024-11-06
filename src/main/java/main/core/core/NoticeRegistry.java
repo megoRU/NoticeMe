@@ -3,6 +3,8 @@ package main.core.core;
 import main.model.entity.Server;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -11,6 +13,8 @@ public class NoticeRegistry {
     //Guild | List: userTrackerId | TrackingUser
     private static final ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Server> serverListMap = new ConcurrentHashMap<>();
+    //Guild | List: user | SuggestionsList
+    private static final ConcurrentMap<String, Set<String>> userSuggestionsMap = new ConcurrentHashMap<>();
     private static volatile NoticeRegistry noticeRegistry;
 
     private NoticeRegistry() {
@@ -50,6 +54,26 @@ public class NoticeRegistry {
             } else {
                 get(guildId).get(userIdTracker).putUser(userId);
             }
+        }
+    }
+
+    public void addUserSuggestions(String userId, String userSuggestionId) {
+        Set<String> stringSet = userSuggestionsMap.get(userId);
+        if (stringSet != null) {
+            stringSet.add(userSuggestionId);
+        } else {
+            stringSet = new HashSet<>();
+            stringSet.add(userSuggestionId);
+            userSuggestionsMap.put(userId, stringSet);
+        }
+    }
+
+    public Set<String> getSuggestions(String userId) {
+        Set<String> strings = userSuggestionsMap.get(userId);
+        if (strings != null) return strings;
+        else {
+            userSuggestionsMap.put(userId, new HashSet<>());
+            return userSuggestionsMap.get(userId);
         }
     }
 

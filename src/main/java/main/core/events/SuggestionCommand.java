@@ -1,17 +1,17 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.core.NoticeMeUtils;
 import main.jsonparser.ParserClass;
-import main.model.entity.Entries;
 import main.model.entity.Subs;
-import main.model.repository.EntriesRepository;
+import main.model.entity.Suggestions;
 import main.model.repository.NoticeRepository;
+import main.model.repository.SuggestionsRepository;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,21 +20,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
+@AllArgsConstructor
 public class SuggestionCommand {
 
     private static final ParserClass jsonParsers = new ParserClass();
 
-    private final EntriesRepository entriesRepository;
     private final NoticeRepository noticeRepository;
-
-    @Autowired
-    public SuggestionCommand(EntriesRepository entriesRepository, NoticeRepository noticeRepository) {
-        this.entriesRepository = entriesRepository;
-        this.noticeRepository = noticeRepository;
-    }
+    private final SuggestionsRepository suggestionsRepository;
 
     public void suggestion(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
@@ -43,13 +37,13 @@ public class SuggestionCommand {
 
         event.deferReply().setEphemeral(true).queue();
 
-        List<Entries> allEntriesForSuggestion = entriesRepository.getAllEntriesForSuggestion(user.getIdLong(), guildId);
+        List<Suggestions> suggestionsList = suggestionsRepository.findAllByUserId(user.getIdLong());
         List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
 
-        List<String> stringList = allEntriesForSuggestion
+        List<String> stringList = suggestionsList
                 .stream()
-                .map(Entries::getUsersInChannel)
-                .flatMap(string -> Stream.of(string.split(",")))
+                .map(Suggestions::getSuggestionUserId)
+                .map(String::valueOf)
                 .distinct()
                 .filter(a -> !BotStartConfig.getMapLocks().containsKey(a))
                 .filter(a -> allSubs.stream()

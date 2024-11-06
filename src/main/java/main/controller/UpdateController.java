@@ -26,6 +26,7 @@ public class UpdateController {
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final EntriesRepository entriesRepository;
+    private final SuggestionsRepository suggestionsRepository;
 
     //LOGGER
     private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
@@ -38,12 +39,14 @@ public class UpdateController {
                             GuildRepository guildRepository,
                             LanguageRepository languageRepository,
                             LockRepository lockRepository,
-                            EntriesRepository entriesRepository) {
+                            EntriesRepository entriesRepository,
+                            SuggestionsRepository suggestionsRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
         this.entriesRepository = entriesRepository;
+        this.suggestionsRepository = suggestionsRepository;
     }
 
     public void registerBot(CoreBot coreBot) {
@@ -103,7 +106,7 @@ public class UpdateController {
                 setupCommand.setup(event);
             }
             case "suggestion" -> {
-                SuggestionCommand suggestionCommand = new SuggestionCommand(entriesRepository, noticeRepository);
+                SuggestionCommand suggestionCommand = new SuggestionCommand(noticeRepository, suggestionsRepository);
                 suggestionCommand.suggestion(event);
             }
             case "sub" -> {
@@ -158,7 +161,7 @@ public class UpdateController {
         if (event.getMember().getUser().isBot()) return;
         if (event.getChannelJoined() == null) return;
 
-        UserJoinEvent userJoinEvent = new UserJoinEvent(entriesRepository);
+        UserJoinEvent userJoinEvent = new UserJoinEvent(suggestionsRepository);
         userJoinEvent.userJoin(event);
     }
 }
