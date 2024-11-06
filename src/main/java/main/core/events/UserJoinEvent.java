@@ -93,7 +93,7 @@ public class UserJoinEvent {
     private void updateUserSuggestions(String userId, List<Member> members, long guildId) {
         Set<String> currentSuggestions = noticeRegistry.getSuggestions(userId);
 
-        if (currentSuggestions == null) {
+        if (currentSuggestions.isEmpty()) {
             List<Suggestions> dbSuggestions = suggestionsRepository.findAllByUserId(Long.parseLong(userId));
             addBotSuggestions(userId, members);
 
