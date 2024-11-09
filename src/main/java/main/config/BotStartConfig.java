@@ -19,7 +19,6 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
@@ -29,8 +28,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.boticordjava.api.entity.bot.stats.BotStats;
-import org.boticordjava.api.impl.BotiCordAPI;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.springframework.context.annotation.Configuration;
@@ -41,9 +38,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -239,29 +240,14 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 900000L, initialDelay = 8000L)
+    @Scheduled(fixedDelay = 3600, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
     private void topGG() {
         if (!Config.isIsDev()) {
             try {
-                if (System.getenv("BOTICORD") == null) return;
                 int serverCount = BotStartConfig.jda.getGuilds().size();
                 jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
-
-                int countMembers = jda.getGuilds().stream()
-                        .map(Guild::getMembers)
-                        .mapToInt(Collection::size)
-                        .sum();
-
-                BotStats botStats = new BotStats(countMembers, serverCount, 1);
-
-                BotiCordAPI api = new BotiCordAPI.Builder()
-                        .token(System.getenv("BOTICORD"))
-                        .build();
-
-                api.setBotStats(Config.getBotId(), botStats);
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "topGG", e);
-                Thread.currentThread().interrupt();
             }
         }
     }
