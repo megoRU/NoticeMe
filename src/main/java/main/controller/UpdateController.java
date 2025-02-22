@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-import java.util.logging.Logger;
 
 @Getter
 @Component
@@ -27,9 +26,6 @@ public class UpdateController {
     private final LockRepository lockRepository;
     private final EntriesRepository entriesRepository;
     private final SuggestionsRepository suggestionsRepository;
-
-    //LOGGER
-    private final static Logger LOGGER = Logger.getLogger(UpdateController.class.getName());
 
     //CORE
     private CoreBot coreBot;

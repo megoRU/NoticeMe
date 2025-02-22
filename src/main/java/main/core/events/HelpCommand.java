@@ -62,8 +62,10 @@ public class HelpCommand {
 
         info.addField(slashCommands, text, false);
         info.addField(messagesEventsLinks, messagesEventsSite + messagesEventsAddMeToOtherGuilds, false);
+
         List<Button> buttons = new ArrayList<>();
         buttons.add(Button.link("https://discord.gg/UrWG3R683d", "Support"));
+
         event.replyEmbeds(info.build()).setEphemeral(true).addActionRow(buttons).queue();
     }
 }

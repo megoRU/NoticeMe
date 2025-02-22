@@ -90,6 +90,7 @@ public class UserJoinEvent {
         }
     }
 
+    //Как я понял сохраняет предложения, но только тех которых нет в БД это интересно
     private void updateUserSuggestions(String userId, List<Member> members, long guildId) {
         Set<String> currentSuggestions = noticeRegistry.getSuggestions(userId);
 
