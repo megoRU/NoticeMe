@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.DiscordLocale;
+import net.dv8tion.jda.api.interactions.InteractionContextType;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -161,63 +162,63 @@ public class BotStartConfig {
              */
 
             CommandData languageCommand = Commands.slash("language", "Setting language")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(language)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка");
 
             CommandData helpCommand = Commands.slash("help", "Bot commands")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота");
 
             CommandData donateCommand = Commands.slash("donate", "Send a donation")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отправить пожертвование");
 
             CommandData setupCommand = Commands.slash("setup", "Set up a TextChannel for notifications")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(setup)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка текстового канала для уведомлений");
 
             CommandData subCommand = Commands.slash("sub", "Subscribe to user")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(notifications)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Подписаться на пользователя");
 
             CommandData listCommand = Commands.slash("list", "List of your subscriptions")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список твоих подписок");
 
             CommandData unsubCommand = Commands.slash("unsub", "Unsubscribe from the user")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(unsub)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
 
             CommandData unsubV2Command = Commands.slash("unsub-v2", "Unsubscribe from the user")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .addOptions(unsub_v2)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
 
             CommandData checkCommand = Commands.slash("check", "Checking the bot's permissions")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Проверка разрешений бота");
 
             CommandData deleteCommand = Commands.slash("delete", "Delete all subscribers from the server")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера");
 
             CommandData suggestionCommand = Commands.slash("suggestion", "List of suggestions for tracking users")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей");
 
             CommandData lockCommand = Commands.slash("lock", "Forbid tracking yourself on all servers")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Запретить отслеживать себя на всех серверах");
 
             CommandData unlockCommand = Commands.slash("unlock", "Allow tracking yourself on all servers")
-                    .setGuildOnly(true)
+                    .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Разрешить отслеживать себя на всех серверах");
 
             commands.addCommands(
