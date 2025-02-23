@@ -40,7 +40,7 @@ public class UnSubCommand {
 
         event.deferReply().setEphemeral(true).queue();
 
-        String userFromOptions = event.getOption("user_id", OptionMapping::getAsString);
+        String userFromOptions = event.getOption("user-id", OptionMapping::getAsString);
         if (userFromOptions == null) return;
         if (!userFromOptions.matches("[0-9]+")) return;
 

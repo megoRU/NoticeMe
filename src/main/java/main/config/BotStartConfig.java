@@ -155,11 +155,11 @@ public class BotStartConfig {
                     .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
 
-            List<OptionData> unsub_v2 = new ArrayList<>();
+            List<OptionData> unsubV2 = new ArrayList<>();
 
-            unsub_v2.add(new OptionData(STRING, "user_id", "Unsubscribe from a user by User ID")
+            unsubV2.add(new OptionData(STRING, "user-id", "Unsubscribe from a user by User ID")
                     .setRequired(true)
-                    .setNameLocalization(DiscordLocale.RUSSIAN, "id_пользователя")
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "id-пользователя")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID"));
 
             /*
@@ -202,7 +202,7 @@ public class BotStartConfig {
 
             CommandData unsubV2Command = Commands.slash("unsub-v2", "Unsubscribe from the user")
                     .setContexts(InteractionContextType.GUILD)
-                    .addOptions(unsub_v2)
+                    .addOptions(unsubV2)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
 
             CommandData checkCommand = Commands.slash("check", "Checking the bot's permissions")
