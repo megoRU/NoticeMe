@@ -131,30 +131,35 @@ public class BotStartConfig {
                     .addChoice("english", Language.LanguageEnum.EN.name())
                     .addChoice("russian", Language.LanguageEnum.RU.name())
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "бот")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка бота"));
 
             List<OptionData> setup = new ArrayList<>();
 
             setup.add(new OptionData(CHANNEL, "text-channel", "Select TextChannel for notification")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "текстовый-канал")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выберите текстовый канал для уведомления"));
 
             List<OptionData> notifications = new ArrayList<>();
 
             notifications.add(new OptionData(USER, "user", "Select a user to track")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать пользователя для отслеживания"));
 
             List<OptionData> unsub = new ArrayList<>();
 
             unsub.add(new OptionData(USER, "user", "Unsubscribe from a user")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
 
             List<OptionData> unsub_v2 = new ArrayList<>();
 
             unsub_v2.add(new OptionData(STRING, "user_id", "Unsubscribe from a user by User ID")
                     .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "id_пользователя")
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID"));
 
             /*
