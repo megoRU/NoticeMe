@@ -1,6 +1,5 @@
 package main.core;
 
-import jakarta.annotation.PostConstruct;
 import main.controller.UpdateController;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -22,7 +21,6 @@ public class CoreBot extends ListenerAdapter {
         this.updateController = updateController;
     }
 
-    @PostConstruct
     public void init() {
         updateController.registerBot(this);
     }
