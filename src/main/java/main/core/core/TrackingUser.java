@@ -33,6 +33,10 @@ public class TrackingUser {
         }
     }
 
+    public Set<String> getUserListSet() {
+        return Set.copyOf(userList);
+    }
+
     public int getUserCount() {
         return userList.size();
     }

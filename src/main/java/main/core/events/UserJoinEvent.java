@@ -31,7 +31,7 @@ public class UserJoinEvent {
 
     private static final ParserClass jsonParsers = new ParserClass();
     private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
-    private final static NoticeRegistry noticeRegistry = NoticeRegistry.getInstance();
+    private final static NoticeRegistry instance = NoticeRegistry.getInstance();
 
     private final SuggestionsRepository suggestionsRepository;
 
@@ -55,7 +55,6 @@ public class UserJoinEvent {
                 CompletableFuture.runAsync(() -> updateUserSuggestions(user.getId(), members, guild.getIdLong()));
             }
 
-            NoticeRegistry instance = NoticeRegistry.getInstance();
             TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
 
             if (instanceUser == null) return;
@@ -90,16 +89,16 @@ public class UserJoinEvent {
         }
     }
 
-    //Как я понял сохраняет предложения, но только тех которых нет в БД это интересно
+    //Как я понял сохранять предложения, но только тех которых нет в БД это интересно
     private void updateUserSuggestions(String userId, List<Member> members, long guildId) {
-        Set<String> currentSuggestions = noticeRegistry.getSuggestions(userId);
+        Set<String> currentSuggestions = instance.getSuggestions(userId);
 
         if (currentSuggestions.isEmpty()) {
             List<Suggestions> dbSuggestions = suggestionsRepository.findAllByUserId(Long.parseLong(userId));
             addBotSuggestions(userId, members);
 
             if (dbSuggestions.isEmpty()) {
-                noticeRegistry.getSuggestions(userId).forEach(suggestion -> saveSuggestion(userId, suggestion, guildId));
+                instance.getSuggestions(userId).forEach(suggestion -> saveSuggestion(userId, suggestion, guildId));
             } else {
                 List<Long> dbSuggestionIds = dbSuggestions.stream()
                         .map(Suggestions::getSuggestionUserId)
@@ -115,7 +114,7 @@ public class UserJoinEvent {
                     .filter(member -> !currentSuggestions.contains(member.getUser().getId()))
                     .filter(member -> !member.getUser().isBot())
                     .forEach(member -> {
-                        noticeRegistry.addUserSuggestions(userId, member.getUser().getId());
+                        instance.addUserSuggestions(userId, member.getUser().getId());
                         saveSuggestion(userId, member.getUser().getId(), guildId);
                     });
         }
@@ -124,7 +123,7 @@ public class UserJoinEvent {
     private void addBotSuggestions(String userId, List<Member> members) {
         members.stream()
                 .filter(member -> member.getUser().isBot())
-                .forEach(member -> noticeRegistry.addUserSuggestions(userId, member.getUser().getId()));
+                .forEach(member -> instance.addUserSuggestions(userId, member.getUser().getId()));
     }
 
     private void saveSuggestion(String userId, String suggestionUserId, long guildId) {

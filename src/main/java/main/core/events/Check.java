@@ -1,9 +1,9 @@
 package main.core.events;
 
 import lombok.AllArgsConstructor;
+import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
-import main.model.repository.GuildRepository;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,26 +19,28 @@ import java.util.List;
 @AllArgsConstructor
 public class Check {
 
-    private final GuildRepository guildRepository;
     private static final ParserClass jsonParsers = new ParserClass();
+    private static final NoticeRegistry instance = NoticeRegistry.getInstance();
 
+    //TODO: Надо проверить когда отсутствует канал, или когда нет настройки
     public void permission(@NotNull SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         if (guild == null) return;
         event.deferReply().setEphemeral(true).queue();
 
-        Long guildId = guild.getIdLong();
+        String guildIdString = guild.getId();
         Member selfMember = guild.getSelfMember();
-        Server server = guildRepository.findServerByGuildIdLong(guildId);
-        String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildId.toString());
+
+        Server server = instance.getServer(guildIdString);
+        String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
 
         if (server == null) {
             event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
             return;
         }
 
-        String channelNotification = jsonParsers.getTranslation("channel_notification", guildId.toString());
-        String acceptToVoiceChannel = jsonParsers.getTranslation("accept_to_voice_channel", guildId.toString());
+        String channelNotification = jsonParsers.getTranslation("channel_notification", guildIdString);
+        String acceptToVoiceChannel = jsonParsers.getTranslation("accept_to_voice_channel", guildIdString);
 
         Long textChannelId = server.getTextChannelId();
         TextChannel textChannel = guild.getTextChannelById(textChannelId);

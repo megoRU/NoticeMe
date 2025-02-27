@@ -1,39 +1,33 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.core.core.NoticeRegistry;
+import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
 import main.model.entity.Subs;
-import main.model.repository.GuildRepository;
 import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class SubCommand {
 
     private static final ParserClass jsonParsers = new ParserClass();
 
-    private final GuildRepository guildRepository;
     private final NoticeRepository noticeRepository;
-
-    @Autowired
-    public SubCommand(GuildRepository guildRepository, NoticeRepository noticeRepository) {
-        this.guildRepository = guildRepository;
-        this.noticeRepository = noticeRepository;
-    }
+    private final static NoticeRegistry instance = NoticeRegistry.getInstance();
 
     public void sub(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
-        var guildId = event.getGuild().getIdLong();
         var user = event.getUser();
 
         event.deferReply().setEphemeral(true).queue();
@@ -59,29 +53,41 @@ public class SubCommand {
             return;
         }
 
-        Optional<Server> guildOptional = guildRepository.findById(guildId);
-        if (guildOptional.isPresent()) {
-            Subs trackingUser = noticeRepository.findTrackingUser(user.getIdLong(), guildId, userDest.getId());
+        Server server = instance.getServer(guildIdString);
 
-            if (trackingUser == null) {
-                Subs notice = new Subs();
-                notice.setServer(guildOptional.get());
-                notice.setUserId(user.getIdLong());
-                notice.setUserTrackingId(userDest.getId());
-                noticeRepository.save(notice);
+        if (server != null) {
+            TrackingUser trackingUser = instance.getUser(guildIdString, user.getId());
 
-                NoticeRegistry instance = NoticeRegistry.getInstance();
-                instance.sub(guildIdString, user.getId(), userDest.getId());
-
-                String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
-                event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();
+            if (trackingUser != null) {
+                Set<String> userListSet = trackingUser.getUserListSet();
+                if (userListSet.contains(userDest.getId())) {
+                    String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
+                    event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
+                } else {
+                    saveUserTracking(event, server, userDest);
+                }
             } else {
-                String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
-                event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
+                saveUserTracking(event, server, userDest);
             }
         } else {
             String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
             event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
         }
+    }
+
+    private void saveUserTracking(@NotNull SlashCommandInteractionEvent event, Server server, @NotNull User userDest) {
+        var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var user = event.getUser();
+
+        Subs notice = new Subs();
+        notice.setServer(server);
+        notice.setUserId(user.getIdLong());
+        notice.setUserTrackingId(userDest.getId());
+        noticeRepository.save(notice);
+
+        instance.sub(guildIdString, user.getId(), userDest.getId());
+
+        String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
+        event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();
     }
 }

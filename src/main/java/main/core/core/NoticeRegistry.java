@@ -4,9 +4,11 @@ import main.model.entity.Server;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
 public class NoticeRegistry {
 
@@ -29,6 +31,15 @@ public class NoticeRegistry {
             }
         }
         return noticeRegistry;
+    }
+
+    public Set<String> getAllUserTrackerIdsByUserId(String guildId, String referenceId) {
+        return trackingUserConcurrentMap.getOrDefault(guildId, new ConcurrentHashMap<>())
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().getUserListSet().contains(referenceId))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 
     private void save(String guildId, ConcurrentMap<String, TrackingUser> concurrentMap) {

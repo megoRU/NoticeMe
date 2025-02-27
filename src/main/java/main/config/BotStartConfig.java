@@ -31,6 +31,8 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -46,8 +48,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -57,7 +57,7 @@ import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 public class BotStartConfig {
 
     public static final String activity = "/sub | ";
-    private final static Logger LOGGER = Logger.getLogger(BotStartConfig.class.getName());
+    private final static Logger LOGGER = LoggerFactory.getLogger(BotStartConfig.class.getName());
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
@@ -113,7 +113,7 @@ public class BotStartConfig {
             jda = jdaBuilder.build();
             jda.awaitReady();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Starting Bot error", e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         List<Command> complete = jda.retrieveCommands().complete();
@@ -245,18 +245,18 @@ public class BotStartConfig {
                             unlockCommand)
                     .queue();
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Slash error", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
     @Scheduled(fixedDelay = 3600, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
-    private void topGG() {
+    private void updateActivity() {
         if (!Config.isIsDev()) {
             try {
-                int serverCount = BotStartConfig.jda.getGuilds().size();
+                int serverCount = jda.getGuilds().size();
                 jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "topGG", e);
+                LOGGER.error(e.getMessage(), e);
             }
         }
     }
@@ -286,7 +286,7 @@ public class BotStartConfig {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "setLanguages", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -298,7 +298,7 @@ public class BotStartConfig {
             }
             System.out.println("getLanguages()");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "getLanguages", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -312,7 +312,7 @@ public class BotStartConfig {
             }
             System.out.println("getLockStatus()");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "getLockStatus", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -326,7 +326,7 @@ public class BotStartConfig {
             }
             System.out.println("getAllServers()");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "getAllServers", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -343,7 +343,7 @@ public class BotStartConfig {
             }
             System.out.println("getAllUsers()");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "getAllUsers", e);
+            LOGGER.error(e.getMessage(), e);
         }
     }
 

@@ -1,5 +1,6 @@
 package main.core.events;
 
+import lombok.AllArgsConstructor;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
@@ -11,22 +12,16 @@ import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 
 @Service
+@AllArgsConstructor
 public class SetupCommand {
 
     private static final ParserClass jsonParsers = new ParserClass();
-
     private final GuildRepository guildRepository;
-
-    @Autowired
-    public SetupCommand(GuildRepository guildRepository) {
-        this.guildRepository = guildRepository;
-    }
 
     public void setup(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();

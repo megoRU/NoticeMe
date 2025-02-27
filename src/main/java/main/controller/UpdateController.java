@@ -94,7 +94,7 @@ public class UpdateController {
                 deleteCommand.delete(event);
             }
             case "list" -> {
-                ListCommand listCommand = new ListCommand(noticeRepository);
+                ListCommand listCommand = new ListCommand();
                 listCommand.list(event);
             }
             case "setup" -> {
@@ -106,7 +106,7 @@ public class UpdateController {
                 suggestionCommand.suggestion(event);
             }
             case "sub" -> {
-                SubCommand subCommand = new SubCommand(guildRepository, noticeRepository);
+                SubCommand subCommand = new SubCommand(noticeRepository);
                 subCommand.sub(event);
             }
             case "unsub" -> {
@@ -118,7 +118,7 @@ public class UpdateController {
                 unSubCommand.unsub_v2(event);
             }
             case "check" -> {
-                Check check = new Check(guildRepository);
+                Check check = new Check();
                 check.permission(event);
             }
         }
@@ -137,7 +137,7 @@ public class UpdateController {
         }
 
         if (buttonId != null && buttonId.contains(NoticeMeUtils.BUTTON_ADD_USER)) {
-            AddUserButton addUserButton = new AddUserButton(guildRepository, noticeRepository);
+            AddUserButton addUserButton = new AddUserButton(noticeRepository);
             addUserButton.addUser(event);
             return;
         }

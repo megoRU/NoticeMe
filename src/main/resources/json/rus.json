@@ -44,5 +44,6 @@
   "channel_notification": "Уведомления:\n<#%s>: %s",
   "accept_to_voice_channel": "Доступ к голосовым каналам:",
   "check": "Проверка разрешения бота",
-  "no_access_send_message": "У меня нет доступа к этому текстовому каналу. Проверьте разрешения: `Permission.VIEW_CHANNEL`, `Permission.MESSAGE_SEND`"
+  "no_access_send_message": "У меня нет доступа к этому текстовому каналу. Проверьте разрешения: `Permission.VIEW_CHANNEL`, `Permission.MESSAGE_SEND`",
+  "number_id_error": "Вы должны ввести число!"
 }

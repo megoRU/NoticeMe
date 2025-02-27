@@ -1,8 +1,8 @@
 package main.core.events;
 
 import main.core.core.NoticeRegistry;
+import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
-import main.model.entity.Subs;
 import main.model.repository.NoticeRepository;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class UnSubCommand {
@@ -18,6 +19,7 @@ public class UnSubCommand {
     private static final ParserClass jsonParsers = new ParserClass();
 
     private final NoticeRepository noticeRepository;
+    private final static NoticeRegistry instance = NoticeRegistry.getInstance();
 
     public UnSubCommand(NoticeRepository noticeRepository) {
         this.noticeRepository = noticeRepository;
@@ -42,28 +44,35 @@ public class UnSubCommand {
 
         String userFromOptions = event.getOption("user-id", OptionMapping::getAsString);
         if (userFromOptions == null) return;
-        if (!userFromOptions.matches("[0-9]+")) return;
+        if (!userFromOptions.matches("[0-9]+")) {
+            String numberIdError = jsonParsers.getTranslation("number_id_error", guildIdString);
+            event.getHook().sendMessage(numberIdError).queue();
+            return;
+        }
 
         unsub(user.getId(), guildIdString, userFromOptions, event);
     }
 
     private void unsub(String userId, String guildId, String userFromOptions, @NotNull SlashCommandInteractionEvent event) {
         long userIdLong = Long.parseLong(userId);
-        long guildIdLong = Long.parseLong(guildId);
 
-        Subs notice = noticeRepository.findTrackingUser(userIdLong, guildIdLong, userFromOptions);
+        TrackingUser trackingUser = instance.getUser(guildId, userFromOptions);
 
-        if (notice == null) {
+        if (trackingUser != null) {
+            Set<String> userListSet = trackingUser.getUserListSet();
+            if (userListSet.contains(userId)) {
+                noticeRepository.deleteByUserTrackingId(userFromOptions, userIdLong);
+                instance.unsub(guildId, userFromOptions, userId);
+
+                String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId), userFromOptions);
+                event.getHook().sendMessage(successfullyDeleted).setEphemeral(true).queue();
+            } else {
+                String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId);
+                event.getHook().sendMessage(dontFindUser).queue();
+            }
+        } else {
             String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId);
             event.getHook().sendMessage(dontFindUser).queue();
-        } else {
-            noticeRepository.deleteByUserTrackingId(notice.getUserTrackingId(), userIdLong);
-
-            NoticeRegistry instance = NoticeRegistry.getInstance();
-            instance.unsub(guildId, userFromOptions, userId);
-
-            String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId), notice.getUserTrackingId());
-            event.getHook().sendMessage(successfullyDeleted).setEphemeral(true).queue();
         }
     }
 }

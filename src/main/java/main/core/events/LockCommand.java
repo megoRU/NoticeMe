@@ -32,6 +32,7 @@ public class LockCommand {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
 
         event.deferReply().setEphemeral(true).queue();
+
         BotStartConfig.getMapLocks().put(user.getId(), Lock.Locked.LOCKED);
         String lockString = jsonParsers.getTranslation("lock", guildIdString);
 

@@ -44,5 +44,6 @@
   "channel_notification": "Notifications:\n<#%s>: %s",
   "accept_to_voice_channel": "Access to voice channels:",
   "check": "Checking the bot's permission",
-  "no_access_send_message": "I don't have access to this text channel. Check the permissions: `Permission.VIEW_CHANNEL`, `Permission.MESSAGE_SEND`"
+  "no_access_send_message": "I don't have access to this text channel. Check the permissions: `Permission.VIEW_CHANNEL`, `Permission.MESSAGE_SEND`",
+  "number_id_error": "You must enter a number!"
 }
