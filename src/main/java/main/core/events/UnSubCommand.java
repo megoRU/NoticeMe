@@ -64,6 +64,8 @@ public class UnSubCommand {
                 noticeRepository.deleteByUserTrackingId(userFromOptions, userIdLong);
                 instance.unsub(guildId, userFromOptions, userId);
 
+                instance.addUserSuggestions(guildId, userId, userFromOptions);
+
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId), userFromOptions);
                 event.getHook().sendMessage(successfullyDeleted).setEphemeral(true).queue();
             } else {

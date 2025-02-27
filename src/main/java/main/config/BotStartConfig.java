@@ -6,14 +6,8 @@ import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
-import main.model.entity.Language;
-import main.model.entity.Lock;
-import main.model.entity.Server;
-import main.model.entity.Subs;
-import main.model.repository.GuildRepository;
-import main.model.repository.LanguageRepository;
-import main.model.repository.LockRepository;
-import main.model.repository.NoticeRepository;
+import main.model.entity.*;
+import main.model.repository.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -41,10 +35,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +58,7 @@ public class BotStartConfig {
 
     //REPOSITORY
     private final NoticeRepository noticeRepository;
+    private final SuggestionsRepository suggestionsRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final GuildRepository guildRepository;
@@ -85,6 +77,7 @@ public class BotStartConfig {
             getAllServers();
             getLockStatus();
             getAllUsers();
+            getSuggestions();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -325,6 +318,28 @@ public class BotStartConfig {
                 instance.putServer(serverId, server);
             }
             System.out.println("getAllServers()");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    private void getSuggestions() {
+        try {
+            List<Suggestions> suggestionsList = suggestionsRepository.findAll();
+            NoticeRegistry instance = NoticeRegistry.getInstance();
+
+            for (Suggestions suggestions : suggestionsList) {
+                String suggestionUserId = String.valueOf(suggestions.getSuggestionUserId());
+                String userId = String.valueOf(suggestions.getUserId());
+                String guildId = String.valueOf(suggestions.getGuildId());
+
+                Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
+
+                if (!stringSet.contains(suggestionUserId)) {
+                    instance.addUserSuggestions(guildId, userId, suggestionUserId);
+                }
+            }
+            System.out.println("getSuggestions()");
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

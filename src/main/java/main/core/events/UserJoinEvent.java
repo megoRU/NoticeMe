@@ -49,9 +49,12 @@ public class UserJoinEvent {
 
             if (!hasPermissionViewChannel || name.contains("AFK")) return;
 
-            List<Member> members = voiceChannel.getMembers(); //Always 1+ users
+            List<Member> members = voiceChannel.getMembers().stream()
+                    .filter(member -> !member.getUser().isBot())
+                    .filter(member -> !member.getUser().getId().equals(user.getId()))
+                    .toList();
 
-            if (members.size() > 1) {
+            if (!members.isEmpty()) {
                 CompletableFuture.runAsync(() -> updateUserSuggestions(user.getId(), members, guild.getIdLong()));
             }
 
@@ -91,46 +94,32 @@ public class UserJoinEvent {
 
     //Как я понял сохранять предложения, но только тех которых нет в БД это интересно
     private void updateUserSuggestions(String userId, List<Member> members, long guildId) {
-        Set<String> currentSuggestions = instance.getSuggestions(userId);
+        String guildIdString = String.valueOf(guildId);
+        Set<String> currentSuggestions = instance.getSuggestionsList(userId, guildIdString);
 
         if (currentSuggestions.isEmpty()) {
-            List<Suggestions> dbSuggestions = suggestionsRepository.findAllByUserId(Long.parseLong(userId));
-            addBotSuggestions(userId, members);
-
-            if (dbSuggestions.isEmpty()) {
-                instance.getSuggestions(userId).forEach(suggestion -> saveSuggestion(userId, suggestion, guildId));
-            } else {
-                List<Long> dbSuggestionIds = dbSuggestions.stream()
-                        .map(Suggestions::getSuggestionUserId)
-                        .toList();
-
-                members.stream()
-                        .filter(member -> !dbSuggestionIds.contains(member.getUser().getIdLong()))
-                        .filter(member -> !member.getUser().isBot())
-                        .forEach(member -> saveSuggestion(userId, member.getUser().getId(), guildId));
-            }
+            addSuggestions(userId, members, guildIdString);
+            instance.getSuggestionsList(userId, guildIdString).forEach(suggestion -> saveSuggestion(userId, Long.parseLong(suggestion), guildId));
         } else {
             members.stream()
                     .filter(member -> !currentSuggestions.contains(member.getUser().getId()))
-                    .filter(member -> !member.getUser().isBot())
                     .forEach(member -> {
-                        instance.addUserSuggestions(userId, member.getUser().getId());
-                        saveSuggestion(userId, member.getUser().getId(), guildId);
+                        instance.addUserSuggestions(guildIdString, userId, member.getUser().getId());
+                        saveSuggestion(userId, member.getUser().getIdLong(), guildId);
                     });
         }
     }
 
-    private void addBotSuggestions(String userId, List<Member> members) {
-        members.stream()
-                .filter(member -> member.getUser().isBot())
-                .forEach(member -> instance.addUserSuggestions(userId, member.getUser().getId()));
+    private void addSuggestions(String userId, List<Member> members, String guildId) {
+        members.forEach(member -> instance.addUserSuggestions(guildId, userId, member.getUser().getId()));
     }
 
-    private void saveSuggestion(String userId, String suggestionUserId, long guildId) {
+    private void saveSuggestion(String userId, long suggestionUserId, long guildId) {
         Suggestions suggestion = new Suggestions();
         suggestion.setUserId(Long.parseLong(userId));
         suggestion.setGuildId(guildId);
-        suggestion.setSuggestionUserId(Long.parseLong(suggestionUserId));
+        suggestion.setSuggestionUserId(suggestionUserId);
+
         suggestionsRepository.save(suggestion);
     }
 }

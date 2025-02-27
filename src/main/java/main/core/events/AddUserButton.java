@@ -3,6 +3,7 @@ package main.core.events;
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.core.core.NoticeRegistry;
+import main.core.core.Suggestions;
 import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
@@ -79,5 +80,8 @@ public class AddUserButton {
         event.getHook().sendMessage(userSaved).setEphemeral(true).queue();
 
         instance.sub(guildIdString, user.getId(), userFromButton);
+
+        Suggestions suggestions = instance.getSuggestions(user.getId(), guildIdString);
+        if (suggestions != null) suggestions.removeUser(userFromButton);
     }
 }

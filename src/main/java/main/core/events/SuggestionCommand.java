@@ -1,13 +1,9 @@
 package main.core.events;
 
 import lombok.AllArgsConstructor;
-import main.config.BotStartConfig;
 import main.core.NoticeMeUtils;
+import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
-import main.model.entity.Subs;
-import main.model.entity.Suggestions;
-import main.model.repository.NoticeRepository;
-import main.model.repository.SuggestionsRepository;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -16,48 +12,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
 public class SuggestionCommand {
 
     private static final ParserClass jsonParsers = new ParserClass();
-
-    private final NoticeRepository noticeRepository;
-    private final SuggestionsRepository suggestionsRepository;
+    private final static NoticeRegistry instance = NoticeRegistry.getInstance();
 
     public void suggestion(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
-        var guildId = event.getGuild().getIdLong();
         var user = event.getUser();
 
-        event.deferReply().setEphemeral(true).queue();
+        Set<String> suggestions = instance.getSuggestionsList(user.getId(), guildIdString);
 
-        List<Suggestions> suggestionsList = suggestionsRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
-        List<Subs> allSubs = noticeRepository.findAllByUserIdAndGuildId(user.getIdLong(), guildId);
-
-        List<String> stringList = suggestionsList
-                .stream()
-                .map(Suggestions::getSuggestionUserId)
-                .map(String::valueOf)
-                .distinct()
-                .filter(a -> !BotStartConfig.getMapLocks().containsKey(a))
-                .filter(a -> allSubs.stream()
-                        .map(Subs::getUserTrackingId)
-                        .noneMatch(s -> s.contains(a)))
-                .toList();
-
-        Map<String, Long> frequencyMap = stringList.stream()
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
-
-        List<String> top5Users = frequencyMap.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+        List<String> top5Users = suggestions.stream()
                 .limit(5)
-                .map(Map.Entry::getKey)
                 .toList();
 
         if (!top5Users.isEmpty()) {
@@ -78,13 +50,10 @@ public class SuggestionCommand {
 
             String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
 
-            event.getHook().sendMessage(suggestionText)
-                    .setActionRow(buttonsList)
-                    .setEphemeral(true)
-                    .queue();
+            event.reply(suggestionText).setActionRow(buttonsList).setEphemeral(true).queue();
         } else {
             String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
-            event.getHook().sendMessage(noSuggestions).setEphemeral(true).queue();
+            event.reply(noSuggestions).setEphemeral(true).queue();
         }
     }
 }

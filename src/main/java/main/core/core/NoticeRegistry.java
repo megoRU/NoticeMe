@@ -15,8 +15,8 @@ public class NoticeRegistry {
     //Guild | List: userTrackerId | TrackingUser
     private static final ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Server> serverListMap = new ConcurrentHashMap<>();
-    //Guild | List: user | SuggestionsList
-    private static final ConcurrentMap<String, Set<String>> userSuggestionsMap = new ConcurrentHashMap<>();
+    //Guild | List: user | Suggestions
+    private static final ConcurrentMap<String, ConcurrentMap<String, Suggestions>> userSuggestionsMap = new ConcurrentHashMap<>();
     private static volatile NoticeRegistry noticeRegistry;
 
     private NoticeRegistry() {
@@ -68,23 +68,50 @@ public class NoticeRegistry {
         }
     }
 
-    public void addUserSuggestions(String userId, String userSuggestionId) {
-        Set<String> stringSet = userSuggestionsMap.get(userId);
-        if (stringSet != null) {
-            stringSet.add(userSuggestionId);
+    public void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
+        ConcurrentMap<String, Suggestions> stringSuggestionsConcurrentMap = userSuggestionsMap.get(guildId);
+        if (stringSuggestionsConcurrentMap != null) {
+            Suggestions suggestions = stringSuggestionsConcurrentMap.get(userId);
+            if (suggestions == null) {
+                suggestions = new Suggestions();
+                stringSuggestionsConcurrentMap.put(userId, suggestions);
+            } else {
+                suggestions.putUser(userSuggestionId);
+            }
         } else {
-            stringSet = new HashSet<>();
-            stringSet.add(userSuggestionId);
-            userSuggestionsMap.put(userId, stringSet);
+            stringSuggestionsConcurrentMap = new ConcurrentHashMap<>();
+
+            Suggestions suggestions = new Suggestions();
+            suggestions.putUser(userSuggestionId);
+
+            stringSuggestionsConcurrentMap.put(userId, suggestions);
+            userSuggestionsMap.put(guildId, stringSuggestionsConcurrentMap);
         }
     }
 
-    public Set<String> getSuggestions(String userId) {
-        Set<String> strings = userSuggestionsMap.get(userId);
-        if (strings != null) return strings;
-        else {
-            userSuggestionsMap.put(userId, new HashSet<>());
-            return userSuggestionsMap.get(userId);
+    public Set<String> getSuggestionsList(String userId, String guildId) {
+        ConcurrentMap<String, Suggestions> stringSuggestionsConcurrentMap = userSuggestionsMap.get(guildId);
+
+        if (stringSuggestionsConcurrentMap != null) {
+            Suggestions suggestions = stringSuggestionsConcurrentMap.get(userId);
+            if (suggestions != null) {
+                return suggestions.getUserList();
+            } else {
+                return new HashSet<>();
+            }
+        } else {
+            return new HashSet<>();
+        }
+    }
+
+    @Nullable
+    public Suggestions getSuggestions(String userId, String guildId) {
+        ConcurrentMap<String, Suggestions> stringSuggestionsConcurrentMap = userSuggestionsMap.get(guildId);
+
+        if (stringSuggestionsConcurrentMap != null) {
+            return stringSuggestionsConcurrentMap.get(userId);
+        } else {
+            return null;
         }
     }
 

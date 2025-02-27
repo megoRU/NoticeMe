@@ -102,7 +102,7 @@ public class UpdateController {
                 setupCommand.setup(event);
             }
             case "suggestion" -> {
-                SuggestionCommand suggestionCommand = new SuggestionCommand(noticeRepository, suggestionsRepository);
+                SuggestionCommand suggestionCommand = new SuggestionCommand();
                 suggestionCommand.suggestion(event);
             }
             case "sub" -> {
@@ -143,7 +143,7 @@ public class UpdateController {
         }
 
         if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_ALL_USERS)) {
-            AddAllUsersButton addAllUsersButton = new AddAllUsersButton(guildRepository, noticeRepository);
+            AddAllUsersButton addAllUsersButton = new AddAllUsersButton(noticeRepository);
             addAllUsersButton.addAllUsers(event);
         }
     }
