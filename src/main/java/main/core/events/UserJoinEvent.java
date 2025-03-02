@@ -98,27 +98,24 @@ public class UserJoinEvent {
     // instanceUser кто, зашел и его список кто на него подписан
     private void updateUserSuggestions(String userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {
         String guildIdString = String.valueOf(guildId);
+        Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildIdString, userId);
+
         Set<String> currentSuggestions = instance.getSuggestionsList(userId, guildIdString);
         Set<String> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
 
         List<Member> newSuggestions = members.stream()
                 .filter(member -> {
                     String memberId = member.getUser().getId();
-                    return !currentSuggestions.contains(memberId) && !subscribedUsers.contains(memberId);
+                    return !currentSuggestions.contains(memberId) && !subscribedUsers.contains(memberId) && !stringSet.contains(memberId);
                 })
                 .toList();
 
         if (!newSuggestions.isEmpty()) {
             newSuggestions.forEach(member -> {
-                instance.addUserSuggestions(guildIdString, userId, member.getUser().getId());
                 saveSuggestion(userId, member.getUser().getIdLong(), guildId);
                 addSuggestions(userId, member, guildIdString);
             });
         }
-    }
-
-    private void addSuggestions(String userId, List<Member> members, String guildId) {
-        members.forEach(member -> instance.addUserSuggestions(guildId, userId, member.getUser().getId()));
     }
 
     private void addSuggestions(String userId, Member member, String guildId) {
