@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -54,11 +55,11 @@ public class UserJoinEvent {
                     .filter(member -> !member.getUser().getId().equals(user.getId()))
                     .toList();
 
-            if (!members.isEmpty()) {
-                CompletableFuture.runAsync(() -> updateUserSuggestions(user.getId(), members, guild.getIdLong()));
-            }
-
             TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
+
+            if (!members.isEmpty()) {
+                CompletableFuture.runAsync(() -> updateUserSuggestions(user.getId(), members, guild.getIdLong(), instanceUser));
+            }
 
             if (instanceUser == null) return;
             String userList = instanceUser.getUserList();
@@ -92,26 +93,33 @@ public class UserJoinEvent {
         }
     }
 
-    //Как я понял сохранять предложения, но только тех которых нет в БД это интересно
-    private void updateUserSuggestions(String userId, List<Member> members, long guildId) {
+    // Как я понял сохранять предложения, но только тех которых нет в БД это интересно
+    // userId кто зашел
+    // instanceUser кто, зашел и его список кто на него подписан
+    private void updateUserSuggestions(String userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {
         String guildIdString = String.valueOf(guildId);
-        Set<String> currentSuggestions = instance.getSuggestionsList(userId, guildIdString);
+        Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildIdString, userId);
 
-        if (currentSuggestions.isEmpty()) {
-            addSuggestions(userId, members, guildIdString);
-            instance.getSuggestionsList(userId, guildIdString).forEach(suggestion -> saveSuggestion(userId, Long.parseLong(suggestion), guildId));
-        } else {
-            members.stream()
-                    .filter(member -> !currentSuggestions.contains(member.getUser().getId()))
-                    .forEach(member -> {
-                        instance.addUserSuggestions(guildIdString, userId, member.getUser().getId());
-                        saveSuggestion(userId, member.getUser().getIdLong(), guildId);
-                    });
+        Set<String> currentSuggestions = instance.getSuggestionsList(userId, guildIdString);
+        Set<String> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
+
+        List<Member> newSuggestions = members.stream()
+                .filter(member -> {
+                    String memberId = member.getUser().getId();
+                    return !currentSuggestions.contains(memberId) && !subscribedUsers.contains(memberId) && !stringSet.contains(memberId);
+                })
+                .toList();
+
+        if (!newSuggestions.isEmpty()) {
+            newSuggestions.forEach(member -> {
+                saveSuggestion(userId, member.getUser().getIdLong(), guildId);
+                addSuggestions(userId, member, guildIdString);
+            });
         }
     }
 
-    private void addSuggestions(String userId, List<Member> members, String guildId) {
-        members.forEach(member -> instance.addUserSuggestions(guildId, userId, member.getUser().getId()));
+    private void addSuggestions(String userId, Member member, String guildId) {
+        instance.addUserSuggestions(guildId, userId, member.getUser().getId());
     }
 
     private void saveSuggestion(String userId, long suggestionUserId, long guildId) {
