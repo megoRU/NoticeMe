@@ -1,6 +1,14 @@
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 @DisplayName("TestNoticeMe")
 public class TestNoticeMe {
@@ -25,6 +33,36 @@ public class TestNoticeMe {
         instance.unsub("500", "2500", "3000");
 
         Assertions.assertEquals("", user.getUserList());
+    }
+    
+    @Test
+    @DisplayName("Проверяем вывод пользователей кто подписан на него")
+    void testSubscribersByReferenceId() {
+        instance.sub("500", "3000", "2500");
+        instance.sub("500", "3000", "2501");
+        instance.sub("500", "3000", "2502");
+
+        Set<String> subscribersSetByUserId = instance.getAllUserTrackerIdsByUserId("500", "3000");
+
+        List<String> actualList = new ArrayList<>(subscribersSetByUserId);
+        actualList.sort(Comparator.naturalOrder());
+
+        Assertions.assertArrayEquals(new String[]{"2500", "2501", "2502"}, actualList.toArray());
+    }
+
+    @Test
+    @DisplayName("Проверяем вывод предложений для пользователя")
+    void testSubscribersUser() {
+        instance.addUserSuggestions("500", "3000", "2500");
+        instance.addUserSuggestions("500", "3000", "2501");
+        instance.addUserSuggestions("500", "3000", "2502");
+
+        Set<String> suggestionsList = instance.getSuggestionsList("3000", "500");
+
+        List<String> actualList = new ArrayList<>(suggestionsList);
+        actualList.sort(Comparator.naturalOrder());
+
+        Assertions.assertArrayEquals(new String[]{"2500", "2501", "2502"}, actualList.toArray());
     }
 
     @Test

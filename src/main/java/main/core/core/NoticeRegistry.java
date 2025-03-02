@@ -33,6 +33,13 @@ public class NoticeRegistry {
         return noticeRegistry;
     }
 
+    /**
+     * Получает список пользователей, которые подписаны на указанного пользователя в заданной гильдии.
+     *
+     * @param guildId     ID гильдии, в рамках которой выполняется поиск.
+     * @param referenceId ID пользователя, для которого нужно найти подписчиков.
+     * @return Множество ID пользователей, которые подписаны на `referenceId`, или пустое множество, если подписчиков нет.
+     */
     public Set<String> getAllUserTrackerIdsByUserId(String guildId, String referenceId) {
         return trackingUserConcurrentMap.getOrDefault(guildId, new ConcurrentHashMap<>())
                 .entrySet()
@@ -69,36 +76,27 @@ public class NoticeRegistry {
     }
 
     public void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
-        ConcurrentMap<String, Suggestions> stringSuggestionsConcurrentMap = userSuggestionsMap.get(guildId);
-        if (stringSuggestionsConcurrentMap != null) {
-            Suggestions suggestions = stringSuggestionsConcurrentMap.get(userId);
-            if (suggestions == null) {
-                suggestions = new Suggestions();
-                stringSuggestionsConcurrentMap.put(userId, suggestions);
-            } else {
-                suggestions.putUser(userSuggestionId);
-            }
-        } else {
-            stringSuggestionsConcurrentMap = new ConcurrentHashMap<>();
+        Suggestions suggestions = getSuggestions(userId, guildId);
 
-            Suggestions suggestions = new Suggestions();
-            suggestions.putUser(userSuggestionId);
+        if (suggestions == null) suggestions = new Suggestions();
+        suggestions.putUser(userSuggestionId);
 
-            stringSuggestionsConcurrentMap.put(userId, suggestions);
-            userSuggestionsMap.put(guildId, stringSuggestionsConcurrentMap);
-        }
+        ConcurrentHashMap<String, Suggestions> concurrentHashMap = new ConcurrentHashMap<>();
+        concurrentHashMap.put(userId, suggestions);
+        userSuggestionsMap.put(guildId, concurrentHashMap);
     }
 
+    /**
+     * Получает список пользователей, на которых подписан конкретный пользователь в указанной гильдии.
+     *
+     * @param userId  ID пользователя, для которого нужно получить список подписок.
+     * @param guildId ID гильдии, в рамках которой выполняется поиск.
+     * @return Множество ID пользователей, на которых подписан `userId`, или пустое множество, если подписок нет.
+     */
     public Set<String> getSuggestionsList(String userId, String guildId) {
-        ConcurrentMap<String, Suggestions> stringSuggestionsConcurrentMap = userSuggestionsMap.get(guildId);
-
-        if (stringSuggestionsConcurrentMap != null) {
-            Suggestions suggestions = stringSuggestionsConcurrentMap.get(userId);
-            if (suggestions != null) {
-                return suggestions.getUserList();
-            } else {
-                return new HashSet<>();
-            }
+        Suggestions suggestions = getSuggestions(userId, guildId);
+        if (suggestions != null) {
+            return suggestions.getUserList();
         } else {
             return new HashSet<>();
         }
@@ -106,10 +104,10 @@ public class NoticeRegistry {
 
     @Nullable
     public Suggestions getSuggestions(String userId, String guildId) {
-        ConcurrentMap<String, Suggestions> stringSuggestionsConcurrentMap = userSuggestionsMap.get(guildId);
+        ConcurrentMap<String, Suggestions> suggestionsConcurrentMap = userSuggestionsMap.get(guildId);
 
-        if (stringSuggestionsConcurrentMap != null) {
-            return stringSuggestionsConcurrentMap.get(userId);
+        if (suggestionsConcurrentMap != null) {
+            return suggestionsConcurrentMap.get(userId);
         } else {
             return null;
         }
@@ -118,8 +116,9 @@ public class NoticeRegistry {
     //                                                        TrackingUser | Data
     private void saveTrackingUser(String guildId, String user, TrackingUser trackingUser) {
         ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
-        if (stringTrackingUserConcurrentMap == null)
+        if (stringTrackingUserConcurrentMap == null) {
             throw new IllegalArgumentException("In this collection does not exist Guild: saveTrackingUser()");
+        }
         stringTrackingUserConcurrentMap.put(user, trackingUser);
     }
 
