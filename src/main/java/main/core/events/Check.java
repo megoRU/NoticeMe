@@ -67,9 +67,10 @@ public class Check {
         List<VoiceChannel> voiceChannelList = guild.getVoiceChannels();
 
         voiceChannelList.forEach(voiceChannel -> {
-            boolean hasPermission = selfMember.hasPermission(voiceChannel, Permission.VIEW_CHANNEL);
+            boolean hasPermission = selfMember.hasPermission(voiceChannel, Permission.VOICE_CONNECT);
+            String voiceChannelName = voiceChannel.getName();
             stringBuilder.append("<#").append(voiceChannel.getId()).append(">").append(": ");
-            if (hasPermission) {
+            if (hasPermission && !voiceChannelName.contains("AFK")) {
                 stringBuilder.append("✅");
             } else {
                 stringBuilder.append("❌");
