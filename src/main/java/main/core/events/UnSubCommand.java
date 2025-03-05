@@ -30,6 +30,7 @@ public class UnSubCommand {
         var user = event.getUser();
 
         event.deferReply().setEphemeral(true).queue();
+
         User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
         if (userFromOptions == null) return;
 

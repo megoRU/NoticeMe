@@ -26,7 +26,6 @@ public class Check {
     public void permission(@NotNull SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         if (guild == null) return;
-        event.deferReply().setEphemeral(true).queue();
 
         String guildIdString = guild.getId();
         Member selfMember = guild.getSelfMember();
@@ -35,7 +34,7 @@ public class Check {
         String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
 
         if (server == null) {
-            event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
+            event.reply(youCannotSetChannel).setEphemeral(true).queue();
             return;
         }
 
@@ -46,7 +45,7 @@ public class Check {
         TextChannel textChannel = guild.getTextChannelById(textChannelId);
 
         if (textChannel == null) {
-            event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
+            event.reply(youCannotSetChannel).setEphemeral(true).queue();
             return;
         }
 
@@ -78,6 +77,6 @@ public class Check {
             stringBuilder.append("\n");
         });
 
-        event.getHook().sendMessage(stringBuilder.toString()).queue();
+        event.reply(stringBuilder.toString()).setEphemeral(true).queue();
     }
 }
