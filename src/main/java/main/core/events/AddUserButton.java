@@ -63,9 +63,10 @@ public class AddUserButton {
         String userFromButton = buttonId.replaceAll("BUTTON_ADD_USER_", "");
 
         Server server = instance.getServer(guildIdString);
+        Long setup = BotStartConfig.getCommandId("setup");
 
         if (server == null) {
-            String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
+            String youCannotSetChannel = String.format(jsonParsers.getTranslation("you_cannot_set_channel", guildIdString), setup);
             event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
             return;
         }

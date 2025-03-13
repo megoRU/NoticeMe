@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.slf4j.Logger;
@@ -52,6 +53,7 @@ public class BotStartConfig {
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
+    private final static Map<String, Long> commandMap = new HashMap<>();
 
     public static JDA jda;
     private final JDABuilder jdaBuilder = JDABuilder.createDefault(Config.getTOKEN());
@@ -109,11 +111,20 @@ public class BotStartConfig {
             LOGGER.error(e.getMessage(), e);
         }
 
-        List<Command> complete = jda.retrieveCommands().complete();
-        complete.forEach(command -> System.out.println(command.toString()));
-
         //Обновить команды
         updateSlashCommands();
+
+        jda.retrieveCommands().queue(
+                list -> {
+                    for (Command command : list) {
+                        String name = command.getName();
+                        long id = command.getIdLong();
+                        commandMap.put(name, id);
+                        System.out.printf("%s [%s]%n", id, name);
+                    }
+                }
+        );
+
         System.out.println("14:42");
     }
 
@@ -368,5 +379,10 @@ public class BotStartConfig {
 
     public static Map<String, Lock.Locked> getMapLocks() {
         return mapLocks;
+    }
+
+    @Nullable
+    public static Long getCommandId(String commandName) {
+        return commandMap.get(commandName);
     }
 }
