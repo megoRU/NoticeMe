@@ -88,7 +88,7 @@ public class SubCommand {
 
         instance.sub(guildIdString, user.getId(), userDest.getId());
 
-        Suggestions suggestions = instance.getSuggestions(user.getId(), guildIdString);
+        Suggestions suggestions = instance.getSuggestions(guildIdString, user.getId());
         if (suggestions != null) suggestions.removeUser(userDest.getId());
 
         String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());

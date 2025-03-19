@@ -100,7 +100,7 @@ public class UserJoinEvent {
         String guildIdString = String.valueOf(guildId);
         Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildIdString, userId);
 
-        Set<String> currentSuggestions = instance.getSuggestionsList(userId, guildIdString);
+        Set<String> currentSuggestions = instance.getSuggestionsList(guildIdString, userId);
         Set<String> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
 
         List<Member> newSuggestions = members.stream()

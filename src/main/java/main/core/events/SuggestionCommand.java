@@ -26,7 +26,7 @@ public class SuggestionCommand {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
         var user = event.getUser();
 
-        Set<String> suggestions = instance.getSuggestionsList(user.getId(), guildIdString);
+        Set<String> suggestions = instance.getSuggestionsList(guildIdString, user.getId());
 
         List<String> top5Users = suggestions.stream()
                 .limit(5)

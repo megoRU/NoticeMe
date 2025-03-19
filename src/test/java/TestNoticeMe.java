@@ -1,9 +1,6 @@
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,8 +18,14 @@ public class TestNoticeMe {
         instance.removeGuild("600");
     }
 
+    @AfterEach
+    void tearDown() {
+        instance.removeGuild("500");
+        instance.removeGuild("600");
+    }
+
     @Test
-    @DisplayName("Проверяем удаление отписывание")
+    @DisplayName("Проверяем отписывание")
     void testUnsubFromUser() {
         instance.sub("500", "3000", "2500");
         TrackingUser user = instance.getUser("500", "2500");
@@ -34,7 +37,7 @@ public class TestNoticeMe {
 
         Assertions.assertEquals("", user.getUserList());
     }
-    
+
     @Test
     @DisplayName("Проверяем вывод пользователей кто подписан на него")
     void testSubscribersByReferenceId() {
@@ -57,7 +60,7 @@ public class TestNoticeMe {
         instance.addUserSuggestions("500", "3000", "2501");
         instance.addUserSuggestions("500", "3000", "2502");
 
-        Set<String> suggestionsList = instance.getSuggestionsList("3000", "500");
+        Set<String> suggestionsList = instance.getSuggestionsList("500", "3000");
 
         List<String> actualList = new ArrayList<>(suggestionsList);
         actualList.sort(Comparator.naturalOrder());
@@ -68,25 +71,12 @@ public class TestNoticeMe {
     @Test
     @DisplayName("Проверяем удаление Guild")
     void testDeleteGuild() {
+        instance.sub("4000", "3000", "2500");
         instance.removeGuild("4000");
 
         TrackingUser user = instance.getUser("4000", "2500");
 
         Assertions.assertNull(user);
-    }
-
-    @Test
-    @DisplayName("Проверяем запрет на отслеживание")
-    void testLock() {
-        //Добавляем вторую гильдию
-        instance.sub("600", "2000", "4000");
-
-        //Удаляем везде 4000
-        instance.removeUserFromAllGuild("4000");
-
-        TrackingUser guild600User4000 = instance.getUser("600", "4000");
-
-        Assertions.assertNull(guild600User4000);
     }
 
     @Test
@@ -116,6 +106,23 @@ public class TestNoticeMe {
         TrackingUser user = instance.getUser("500", "3000");
         Assertions.assertNotNull(user);
         Assertions.assertEquals("<@2500>, <@2600>", user.getUserList());
+    }
+
+    @Test
+    @DisplayName("Проверяем удаление пользователя из всех Guild")
+    void testDeletingUserFromAllGuilds() {
+        instance.sub("500", "2500", "3000");
+        instance.sub("500", "2501", "3000");
+        instance.sub("500", "2502", "3000");
+
+        TrackingUser user = instance.getUser("500", "3000");
+        Assertions.assertNotNull(user);
+        Assertions.assertEquals(3, user.getUserCount());
+
+        instance.removeUserFromAllGuild("3000");
+        Set<String> stringSet = instance.getAllUserTrackerIdsByUserId("500", "3000");
+
+        Assertions.assertEquals(0, stringSet.size());
     }
 
     @Test

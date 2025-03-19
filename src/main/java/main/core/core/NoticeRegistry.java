@@ -38,7 +38,7 @@ public class NoticeRegistry {
      *
      * @param guildId     ID гильдии, в рамках которой выполняется поиск.
      * @param referenceId ID пользователя, для которого нужно найти подписчиков.
-     * @return Множество ID пользователей, которые подписаны на `referenceId`, или пустое множество, если подписчиков нет.
+     * @return Множество ID пользователей, которые подписаны на referenceId, или пустое множество, если подписчиков нет.
      */
     public Set<String> getAllUserTrackerIdsByUserId(String guildId, String referenceId) {
         return trackingUserConcurrentMap.getOrDefault(guildId, new ConcurrentHashMap<>())
@@ -76,7 +76,7 @@ public class NoticeRegistry {
     }
 
     public void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
-        Suggestions suggestions = getSuggestions(userId, guildId);
+        Suggestions suggestions = getSuggestions(guildId, userId);
 
         if (suggestions == null) suggestions = new Suggestions();
         suggestions.putUser(userSuggestionId);
@@ -89,12 +89,12 @@ public class NoticeRegistry {
     /**
      * Получает список пользователей, на которых подписан конкретный пользователь в указанной гильдии.
      *
-     * @param userId  ID пользователя, для которого нужно получить список подписок.
      * @param guildId ID гильдии, в рамках которой выполняется поиск.
+     * @param userId  ID пользователя, для которого нужно получить список подписок.
      * @return Множество ID пользователей, на которых подписан `userId`, или пустое множество, если подписок нет.
      */
-    public Set<String> getSuggestionsList(String userId, String guildId) {
-        Suggestions suggestions = getSuggestions(userId, guildId);
+    public Set<String> getSuggestionsList(String guildId, String userId) {
+        Suggestions suggestions = getSuggestions(guildId, userId);
         if (suggestions != null) {
             return suggestions.getUserList();
         } else {
@@ -103,7 +103,7 @@ public class NoticeRegistry {
     }
 
     @Nullable
-    public Suggestions getSuggestions(String userId, String guildId) {
+    public Suggestions getSuggestions(String guildId, String userId) {
         ConcurrentMap<String, Suggestions> suggestionsConcurrentMap = userSuggestionsMap.get(guildId);
 
         if (suggestionsConcurrentMap != null) {
@@ -143,8 +143,12 @@ public class NoticeRegistry {
     @Nullable
     public TrackingUser getUser(String guildId, String user) {
         ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
-        if (stringTrackingUserConcurrentMap == null) return null;
-        return stringTrackingUserConcurrentMap.get(user);
+
+        if (stringTrackingUserConcurrentMap != null) {
+            return stringTrackingUserConcurrentMap.get(user);
+        } else {
+            return null;
+        }
     }
 
     private boolean hasGuild(String guildId) {
@@ -156,7 +160,10 @@ public class NoticeRegistry {
     }
 
     private void removeUserFromGuild(String guildId, String user) {
-        trackingUserConcurrentMap.get(guildId).remove(user);
+        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+        if (stringTrackingUserConcurrentMap != null) {
+            stringTrackingUserConcurrentMap.remove(user);
+        }
     }
 
     public void unsub(String guildId, String trackingUserId, String userId) {
@@ -168,8 +175,7 @@ public class NoticeRegistry {
     }
 
     public void removeUserFromAllGuild(String user) {
-        ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> listUsers = new ConcurrentHashMap<>(trackingUserConcurrentMap);
-        listUsers.forEach((guild, trackerUser) -> {
+        trackingUserConcurrentMap.forEach((guild, trackerUser) -> {
             TrackingUser trackingUser = trackerUser.get(user);
             if (trackingUser != null) {
                 removeUserFromGuild(guild, user);

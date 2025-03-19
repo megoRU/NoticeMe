@@ -65,7 +65,7 @@ public class AddAllUsersButton {
             NoticeRegistry instance = NoticeRegistry.getInstance();
             instance.sub(guildIdString, user.getId(), value.getId());
 
-            Suggestions suggestions = instance.getSuggestions(user.getId(), guildIdString);
+            Suggestions suggestions = instance.getSuggestions(guildIdString, user.getId());
             if (suggestions != null) suggestions.removeUser(value.getId());
         }
         noticeRepository.saveAll(subsList);

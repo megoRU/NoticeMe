@@ -82,7 +82,7 @@ public class AddUserButton {
 
         instance.sub(guildIdString, user.getId(), userFromButton);
 
-        Suggestions suggestions = instance.getSuggestions(user.getId(), guildIdString);
+        Suggestions suggestions = instance.getSuggestions(guildIdString, user.getId());
         if (suggestions != null) suggestions.removeUser(userFromButton);
     }
 }
