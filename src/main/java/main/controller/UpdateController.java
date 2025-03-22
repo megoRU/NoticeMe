@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,7 @@ public class UpdateController {
     private final LockRepository lockRepository;
     private final EntriesRepository entriesRepository;
     private final SuggestionsRepository suggestionsRepository;
+    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
 
     //CORE
     private CoreBot coreBot;
@@ -54,14 +57,16 @@ public class UpdateController {
     }
 
     private void distributeEventsByType(Object event) {
-        if (event instanceof SlashCommandInteractionEvent) {
-            slashEvent((SlashCommandInteractionEvent) event);
-        } else if (event instanceof GuildVoiceUpdateEvent) {
-            userJoinChannelEvent((GuildVoiceUpdateEvent) event);
-        } else if (event instanceof ButtonInteractionEvent) {
-            buttonEvent((ButtonInteractionEvent) event);
-        } else if (event instanceof GuildJoinEvent) {
-            joinEvent((GuildJoinEvent) event);
+        if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
+            LOGGER.info(slashCommandInteractionEvent.getName());
+            slashEvent(slashCommandInteractionEvent);
+        } else if (event instanceof GuildVoiceUpdateEvent guildVoiceUpdateEvent) {
+            userJoinChannelEvent(guildVoiceUpdateEvent);
+        } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
+            LOGGER.info(buttonInteractionEvent.getButton().getLabel());
+            buttonEvent(buttonInteractionEvent);
+        } else if (event instanceof GuildJoinEvent guildJoinEvent) {
+            joinEvent(guildJoinEvent);
         }
     }
 
