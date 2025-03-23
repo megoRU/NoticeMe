@@ -38,8 +38,11 @@ public class UserJoinEvent {
 
     public void userJoin(@NotNull GuildVoiceUpdateEvent event) {
         Guild guild = event.getGuild();
-        User user = event.getMember().getUser();
+        Member eventMember = event.getMember();
+        User user = eventMember.getUser();
+        String userId = user.getId();
         Member selfMember = guild.getSelfMember();
+        String effectiveName = eventMember.getEffectiveName();
 
         try {
             VoiceChannel voiceChannel = getAsChannel(event.getChannelJoined());
@@ -52,13 +55,13 @@ public class UserJoinEvent {
 
             List<Member> members = voiceChannel.getMembers().stream()
                     .filter(member -> !member.getUser().isBot())
-                    .filter(member -> !member.getUser().getId().equals(user.getId()))
+                    .filter(member -> !member.getUser().getId().equals(userId))
                     .toList();
 
-            TrackingUser instanceUser = instance.getUser(guild.getId(), user.getId());
+            TrackingUser instanceUser = instance.getUser(guild.getId(), userId);
 
             if (!members.isEmpty()) {
-                CompletableFuture.runAsync(() -> updateUserSuggestions(user.getId(), members, guild.getIdLong(), instanceUser));
+                CompletableFuture.runAsync(() -> updateUserSuggestions(userId, members, guild.getIdLong(), instanceUser));
             }
 
             if (instanceUser == null) return;
@@ -70,7 +73,7 @@ public class UserJoinEvent {
                     if (textChannel != null) {
                         if (selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
                             String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
-                                    user.getName(),
+                                    effectiveName,
                                     voiceChannel.getId(),
                                     userList);
 
