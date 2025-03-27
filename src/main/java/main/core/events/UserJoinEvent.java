@@ -107,25 +107,27 @@ public class UserJoinEvent {
         Set<String> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
 
         List<Member> newSuggestions = members.stream()
-                .filter(member -> {
-                    String memberId = member.getUser().getId();
-                    return !currentSuggestions.contains(memberId) && !subscribedUsers.contains(memberId) && !stringSet.contains(memberId);
-                })
+                .filter(member -> !currentSuggestions.contains(member.getUser().getId()))
+                .filter(member -> !subscribedUsers.contains(member.getUser().getId()))
+                .filter(member -> !stringSet.contains(member.getUser().getId()))
                 .toList();
 
         if (!newSuggestions.isEmpty()) {
             newSuggestions.forEach(member -> {
-                saveSuggestion(userId, member.getUser().getIdLong(), guildId);
+                saveSuggestion(userId, member, guildId);
                 addSuggestions(userId, member, guildIdString);
             });
         }
     }
 
-    private void addSuggestions(String userId, Member member, String guildId) {
-        instance.addUserSuggestions(guildId, userId, member.getUser().getId());
+    private void addSuggestions(String userId, Member suggestionMember, String guildId) {
+        String suggestionUserId = suggestionMember.getUser().getId();
+        instance.addUserSuggestions(guildId, userId, suggestionUserId);
     }
 
-    private void saveSuggestion(String userId, long suggestionUserId, long guildId) {
+    private void saveSuggestion(String userId, Member suggestionMember, long guildId) {
+        long suggestionUserId = suggestionMember.getUser().getIdLong();
+
         Suggestions suggestion = new Suggestions();
         suggestion.setUserId(Long.parseLong(userId));
         suggestion.setGuildId(guildId);

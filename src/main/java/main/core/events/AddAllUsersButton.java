@@ -40,8 +40,8 @@ public class AddAllUsersButton {
 
         // Фильтрация и сборка упомянутых пользователей
         List<User> collect = members.stream()
-                .parallel() // Параллельная обработка
-                .filter(u -> !allUserTrackerIdsByUserId.contains(u.getId()) && !BotStartConfig.getMapLocks().containsKey(u.getId()))
+                .filter(users -> !allUserTrackerIdsByUserId.contains(users.getId()))
+                .filter(users -> !BotStartConfig.getMapLocks().containsKey(users.getId()))
                 .toList();
 
         List<Subs> subsList = new ArrayList<>();

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import main.core.NoticeMeUtils;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -25,6 +26,7 @@ public class SuggestionCommand {
     public void suggestion(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
         var user = event.getUser();
+        JDA jda = event.getJDA();
 
         Set<String> suggestions = instance.getSuggestionsList(guildIdString, user.getId());
 
@@ -42,8 +44,9 @@ public class SuggestionCommand {
                 } else {
                     stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(top5Users.get(i)).append(">");
                 }
-                User userFromBD = event.getJDA().retrieveUserById(top5Users.get(i)).complete();
-                String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromBD.getGlobalName());
+                User userFromDiscord = jda.getUserById(top5Users.get(i));
+                if (userFromDiscord == null) userFromDiscord = jda.retrieveUserById(top5Users.get(i)).complete();
+                String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromDiscord.getGlobalName());
 
                 buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
             }

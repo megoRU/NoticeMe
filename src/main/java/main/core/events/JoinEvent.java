@@ -2,6 +2,7 @@ package main.core.events;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
@@ -14,8 +15,9 @@ public class JoinEvent {
 
     public void join(@NotNull GuildJoinEvent event) {
         try {
-            DefaultGuildChannelUnion defaultChannel = event.getGuild().getDefaultChannel();
-            Member selfMember = event.getGuild().getSelfMember();
+            Guild guild = event.getGuild();
+            DefaultGuildChannelUnion defaultChannel = guild.getDefaultChannel();
+            Member selfMember = guild.getSelfMember();
             if (defaultChannel == null) return;
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
