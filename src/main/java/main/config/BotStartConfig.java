@@ -71,7 +71,6 @@ public class BotStartConfig {
     private void startBot() {
         try {
             CoreBot coreBot = new CoreBot(updateController);
-            coreBot.init();
 
             //Update
             setLanguages();

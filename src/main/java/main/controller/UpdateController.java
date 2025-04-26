@@ -30,9 +30,6 @@ public class UpdateController {
     private final SuggestionsRepository suggestionsRepository;
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
 
-    //CORE
-    private CoreBot coreBot;
-
     @Autowired
     public UpdateController(NoticeRepository noticeRepository,
                             GuildRepository guildRepository,
@@ -46,10 +43,6 @@ public class UpdateController {
         this.lockRepository = lockRepository;
         this.entriesRepository = entriesRepository;
         this.suggestionsRepository = suggestionsRepository;
-    }
-
-    public void registerBot(CoreBot coreBot) {
-        this.coreBot = coreBot;
     }
 
     public void processEvent(Object event) {
