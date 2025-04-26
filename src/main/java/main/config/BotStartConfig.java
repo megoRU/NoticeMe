@@ -103,29 +103,29 @@ public class BotStartConfig {
             jdaBuilder.enableIntents(intents);
             jdaBuilder.setActivity(Activity.playing("Starting..."));
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
-            jdaBuilder.addEventListeners(new CoreBot(updateController));
+            jdaBuilder.addEventListeners(coreBot);
 
             jda = jdaBuilder.build();
             jda.awaitReady();
+
+            //Обновить команды
+            updateSlashCommands();
+
+            jda.retrieveCommands().queue(
+                    list -> {
+                        for (Command command : list) {
+                            String name = command.getName();
+                            long id = command.getIdLong();
+                            commandMap.put(name, id);
+                            System.out.printf("%s [%s]%n", id, name);
+                        }
+                    }
+            );
+
+            System.out.println("15:16");
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
-
-        //Обновить команды
-        updateSlashCommands();
-
-        jda.retrieveCommands().queue(
-                list -> {
-                    for (Command command : list) {
-                        String name = command.getName();
-                        long id = command.getIdLong();
-                        commandMap.put(name, id);
-                        System.out.printf("%s [%s]%n", id, name);
-                    }
-                }
-        );
-
-        System.out.println("14:42");
     }
 
     private void updateSlashCommands() {
