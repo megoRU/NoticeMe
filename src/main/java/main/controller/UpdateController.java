@@ -1,7 +1,6 @@
 package main.controller;
 
 import lombok.Getter;
-import main.core.CoreBot;
 import main.core.NoticeMeUtils;
 import main.core.events.*;
 import main.model.repository.*;
