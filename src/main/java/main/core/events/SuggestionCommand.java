@@ -7,8 +7,11 @@ import main.jsonparser.ParserClass;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -22,6 +25,7 @@ public class SuggestionCommand {
 
     private static final ParserClass jsonParsers = new ParserClass();
     private final static NoticeRegistry instance = NoticeRegistry.getInstance();
+    private final static Logger LOGGER = LoggerFactory.getLogger(SuggestionCommand.class.getName());
 
     public void suggestion(@NotNull SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
@@ -47,12 +51,19 @@ public class SuggestionCommand {
 
                 Member member = guild.getMemberById(top5Users.get(i));
                 if (member == null) {
-                    member = guild.retrieveMemberById(top5Users.get(i)).complete();
+                    try {
+                        member = guild.retrieveMemberById(top5Users.get(i)).complete();
+                        String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), member.getEffectiveName());
+                        buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
+                    } catch (ErrorResponseException e) {
+                        if (e.getErrorCode() == 10007) { // UNKNOWN_MEMBER
+                            LOGGER.info("UNKNOWN_MEMBER: {} Guild: {}", top5Users.get(i), guildIdString);
+                        }
+                    }
+                } else {
+                    String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), member.getEffectiveName());
+                    buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
                 }
-
-                String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), member.getEffectiveName());
-
-                buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
             }
 
             String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
