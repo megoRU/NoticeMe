@@ -345,13 +345,14 @@ public class BotStartConfig {
 
                 Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
 
-                if (userId.equals("1088533417848733906")) {
+                if (userId.equals("250699265389625347")) {
                     System.out.println(suggestionUserId);
+                    System.out.println(stringSet);
                 }
 
-                if (!stringSet.contains(suggestionUserId)) {
-                    instance.addUserSuggestions(guildId, suggestionUserId, userId);
-                }
+//                if (!stringSet.contains(suggestionUserId)) {
+                    instance.addUserSuggestions(guildId, userId, suggestionUserId);
+//                }
             }
             System.out.println("getSuggestions()");
         } catch (Exception e) {
