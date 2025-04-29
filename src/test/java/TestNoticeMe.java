@@ -58,14 +58,14 @@ public class TestNoticeMe {
     void testSubscribersUser() {
         instance.addUserSuggestions("500", "3000", "2500");
         instance.addUserSuggestions("500", "3000", "2501");
-        instance.addUserSuggestions("500", "3000", "2502");
+        instance.addUserSuggestions("500", "3001", "2502");
 
         Set<String> suggestionsList = instance.getSuggestionsList("500", "3000");
 
         List<String> actualList = new ArrayList<>(suggestionsList);
         actualList.sort(Comparator.naturalOrder());
 
-        Assertions.assertArrayEquals(new String[]{"2500", "2501", "2502"}, actualList.toArray());
+        Assertions.assertArrayEquals(new String[]{"2500", "2501"}, actualList.toArray());
     }
 
     @Test

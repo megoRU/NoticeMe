@@ -75,15 +75,16 @@ public class NoticeRegistry {
         }
     }
 
-    public void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
-        Suggestions suggestions = getSuggestions(guildId, userId);
+    public synchronized void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
+        userSuggestionsMap.computeIfAbsent(guildId, k -> new ConcurrentHashMap<>());
 
-        if (suggestions == null) suggestions = new Suggestions();
+        Suggestions suggestions = userSuggestionsMap.get(guildId).get(userId);
+        if (suggestions == null) {
+            suggestions = new Suggestions();
+            userSuggestionsMap.get(guildId).put(userId, suggestions);
+        }
+
         suggestions.putUser(userSuggestionId);
-
-        ConcurrentHashMap<String, Suggestions> concurrentHashMap = new ConcurrentHashMap<>();
-        concurrentHashMap.put(userId, suggestions);
-        userSuggestionsMap.put(guildId, concurrentHashMap);
     }
 
     /**
