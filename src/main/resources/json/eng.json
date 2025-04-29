@@ -9,7 +9,7 @@
   "empty_list": "You don't have anyone in your subscriptions",
   "subscription": "Here is a list of everyone you have subscribed to in this guild:\n%s",
   "dont_find_user": "Couldn't find this user in your subscriptions!",
-  "successfully_deleted": "Successfully deleted this user: <@%s>\nin your subscriptions",
+  "successfully_deleted": "Successfully deleted user: <@%s> in your subscriptions",
   "delete_data": "Data deleted.",
   "warning_delete_data": "This will delete all the data in the database for your server.\nIt will be impossible to cancel this action.\nIf you really want to, click the button below.",
   "lock": "Now they won't be able to track you.\nAll subscriptions to you have been cancelled.",

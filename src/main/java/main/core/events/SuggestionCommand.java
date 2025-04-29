@@ -48,7 +48,7 @@ public class SuggestionCommand {
                 if (userFromDiscord == null) userFromDiscord = jda.retrieveUserById(top5Users.get(i)).complete();
                 String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromDiscord.getGlobalName());
 
-                buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
+                buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + userFromDiscord.getGlobalName(), addUser));
             }
 
             String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
