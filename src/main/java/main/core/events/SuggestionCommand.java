@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import main.core.NoticeMeUtils;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
@@ -24,9 +24,9 @@ public class SuggestionCommand {
     private final static NoticeRegistry instance = NoticeRegistry.getInstance();
 
     public void suggestion(@NotNull SlashCommandInteractionEvent event) {
-        var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        Guild guild = event.getGuild();
+        var guildIdString = Objects.requireNonNull(guild).getId();
         var user = event.getUser();
-        JDA jda = event.getJDA();
 
         Set<String> suggestions = instance.getSuggestionsList(guildIdString, user.getId());
 
@@ -44,10 +44,13 @@ public class SuggestionCommand {
                 } else {
                     stringBuilder.append("\n").append((i + 1)).append(". ").append("<@").append(top5Users.get(i)).append(">");
                 }
-                User userFromDiscord = jda.getUserById(top5Users.get(i));
-                if (userFromDiscord == null) userFromDiscord = jda.retrieveUserById(top5Users.get(i)).complete();
 
-                String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), userFromDiscord.getEffectiveName());
+                Member member = guild.getMemberById(top5Users.get(i));
+                if (member == null) {
+                    member = guild.retrieveMemberById(top5Users.get(i)).complete();
+                }
+
+                String addUser = String.format(jsonParsers.getTranslation("add_user", guildIdString), member.getEffectiveName());
 
                 buttonsList.add(Button.primary(NoticeMeUtils.BUTTON_ADD_USER + top5Users.get(i), addUser));
             }
