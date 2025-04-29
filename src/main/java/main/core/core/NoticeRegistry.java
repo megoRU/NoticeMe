@@ -75,7 +75,7 @@ public class NoticeRegistry {
         }
     }
 
-    public synchronized void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
+    public void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
         userSuggestionsMap.computeIfAbsent(guildId, k -> new ConcurrentHashMap<>());
 
         Suggestions suggestions = userSuggestionsMap.get(guildId).get(userId);
