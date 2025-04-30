@@ -93,7 +93,6 @@ public class TestNoticeMe {
         Assertions.assertNotNull(secondUser);
         Assertions.assertEquals("<@2500>", user.getUserList());
         Assertions.assertEquals("<@3000>", secondUser.getUserList());
-
     }
 
     @Test

@@ -96,7 +96,7 @@ public class UserJoinEvent {
         }
     }
 
-    // Как я понял сохранять предложения, но только тех которых нет в БД это интересно
+    // Сохраняет предложения, но только тех которых нет в БД
     // userId кто зашел
     // instanceUser кто, зашел и его список кто на него подписан
     private void updateUserSuggestions(String userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {

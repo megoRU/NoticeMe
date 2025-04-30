@@ -25,7 +25,6 @@ public class UpdateController {
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
-    private final EntriesRepository entriesRepository;
     private final SuggestionsRepository suggestionsRepository;
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
 
@@ -34,13 +33,11 @@ public class UpdateController {
                             GuildRepository guildRepository,
                             LanguageRepository languageRepository,
                             LockRepository lockRepository,
-                            EntriesRepository entriesRepository,
                             SuggestionsRepository suggestionsRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
-        this.entriesRepository = entriesRepository;
         this.suggestionsRepository = suggestionsRepository;
     }
 
