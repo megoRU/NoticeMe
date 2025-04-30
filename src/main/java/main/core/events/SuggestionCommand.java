@@ -66,9 +66,13 @@ public class SuggestionCommand {
                 }
             }
 
-            String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
-
-            event.reply(suggestionText).setActionRow(buttonsList).setEphemeral(true).queue();
+            if (buttonsList.isEmpty()) {
+                String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
+                event.reply(noSuggestions).setEphemeral(true).queue();
+            } else {
+                String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
+                event.reply(suggestionText).setActionRow(buttonsList).setEphemeral(true).queue();
+            }
         } else {
             String noSuggestions = jsonParsers.getTranslation("no_suggestions", guildIdString);
             event.reply(noSuggestions).setEphemeral(true).queue();
