@@ -134,39 +134,50 @@ public class BotStartConfig {
             List<OptionData> language = new ArrayList<>();
 
             language.add(new OptionData(STRING, "bot", "Setting the bot language")
-                    .addChoice("english", Language.LanguageEnum.EN.name())
-                    .addChoice("russian", Language.LanguageEnum.RU.name())
+                    .addChoice("English", Language.LanguageEnum.EN.name())
+                    .addChoice("Русский", Language.LanguageEnum.RU.name())
+                    .addChoice("Français", Language.LanguageEnum.FR.name())
                     .setRequired(true)
                     .setNameLocalization(DiscordLocale.RUSSIAN, "бот")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка бота"));
+                    .setNameLocalization(DiscordLocale.FRENCH, "bot")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка бота")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Définition de la langue du bot"));
 
             List<OptionData> setup = new ArrayList<>();
 
             setup.add(new OptionData(CHANNEL, "text-channel", "Select TextChannel for notification")
                     .setRequired(true)
                     .setNameLocalization(DiscordLocale.RUSSIAN, "текстовый-канал")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выберите текстовый канал для уведомления"));
+                    .setNameLocalization(DiscordLocale.FRENCH, "canal-texte")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выберите текстовый канал для уведомления")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Sélectionnez un canal texte pour les notifications"));
 
             List<OptionData> notifications = new ArrayList<>();
 
             notifications.add(new OptionData(USER, "user", "Select a user to track")
                     .setRequired(true)
                     .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать пользователя для отслеживания"));
+                    .setNameLocalization(DiscordLocale.FRENCH, "utilisateur")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Выбрать пользователя для отслеживания")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Sélectionner un utilisateur à suivre"));
 
             List<OptionData> unsub = new ArrayList<>();
 
             unsub.add(new OptionData(USER, "user", "Unsubscribe from a user")
                     .setRequired(true)
                     .setNameLocalization(DiscordLocale.RUSSIAN, "пользователь")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя"));
+                    .setNameLocalization(DiscordLocale.FRENCH, "utilisateur")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Se désabonner d'un utilisateur"));
 
             List<OptionData> unsubV2 = new ArrayList<>();
 
             unsubV2.add(new OptionData(STRING, "user-id", "Unsubscribe from a user by User ID")
                     .setRequired(true)
                     .setNameLocalization(DiscordLocale.RUSSIAN, "id-пользователя")
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID"));
+                    .setNameLocalization(DiscordLocale.FRENCH, "id-utilisateur")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя по User ID")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Se désabonner par identifiant utilisateur"));
 
             /*
              * Команды
@@ -176,61 +187,74 @@ public class BotStartConfig {
                     .setContexts(InteractionContextType.GUILD)
                     .addOptions(language)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Définir la langue");
 
             CommandData helpCommand = Commands.slash("help", "Bot commands")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Команды бота")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Commandes du bot");
 
             CommandData donateCommand = Commands.slash("donate", "Send a donation")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отправить пожертвование");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отправить пожертвование")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Envoyer un don");
 
             CommandData setupCommand = Commands.slash("setup", "Set up a TextChannel for notifications")
                     .setContexts(InteractionContextType.GUILD)
                     .addOptions(setup)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка текстового канала для уведомлений");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка текстового канала для уведомлений")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Configurer un canal texte pour les notifications");
 
             CommandData subCommand = Commands.slash("sub", "Subscribe to user")
                     .setContexts(InteractionContextType.GUILD)
                     .addOptions(notifications)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Подписаться на пользователя");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Подписаться на пользователя")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "S'abonner à un utilisateur");
 
             CommandData listCommand = Commands.slash("list", "List of your subscriptions")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список твоих подписок");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список твоих подписок")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Liste de vos abonnements");
 
             CommandData unsubCommand = Commands.slash("unsub", "Unsubscribe from the user")
                     .setContexts(InteractionContextType.GUILD)
                     .addOptions(unsub)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Se désabonner de l'utilisateur");
 
             CommandData unsubV2Command = Commands.slash("unsub-v2", "Unsubscribe from the user")
                     .setContexts(InteractionContextType.GUILD)
                     .addOptions(unsubV2)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Отписаться от пользователя")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Se désabonner de l'utilisateur");
 
             CommandData checkCommand = Commands.slash("check", "Checking the bot's permissions")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Проверка разрешений бота");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Проверка разрешений бота")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Vérification des permissions du bot");
 
             CommandData deleteCommand = Commands.slash("delete", "Delete all subscribers from the server")
                     .setContexts(InteractionContextType.GUILD)
                     .setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Supprimer tous les abonnés du serveur");
 
             CommandData suggestionCommand = Commands.slash("suggestion", "List of suggestions for tracking users")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Liste des suggestions d'utilisateurs à suivre");
 
             CommandData lockCommand = Commands.slash("lock", "Forbid tracking yourself on all servers")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Запретить отслеживать себя на всех серверах");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Запретить отслеживать себя на всех серверах")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Interdire le suivi de soi sur tous les serveurs");
 
             CommandData unlockCommand = Commands.slash("unlock", "Allow tracking yourself on all servers")
                     .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Разрешить отслеживать себя на всех серверах");
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Разрешить отслеживать себя на всех серверах")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Autoriser le suivi de soi sur tous les serveurs");
 
             commands.addCommands(
                             languageCommand,
@@ -269,6 +293,7 @@ public class BotStartConfig {
             List<String> listLanguages = new ArrayList<>();
             listLanguages.add("rus");
             listLanguages.add("eng");
+            listLanguages.add("fre");
 
             for (String listLanguage : listLanguages) {
                 InputStream inputStream = new ClassPathResource("json/" + listLanguage + ".json").getInputStream();
@@ -277,10 +302,10 @@ public class BotStartConfig {
                 JSONObject jsonObject = new JSONObject(new JSONTokener(reader));
 
                 for (String o : jsonObject.keySet()) {
-                    if (listLanguage.equals("rus")) {
-                        ParserClass.russian.put(o, String.valueOf(jsonObject.get(o)));
-                    } else {
-                        ParserClass.english.put(o, String.valueOf(jsonObject.get(o)));
+                    switch (listLanguage) {
+                        case "eng" -> ParserClass.english.put(o, String.valueOf(jsonObject.get(o)));
+                        case "rus" -> ParserClass.russian.put(o, String.valueOf(jsonObject.get(o)));
+                        case "fre" -> ParserClass.french.put(o, String.valueOf(jsonObject.get(o)));
                     }
                 }
                 reader.close();

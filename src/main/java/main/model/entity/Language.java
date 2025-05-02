@@ -18,12 +18,13 @@ public class Language {
     @Column(name = "guild_id", nullable = false)
     private Long guildId;
 
-    @Column(name = "language", columnDefinition = "enum ('RU', 'EN')", nullable = false)
+    @Column(name = "language", columnDefinition = "enum ('RU', 'EN', 'FR')", nullable = false)
     @Enumerated(EnumType.STRING)
     private LanguageEnum language;
 
     public enum LanguageEnum {
         RU,
-        EN
+        EN,
+        FR
     }
 }
