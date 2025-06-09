@@ -1,5 +1,7 @@
 {
-  "user_enter_to_channel": "Пользователь: **%s** зашёл в канал: <#%s>\n%s",
+  "user_enter_to_channel": "**%s** %s в канал: <#%s>\n%s",
+  "user_enter_female": "зашла",
+  "user_enter_male": "зашёл",
   "language_set": "Язык успешно сохранён",
   "yourself": "Вы не можете выбрать себя",
   "bot": "Вы не можете выбрать бота",
@@ -45,5 +47,6 @@
   "accept_to_voice_channel": "Доступ к голосовым каналам:",
   "check": "Проверка разрешения бота",
   "no_access_send_message": "У меня нет доступа к этому текстовому каналу. Проверьте разрешения: `Permission.VIEW_CHANNEL`, `Permission.MESSAGE_SEND`",
-  "number_id_error": "Вы должны ввести число!"
+  "number_id_error": "Вы должны ввести число!",
+  "gender_settings": "Готово! Теперь буду уведомлять подписчиков так:\n**%s** %s в канал <#%s>"
 }

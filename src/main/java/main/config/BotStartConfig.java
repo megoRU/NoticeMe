@@ -53,6 +53,7 @@ public class BotStartConfig {
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, Gender.GenderType> mapGenders = new ConcurrentHashMap<>();
     private final static Map<String, Long> commandMap = new HashMap<>();
 
     public static JDA jda;
@@ -64,6 +65,7 @@ public class BotStartConfig {
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final GuildRepository guildRepository;
+    private final GenderRepository genderRepository;
 
     private final UpdateController updateController;
 
@@ -75,6 +77,7 @@ public class BotStartConfig {
             //Update
             setLanguages();
             getLanguages();
+            getGenders();
             getAllServers();
             getLockStatus();
             getAllUsers();
@@ -143,6 +146,17 @@ public class BotStartConfig {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка языка бота")
                     .setDescriptionLocalization(DiscordLocale.FRENCH, "Définition de la langue du bot"));
 
+            List<OptionData> gender = new ArrayList<>();
+
+            gender.add(new OptionData(STRING, "gender", "Setting your gender")
+                    .addChoice("Male", Gender.GenderType.MALE.name())
+                    .addChoice("Female", Gender.GenderType.FEMALE.name())
+                    .setRequired(true)
+                    .setNameLocalization(DiscordLocale.RUSSIAN, "гендер")
+                    .setNameLocalization(DiscordLocale.FRENCH, "genre")
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка своего гендера")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Définir son genre"));
+
             List<OptionData> setup = new ArrayList<>();
 
             setup.add(new OptionData(CHANNEL, "text-channel", "Select TextChannel for notification")
@@ -182,6 +196,12 @@ public class BotStartConfig {
             /*
              * Команды
              */
+
+            CommandData genderCommand = Commands.slash("gender", "Setting your gender")
+                    .setContexts(InteractionContextType.GUILD)
+                    .addOptions(gender)
+                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Установка своего гендера")
+                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Définir son genre");
 
             CommandData languageCommand = Commands.slash("language", "Setting language")
                     .setContexts(InteractionContextType.GUILD)
@@ -257,6 +277,7 @@ public class BotStartConfig {
                     .setDescriptionLocalization(DiscordLocale.FRENCH, "Autoriser le suivi de soi sur tous les serveurs");
 
             commands.addCommands(
+                            genderCommand,
                             languageCommand,
                             helpCommand,
                             donateCommand,
@@ -325,6 +346,18 @@ public class BotStartConfig {
                 mapLanguages.put(language.getGuildId().toString(), language.getLanguage());
             }
             System.out.println("getLanguages()");
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    private void getGenders() {
+        try {
+            List<Gender> genderList = genderRepository.findAll();
+            for (Gender gender : genderList) {
+                mapGenders.put(gender.getUserId().toString(), gender.getGender());
+            }
+            System.out.println("getGenders()");
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -403,6 +436,10 @@ public class BotStartConfig {
 
     public static Map<String, Lock.Locked> getMapLocks() {
         return mapLocks;
+    }
+
+    public static Map<String, Gender.GenderType> getMapGenders() {
+        return mapGenders;
     }
 
     @Nullable

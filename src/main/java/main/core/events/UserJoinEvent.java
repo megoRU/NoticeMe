@@ -2,9 +2,11 @@ package main.core.events;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
+import main.config.BotStartConfig;
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
+import main.model.entity.Gender;
 import main.model.entity.Server;
 import main.model.entity.Suggestions;
 import main.model.repository.SuggestionsRepository;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
@@ -72,11 +75,19 @@ public class UserJoinEvent {
                     TextChannel textChannel = guild.getTextChannelById(server.getTextChannelId());
                     if (textChannel != null) {
                         if (selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
-                            String text = String.format(jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
-                                    effectiveName,
-                                    voiceChannel.getId(),
-                                    userList);
+                            Map<String, Gender.GenderType> mapGenders = BotStartConfig.getMapGenders();
+                            Gender.GenderType genderType = mapGenders.get(userId);
+                            if (genderType == null) genderType = Gender.GenderType.MALE;
 
+                            String genderKey = (genderType == Gender.GenderType.FEMALE) ? "user_enter_female" : "user_enter_male";
+                            String genderText = jsonParsers.getTranslation(genderKey, guild.getId());
+                            String text = String.format(
+                                    jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
+                                    effectiveName,
+                                    genderText,
+                                    voiceChannel.getId(),
+                                    userList
+                            );
                             textChannel.sendMessage(text).queue();
                         }
                     }

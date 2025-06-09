@@ -1,5 +1,7 @@
 {
-  "user_enter_to_channel": "The user: **%s** has entered the channel: <#%s>\n%s",
+  "user_enter_to_channel": "**%s** %s the channel: <#%s>\n%s",
+  "user_enter_female": "has entered",
+  "user_enter_male": "has entered",
   "language_set": "Language saved successfully",
   "yourself": "You can't choose yourself",
   "bot": "You can't choose a bot",
@@ -45,5 +47,6 @@
   "accept_to_voice_channel": "Access to voice channels:",
   "check": "Checking the bot's permission",
   "no_access_send_message": "I don't have access to this text channel. Check the permissions: `Permission.VIEW_CHANNEL`, `Permission.MESSAGE_SEND`",
-  "number_id_error": "You must enter a number!"
+  "number_id_error": "You must enter a number!",
+  "gender_settings": "Done! I will now notify subscribers like this:\n**%s** %s in channel <#%s>"
 }

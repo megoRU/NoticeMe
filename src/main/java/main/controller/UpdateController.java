@@ -26,6 +26,7 @@ public class UpdateController {
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final SuggestionsRepository suggestionsRepository;
+    private final GenderRepository genderRepository;
     private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
 
     @Autowired
@@ -33,12 +34,14 @@ public class UpdateController {
                             GuildRepository guildRepository,
                             LanguageRepository languageRepository,
                             LockRepository lockRepository,
-                            SuggestionsRepository suggestionsRepository) {
+                            SuggestionsRepository suggestionsRepository,
+                            GenderRepository genderRepository) {
         this.noticeRepository = noticeRepository;
         this.guildRepository = guildRepository;
         this.languageRepository = languageRepository;
         this.lockRepository = lockRepository;
         this.suggestionsRepository = suggestionsRepository;
+        this.genderRepository = genderRepository;
     }
 
     public void processEvent(Object event) {
@@ -86,6 +89,10 @@ public class UpdateController {
             case "delete" -> {
                 DeleteCommand deleteCommand = new DeleteCommand();
                 deleteCommand.delete(event);
+            }
+            case "gender" -> {
+                GenderCommand genderCommand = new GenderCommand(genderRepository);
+                genderCommand.gender(event);
             }
             case "list" -> {
                 ListCommand listCommand = new ListCommand();
