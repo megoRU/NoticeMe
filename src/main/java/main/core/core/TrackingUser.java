@@ -2,11 +2,11 @@ package main.core.core;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TrackingUser {
 
-    private final Set<Long> userList = new ConcurrentSkipListSet<>();
+    private final Set<Long> userList = ConcurrentHashMap.newKeySet();
     private LocalDateTime timeJoin = null;
 
     public String getUserList() {

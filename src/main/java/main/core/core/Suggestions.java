@@ -1,11 +1,11 @@
 package main.core.core;
 
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Suggestions {
 
-    private final Set<Long> userList = new ConcurrentSkipListSet<>();
+    private final Set<Long> userList = ConcurrentHashMap.newKeySet();
 
     public void putUser(Long userId) {
         userList.add(userId);
