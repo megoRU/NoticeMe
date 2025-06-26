@@ -30,7 +30,7 @@ public class Check {
         String guildIdString = guild.getId();
         Member selfMember = guild.getSelfMember();
 
-        Server server = instance.getServer(guildIdString);
+        Server server = instance.getServer(guild.getIdLong());
         String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
 
         if (server == null) {

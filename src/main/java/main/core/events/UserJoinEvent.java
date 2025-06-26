@@ -44,6 +44,8 @@ public class UserJoinEvent {
         Member eventMember = event.getMember();
         User user = eventMember.getUser();
         String userId = user.getId();
+        Long userIdLong = user.getIdLong();
+
         Member selfMember = guild.getSelfMember();
         String effectiveName = eventMember.getEffectiveName();
 
@@ -61,16 +63,16 @@ public class UserJoinEvent {
                     .filter(member -> !member.getUser().getId().equals(userId))
                     .toList();
 
-            TrackingUser instanceUser = instance.getUser(guild.getId(), userId);
+            TrackingUser instanceUser = instance.getUser(guild.getIdLong(), userIdLong);
 
             if (!members.isEmpty()) {
-                CompletableFuture.runAsync(() -> updateUserSuggestions(userId, members, guild.getIdLong(), instanceUser));
+                CompletableFuture.runAsync(() -> updateUserSuggestions(userIdLong, members, guild.getIdLong(), instanceUser));
             }
 
             if (instanceUser == null) return;
             String userList = instanceUser.getUserList();
             if (!instanceUser.hasUserJoin()) {
-                Server server = instance.getServer(guild.getId());
+                Server server = instance.getServer(guild.getIdLong());
                 if (server != null) {
                     TextChannel textChannel = guild.getTextChannelById(server.getTextChannelId());
                     if (textChannel != null) {
@@ -110,37 +112,36 @@ public class UserJoinEvent {
     // Сохраняет предложения, но только тех которых нет в БД
     // userId кто зашел
     // instanceUser кто, зашел и его список кто на него подписан
-    private void updateUserSuggestions(String userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {
-        String guildIdString = String.valueOf(guildId);
-        Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildIdString, userId);
+    private void updateUserSuggestions(Long userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {
+        Set<Long> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
 
-        Set<String> currentSuggestions = instance.getSuggestionsList(guildIdString, userId);
-        Set<String> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
+        Set<Long> currentSuggestions = instance.getSuggestionsList(guildId, userId);
+        Set<Long> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
 
         List<Member> newSuggestions = members.stream()
-                .filter(member -> !currentSuggestions.contains(member.getUser().getId()))
-                .filter(member -> !subscribedUsers.contains(member.getUser().getId()))
-                .filter(member -> !stringSet.contains(member.getUser().getId()))
+                .filter(member -> !currentSuggestions.contains(member.getUser().getIdLong()))
+                .filter(member -> !subscribedUsers.contains(member.getUser().getIdLong()))
+                .filter(member -> !stringSet.contains(member.getUser().getIdLong()))
                 .toList();
 
         if (!newSuggestions.isEmpty()) {
             newSuggestions.forEach(member -> {
                 saveSuggestion(userId, member, guildId);
-                addSuggestions(userId, member, guildIdString);
+                addSuggestions(userId, member, guildId);
             });
         }
     }
 
-    private void addSuggestions(String userId, Member suggestionMember, String guildId) {
-        String suggestionUserId = suggestionMember.getUser().getId();
+    private void addSuggestions(Long userId, Member suggestionMember, Long guildId) {
+        Long suggestionUserId = suggestionMember.getUser().getIdLong();
         instance.addUserSuggestions(guildId, userId, suggestionUserId);
     }
 
-    private void saveSuggestion(String userId, Member suggestionMember, long guildId) {
+    private void saveSuggestion(Long userId, Member suggestionMember, long guildId) {
         long suggestionUserId = suggestionMember.getUser().getIdLong();
 
         Suggestions suggestion = new Suggestions();
-        suggestion.setUserId(Long.parseLong(userId));
+        suggestion.setUserId(userId);
         suggestion.setGuildId(guildId);
         suggestion.setSuggestionUserId(suggestionUserId);
 

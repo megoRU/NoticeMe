@@ -29,6 +29,8 @@ public class AddAllUsersButton {
 
     public void addAllUsers(@NotNull ButtonInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
+
         var user = event.getUser();
         String buttonId = event.getButton().getId();
         if (buttonId == null) return;
@@ -36,17 +38,17 @@ public class AddAllUsersButton {
         event.editButton(event.getButton().asDisabled()).queue();
         List<User> members = event.getMessage().getMentions().getUsers();
 
-        Set<String> allUserTrackerIdsByUserId = instance.getAllUserTrackerIdsByUserId(guildIdString, user.getId());
+        Set<Long> allUserTrackerIdsByUserId = instance.getAllUserTrackerIdsByUserId(guildIdLong, user.getIdLong());
 
         // Фильтрация и сборка упомянутых пользователей
         List<User> collect = members.stream()
-                .filter(users -> !allUserTrackerIdsByUserId.contains(users.getId()))
+                .filter(users -> !allUserTrackerIdsByUserId.contains(users.getIdLong()))
                 .filter(users -> !BotStartConfig.getMapLocks().containsKey(users.getId()))
                 .toList();
 
         List<Subs> subsList = new ArrayList<>();
 
-        Server server = instance.getServer(guildIdString);
+        Server server = instance.getServer(guildIdLong);
 
         if (server == null) {
             String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
@@ -63,10 +65,10 @@ public class AddAllUsersButton {
             subsList.add(subs);
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
-            instance.sub(guildIdString, user.getId(), value.getId());
+            instance.sub(guildIdLong, user.getIdLong(), value.getIdLong());
 
-            Suggestions suggestions = instance.getSuggestions(guildIdString, user.getId());
-            if (suggestions != null) suggestions.removeUser(value.getId());
+            Suggestions suggestions = instance.getSuggestions(guildIdLong, user.getIdLong());
+            if (suggestions != null) suggestions.removeUser(value.getIdLong());
         }
         noticeRepository.saveAll(subsList);
         String usersSaved = jsonParsers.getTranslation("users_saved", guildIdString);

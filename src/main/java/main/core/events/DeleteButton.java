@@ -30,8 +30,8 @@ public class DeleteButton {
         guildRepository.deleteById(guildIdLong);
 
         NoticeRegistry instance = NoticeRegistry.getInstance();
-        instance.removeGuild(guildIdString);
-        instance.removeServer(guildIdString);
+        instance.removeGuild(guildIdLong);
+        instance.removeServer(guildIdLong);
 
         String deleteData = String.format(jsonParsers.getTranslation("delete_data", guildIdString));
         event.getHook().sendMessage(deleteData).setEphemeral(true).queue();

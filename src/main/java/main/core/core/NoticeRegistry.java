@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 public class NoticeRegistry {
 
     //Guild | List: userTrackerId | TrackingUser
-    private static final ConcurrentMap<String, ConcurrentMap<String, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<String, Server> serverListMap = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Long, ConcurrentMap<Long, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Long, Server> serverListMap = new ConcurrentHashMap<>();
     //Guild | List: user | Suggestions
-    private static final ConcurrentMap<String, ConcurrentMap<String, Suggestions>> userSuggestionsMap = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Long, ConcurrentMap<Long, Suggestions>> userSuggestionsMap = new ConcurrentHashMap<>();
     private static volatile NoticeRegistry noticeRegistry;
 
     private NoticeRegistry() {
@@ -40,7 +40,7 @@ public class NoticeRegistry {
      * @param referenceId ID пользователя, для которого нужно найти подписчиков.
      * @return Множество ID пользователей, которые подписаны на referenceId, или пустое множество, если подписчиков нет.
      */
-    public Set<String> getAllUserTrackerIdsByUserId(String guildId, String referenceId) {
+    public Set<Long> getAllUserTrackerIdsByUserId(Long guildId, Long referenceId) {
         return trackingUserConcurrentMap.getOrDefault(guildId, new ConcurrentHashMap<>())
                 .entrySet()
                 .stream()
@@ -49,18 +49,18 @@ public class NoticeRegistry {
                 .collect(Collectors.toSet());
     }
 
-    private void save(String guildId, ConcurrentMap<String, TrackingUser> concurrentMap) {
+    private void save(Long guildId, ConcurrentMap<Long, TrackingUser> concurrentMap) {
         trackingUserConcurrentMap.put(guildId, concurrentMap);
     }
 
     /*
         userId этот тот кто подписан на userIdTracker
      */
-    public void sub(String guildId, String userId, String userIdTracker) {
+    public void sub(Long guildId, Long userId, Long userIdTracker) {
         if (!hasGuild(guildId)) {
             TrackingUser trackingUser = new TrackingUser();
             trackingUser.putUser(userId);
-            ConcurrentMap<String, TrackingUser> trackingUserConcurrentMap = new ConcurrentHashMap<>();
+            ConcurrentMap<Long, TrackingUser> trackingUserConcurrentMap = new ConcurrentHashMap<>();
             trackingUserConcurrentMap.put(userIdTracker, trackingUser);
             save(guildId, trackingUserConcurrentMap);
         } else {
@@ -75,7 +75,7 @@ public class NoticeRegistry {
         }
     }
 
-    public void addUserSuggestions(String guildId, String userId, String userSuggestionId) {
+    public void addUserSuggestions(Long guildId, Long userId, Long userSuggestionId) {
         userSuggestionsMap.computeIfAbsent(guildId, k -> new ConcurrentHashMap<>());
 
         Suggestions suggestions = userSuggestionsMap.get(guildId).get(userId);
@@ -94,7 +94,7 @@ public class NoticeRegistry {
      * @param userId  ID пользователя, для которого нужно получить список подписок.
      * @return Множество ID пользователей, на которых подписан `userId`, или пустое множество, если подписок нет.
      */
-    public Set<String> getSuggestionsList(String guildId, String userId) {
+    public Set<Long> getSuggestionsList(Long guildId, Long userId) {
         Suggestions suggestions = getSuggestions(guildId, userId);
         if (suggestions != null) {
             return suggestions.getUserList();
@@ -104,8 +104,8 @@ public class NoticeRegistry {
     }
 
     @Nullable
-    public Suggestions getSuggestions(String guildId, String userId) {
-        ConcurrentMap<String, Suggestions> suggestionsConcurrentMap = userSuggestionsMap.get(guildId);
+    public Suggestions getSuggestions(Long guildId, Long userId) {
+        ConcurrentMap<Long, Suggestions> suggestionsConcurrentMap = userSuggestionsMap.get(guildId);
 
         if (suggestionsConcurrentMap != null) {
             return suggestionsConcurrentMap.get(userId);
@@ -115,8 +115,8 @@ public class NoticeRegistry {
     }
 
     //                                                        TrackingUser | Data
-    private void saveTrackingUser(String guildId, String user, TrackingUser trackingUser) {
-        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+    private void saveTrackingUser(Long guildId, Long user, TrackingUser trackingUser) {
+        ConcurrentMap<Long, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
         if (stringTrackingUserConcurrentMap == null) {
             throw new IllegalArgumentException("In this collection does not exist Guild: saveTrackingUser()");
         }
@@ -124,26 +124,26 @@ public class NoticeRegistry {
     }
 
     //TrackingUser | Data
-    private ConcurrentMap<String, TrackingUser> get(String guildId) {
+    private ConcurrentMap<Long, TrackingUser> get(Long guildId) {
         return trackingUserConcurrentMap.get(guildId);
     }
 
-    public void putServer(String serverId, Server server) {
+    public void putServer(Long serverId, Server server) {
         serverListMap.put(serverId, server);
     }
 
-    public void removeServer(String serverId) {
+    public void removeServer(Long serverId) {
         serverListMap.remove(serverId);
     }
 
     @Nullable
-    public Server getServer(String serverId) {
+    public Server getServer(Long serverId) {
         return serverListMap.get(serverId);
     }
 
     @Nullable
-    public TrackingUser getUser(String guildId, String user) {
-        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+    public TrackingUser getUser(Long guildId, Long user) {
+        ConcurrentMap<Long, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
 
         if (stringTrackingUserConcurrentMap != null) {
             return stringTrackingUserConcurrentMap.get(user);
@@ -152,30 +152,30 @@ public class NoticeRegistry {
         }
     }
 
-    private boolean hasGuild(String guildId) {
+    private boolean hasGuild(Long guildId) {
         return trackingUserConcurrentMap.containsKey(guildId);
     }
 
-    public void removeGuild(String guildId) {
+    public void removeGuild(Long guildId) {
         trackingUserConcurrentMap.remove(guildId);
     }
 
-    private void removeUserFromGuild(String guildId, String user) {
-        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+    private void removeUserFromGuild(Long guildId, Long user) {
+        ConcurrentMap<Long, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
         if (stringTrackingUserConcurrentMap != null) {
             stringTrackingUserConcurrentMap.remove(user);
         }
     }
 
-    public void unsub(String guildId, String trackingUserId, String userId) {
-        ConcurrentMap<String, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
+    public void unsub(Long guildId, Long trackingUserId, Long userId) {
+        ConcurrentMap<Long, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
         if (stringTrackingUserConcurrentMap != null) {
             TrackingUser trackingUser = stringTrackingUserConcurrentMap.get(trackingUserId);
             if (trackingUser != null) trackingUser.removeUserFromList(userId);
         }
     }
 
-    public void removeUserFromAllGuild(String user) {
+    public void removeUserFromAllGuild(Long user) {
         trackingUserConcurrentMap.forEach((guild, trackerUser) -> {
             TrackingUser trackingUser = trackerUser.get(user);
             if (trackingUser != null) {

@@ -29,6 +29,7 @@ public class SubCommand {
 
     public void sub(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var guildIdLong = event.getGuild().getIdLong();
         var user = event.getUser();
 
         event.deferReply().setEphemeral(true).queue();
@@ -54,14 +55,14 @@ public class SubCommand {
             return;
         }
 
-        Server server = instance.getServer(guildIdString);
+        Server server = instance.getServer(guildIdLong);
 
         if (server != null) {
-            TrackingUser trackingUser = instance.getUser(guildIdString, user.getId());
+            TrackingUser trackingUser = instance.getUser(guildIdLong, user.getIdLong());
 
             if (trackingUser != null) {
-                Set<String> userListSet = trackingUser.getUserListSet();
-                if (userListSet.contains(userDest.getId())) {
+                Set<Long> userListSet = trackingUser.getUserListSet();
+                if (userListSet.contains(userDest.getIdLong())) {
                     String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
                     event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
                 } else {
@@ -78,6 +79,7 @@ public class SubCommand {
 
     private void saveUserTracking(@NotNull SlashCommandInteractionEvent event, Server server, @NotNull User userDest) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        Long guildIdLong = event.getGuild().getIdLong();
         var user = event.getUser();
 
         Subs notice = new Subs();
@@ -86,10 +88,10 @@ public class SubCommand {
         notice.setUserTrackingId(userDest.getId());
         noticeRepository.save(notice);
 
-        instance.sub(guildIdString, user.getId(), userDest.getId());
+        instance.sub(guildIdLong, user.getIdLong(), userDest.getIdLong());
 
-        Suggestions suggestions = instance.getSuggestions(guildIdString, user.getId());
-        if (suggestions != null) suggestions.removeUser(userDest.getId());
+        Suggestions suggestions = instance.getSuggestions(guildIdLong, user.getIdLong());
+        if (suggestions != null) suggestions.removeUser(userDest.getIdLong());
 
         String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
         event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();

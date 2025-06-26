@@ -25,6 +25,8 @@ public class SetupCommand {
 
     public void setup(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
+
         var guildId = event.getGuild().getIdLong();
 
         event.deferReply().setEphemeral(true).queue();
@@ -71,7 +73,7 @@ public class SetupCommand {
             guildRepository.save(server);
 
             NoticeRegistry instance = NoticeRegistry.getInstance();
-            instance.putServer(guildIdString, server);
+            instance.putServer(guildIdLong, server);
 
             String nowBotWillReceive = jsonParsers.getTranslation("now_bot_will_receive", guildIdString);
             String format = String.format(nowBotWillReceive, guildChannelUnion.asTextChannel().getIdLong());

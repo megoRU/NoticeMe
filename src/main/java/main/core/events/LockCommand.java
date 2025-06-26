@@ -37,7 +37,7 @@ public class LockCommand {
         String lockString = jsonParsers.getTranslation("lock", guildIdString);
 
         NoticeRegistry instance = NoticeRegistry.getInstance();
-        instance.removeUserFromAllGuild(user.getId());
+        instance.removeUserFromAllGuild(user.getIdLong());
         noticeRepository.deleteAllByUserTrackingId(user.getId());
 
         Lock lock = new Lock();

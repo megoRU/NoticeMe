@@ -5,21 +5,21 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Suggestions {
 
-    private final Set<String> userList = new ConcurrentSkipListSet<>();
+    private final Set<Long> userList = new ConcurrentSkipListSet<>();
 
-    public void putUser(String userId) {
+    public void putUser(Long userId) {
         userList.add(userId);
     }
 
-    public void removeUser(String userId) {
+    public void removeUser(Long userId) {
         userList.remove(userId);
     }
 
-    public boolean containsUser(String userId) {
+    public boolean containsUser(Long userId) {
         return userList.contains(userId);
     }
 
-    public Set<String> getUserList() {
+    public Set<Long> getUserList() {
         return Set.copyOf(userList);
     }
 }

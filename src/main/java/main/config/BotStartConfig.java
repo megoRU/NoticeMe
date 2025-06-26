@@ -382,7 +382,7 @@ public class BotStartConfig {
             NoticeRegistry instance = NoticeRegistry.getInstance();
             List<Server> serverList = guildRepository.findAll();
             for (Server server : serverList) {
-                String serverId = server.getGuildIdLong().toString();
+                Long serverId = server.getGuildIdLong();
                 instance.putServer(serverId, server);
             }
             System.out.println("getAllServers()");
@@ -397,11 +397,11 @@ public class BotStartConfig {
             NoticeRegistry instance = NoticeRegistry.getInstance();
 
             for (Suggestions suggestions : suggestionsList) {
-                String suggestionUserId = String.valueOf(suggestions.getSuggestionUserId());
-                String userId = String.valueOf(suggestions.getUserId());
-                String guildId = String.valueOf(suggestions.getGuildId());
+                Long suggestionUserId = suggestions.getSuggestionUserId();
+                Long userId = suggestions.getUserId();
+                Long guildId = suggestions.getGuildId();
 
-                Set<String> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
+                Set<Long> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
 
                 if (!stringSet.contains(suggestionUserId)) {
                     instance.addUserSuggestions(guildId, userId, suggestionUserId);
@@ -419,9 +419,9 @@ public class BotStartConfig {
             NoticeRegistry instance = NoticeRegistry.getInstance();
 
             for (Subs notice : noticeList) {
-                String guildId = notice.getServer().getGuildIdLong().toString();
-                String userIdTracker = notice.getUserTrackingId();
-                String userId = notice.getUserId().toString();
+                Long guildId = notice.getServer().getGuildIdLong();
+                Long userIdTracker = Long.valueOf(notice.getUserTrackingId());
+                Long userId = notice.getUserId();
                 instance.sub(guildId, userId, userIdTracker);
             }
             System.out.println("getAllUsers()");

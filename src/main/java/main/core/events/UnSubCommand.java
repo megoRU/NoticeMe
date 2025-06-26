@@ -26,7 +26,8 @@ public class UnSubCommand {
     }
 
     public void unsub(@NotNull SlashCommandInteractionEvent event) {
-        var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
+
         var user = event.getUser();
 
         event.deferReply().setEphemeral(true).queue();
@@ -34,11 +35,13 @@ public class UnSubCommand {
         User userFromOptions = event.getOption("user", OptionMapping::getAsUser);
         if (userFromOptions == null) return;
 
-        unsub(user.getId(), guildIdString, userFromOptions.getId(), event);
+        unsub(user.getIdLong(), guildIdLong, userFromOptions.getIdLong(), event);
     }
 
     public void unsub_v2(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
+
         var user = event.getUser();
 
         event.deferReply().setEphemeral(true).queue();
@@ -51,30 +54,28 @@ public class UnSubCommand {
             return;
         }
 
-        unsub(user.getId(), guildIdString, userFromOptions, event);
+        unsub(user.getIdLong(), guildIdLong, Long.parseLong(userFromOptions), event);
     }
 
-    private void unsub(String userId, String guildId, String userFromOptions, @NotNull SlashCommandInteractionEvent event) {
-        long userIdLong = Long.parseLong(userId);
-
+    private void unsub(Long userId, Long guildId, Long userFromOptions, @NotNull SlashCommandInteractionEvent event) {
         TrackingUser trackingUser = instance.getUser(guildId, userFromOptions);
 
         if (trackingUser != null) {
-            Set<String> userListSet = trackingUser.getUserListSet();
+            Set<Long> userListSet = trackingUser.getUserListSet();
             if (userListSet.contains(userId)) {
-                noticeRepository.deleteByUserTrackingId(userFromOptions, userIdLong);
+                noticeRepository.deleteByUserTrackingId(userFromOptions.toString(), userId);
                 instance.unsub(guildId, userFromOptions, userId);
 
                 instance.addUserSuggestions(guildId, userId, userFromOptions);
 
-                String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId), userFromOptions);
+                String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId.toString()), userFromOptions);
                 event.getHook().sendMessage(successfullyDeleted).setEphemeral(true).queue();
             } else {
-                String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId);
+                String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId.toString());
                 event.getHook().sendMessage(dontFindUser).queue();
             }
         } else {
-            String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId);
+            String dontFindUser = jsonParsers.getTranslation("dont_find_user", guildId.toString());
             event.getHook().sendMessage(dontFindUser).queue();
         }
     }

@@ -30,10 +30,12 @@ public class SuggestionCommand {
     public void suggestion(@NotNull SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
         var guildIdString = Objects.requireNonNull(guild).getId();
+        var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
+
         var user = event.getUser();
 
-        Set<String> suggestions = instance.getSuggestionsList(guildIdString, user.getId());
-        List<String> top5Users = suggestions.stream().limit(5).toList();
+        Set<Long> suggestions = instance.getSuggestionsList(guildIdLong, user.getIdLong());
+        List<Long> top5Users = suggestions.stream().limit(5).toList();
 
         StringBuilder stringBuilder = new StringBuilder();
         List<Button> buttonsList = new ArrayList<>();

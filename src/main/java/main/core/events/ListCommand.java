@@ -20,13 +20,14 @@ public class ListCommand {
     public void list(@NotNull SlashCommandInteractionEvent event) {
         var user = event.getUser();
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
+        var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
 
-        Set<String> allUserTrackerIdsByUserId = instance.getAllUserTrackerIdsByUserId(guildIdString, user.getId());
+        Set<Long> allUserTrackerIdsByUserId = instance.getAllUserTrackerIdsByUserId(guildIdLong, user.getIdLong());
 
         if (!allUserTrackerIdsByUserId.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
 
-            for (String userNotice : allUserTrackerIdsByUserId) {
+            for (Long userNotice : allUserTrackerIdsByUserId) {
                 if (stringBuilder.isEmpty()) {
                     stringBuilder.append("<@").append(userNotice).append(">");
                 } else {

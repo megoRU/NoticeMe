@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TrackingUser {
 
-    private final Set<String> userList = new ConcurrentSkipListSet<>();
+    private final Set<Long> userList = new ConcurrentSkipListSet<>();
     private LocalDateTime timeJoin = null;
 
     public String getUserList() {
@@ -33,7 +33,7 @@ public class TrackingUser {
         }
     }
 
-    public Set<String> getUserListSet() {
+    public Set<Long> getUserListSet() {
         return Set.copyOf(userList);
     }
 
@@ -41,11 +41,11 @@ public class TrackingUser {
         return userList.size();
     }
 
-    public void putUser(String userId) {
+    public void putUser(Long userId) {
         userList.add(userId);
     }
 
-    public void removeUserFromList(String userId) {
+    public void removeUserFromList(Long userId) {
         userList.remove(userId);
     }
 
