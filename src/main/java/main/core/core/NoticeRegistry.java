@@ -40,7 +40,7 @@ public class NoticeRegistry {
      * @param referenceId ID пользователя, для которого нужно найти подписчиков.
      * @return Множество ID пользователей, которые подписаны на referenceId, или пустое множество, если подписчиков нет.
      */
-    public Set<Long> getAllUserTrackerIdsByUserId(Long guildId, Long referenceId) {
+    public Set<Long> getUserTrackerIdsByUserId(Long guildId, Long referenceId) {
         return trackingUserConcurrentMap.getOrDefault(guildId, new ConcurrentHashMap<>())
                 .entrySet()
                 .stream()

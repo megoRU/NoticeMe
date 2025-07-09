@@ -401,7 +401,7 @@ public class BotStartConfig {
                 Long userId = suggestions.getUserId();
                 Long guildId = suggestions.getGuildId();
 
-                Set<Long> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
+                Set<Long> stringSet = instance.getUserTrackerIdsByUserId(guildId, userId);
 
                 if (!stringSet.contains(suggestionUserId)) {
                     instance.addUserSuggestions(guildId, userId, suggestionUserId);

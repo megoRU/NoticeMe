@@ -113,7 +113,7 @@ public class UserJoinEvent {
     // userId кто зашел
     // instanceUser кто, зашел и его список кто на него подписан
     private void updateUserSuggestions(Long userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {
-        Set<Long> stringSet = instance.getAllUserTrackerIdsByUserId(guildId, userId);
+        Set<Long> stringSet = instance.getUserTrackerIdsByUserId(guildId, userId);
 
         Set<Long> currentSuggestions = instance.getSuggestionsList(guildId, userId);
         Set<Long> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();

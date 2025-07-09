@@ -22,7 +22,7 @@ public class ListCommand {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
         var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
 
-        Set<Long> allUserTrackerIdsByUserId = instance.getAllUserTrackerIdsByUserId(guildIdLong, user.getIdLong());
+        Set<Long> allUserTrackerIdsByUserId = instance.getUserTrackerIdsByUserId(guildIdLong, user.getIdLong());
 
         if (!allUserTrackerIdsByUserId.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();

@@ -42,14 +42,10 @@ public class TestNoticeMe {
         instance.sub(500L, 3000L, 2501L);
         instance.sub(500L, 3000L, 2502L);
 
-        Set<Long> subscribersSetByUserId = instance.getAllUserTrackerIdsByUserId(500L, 3000L);
-
-        System.out.println(subscribersSetByUserId);
+        Set<Long> subscribersSetByUserId = instance.getUserTrackerIdsByUserId(500L, 3000L);
 
         List<Long> actualList = new ArrayList<>(subscribersSetByUserId);
         actualList.sort(Comparator.naturalOrder());
-
-        System.out.println(Arrays.toString(actualList.toArray()));
 
         Assertions.assertArrayEquals(new Long[]{2500L, 2501L, 2502L}, actualList.toArray());
     }
@@ -120,7 +116,7 @@ public class TestNoticeMe {
         Assertions.assertEquals(3, user.getUserCount());
 
         instance.removeUserFromAllGuild(3000L);
-        Set<Long> stringSet = instance.getAllUserTrackerIdsByUserId(500L, 3000L);
+        Set<Long> stringSet = instance.getUserTrackerIdsByUserId(500L, 3000L);
 
         Assertions.assertEquals(0, stringSet.size());
     }
@@ -136,6 +132,36 @@ public class TestNoticeMe {
         Assertions.assertFalse(first);
         Assertions.assertTrue(second);
     }
+
+    @Test
+    @DisplayName("Проверяем соответствие getUser и getAllUserTrackerIdsByUserId")
+    void testGetUserAndGetAllUserTrackerIdsByUserId() {
+        Long guildId = 700L;
+        Long subscriber1 = 1001L;
+        Long subscriber2 = 1002L;
+        Long targetUser = 2000L;
+
+        // Подписываем двух пользователей на одного
+        instance.sub(guildId, subscriber1, targetUser);
+        instance.sub(guildId, subscriber2, targetUser);
+
+        // Проверка метода getUser
+        TrackingUser user = instance.getUser(guildId, targetUser);
+        Assertions.assertNotNull(user);
+        System.out.println(user.getUserList());
+        Assertions.assertEquals(Set.of(subscriber1, subscriber2), user.getUserListSet());
+
+        // Проверка метода getAllUserTrackerIdsByUserId
+        Set<Long> trackerIds = instance.getUserTrackerIdsByUserId(guildId, targetUser);
+
+        System.out.println(trackerIds.toString());
+
+        Assertions.assertTrue(trackerIds.contains(targetUser));
+
+        trackerIds = instance.getUserTrackerIdsByUserId(guildId, subscriber2);
+        Assertions.assertTrue(trackerIds.contains(targetUser));
+    }
+
 
     @Test
     @DisplayName("Проверяем вывод при одном подписчике")

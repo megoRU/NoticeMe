@@ -38,7 +38,7 @@ public class AddAllUsersButton {
         event.editButton(event.getButton().asDisabled()).queue();
         List<User> members = event.getMessage().getMentions().getUsers();
 
-        Set<Long> allUserTrackerIdsByUserId = instance.getAllUserTrackerIdsByUserId(guildIdLong, user.getIdLong());
+        Set<Long> allUserTrackerIdsByUserId = instance.getUserTrackerIdsByUserId(guildIdLong, user.getIdLong());
 
         // Фильтрация и сборка упомянутых пользователей
         List<User> collect = members.stream()
