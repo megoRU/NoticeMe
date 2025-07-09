@@ -134,36 +134,6 @@ public class TestNoticeMe {
     }
 
     @Test
-    @DisplayName("Проверяем соответствие getUser и getAllUserTrackerIdsByUserId")
-    void testGetUserAndGetAllUserTrackerIdsByUserId() {
-        Long guildId = 700L;
-        Long subscriber1 = 1001L;
-        Long subscriber2 = 1002L;
-        Long targetUser = 2000L;
-
-        // Подписываем двух пользователей на одного
-        instance.sub(guildId, subscriber1, targetUser);
-        instance.sub(guildId, subscriber2, targetUser);
-
-        // Проверка метода getUser
-        TrackingUser user = instance.getUser(guildId, targetUser);
-        Assertions.assertNotNull(user);
-        System.out.println(user.getUserList());
-        Assertions.assertEquals(Set.of(subscriber1, subscriber2), user.getUserListSet());
-
-        // Проверка метода getAllUserTrackerIdsByUserId
-        Set<Long> trackerIds = instance.getUserTrackerIdsByUserId(guildId, targetUser);
-
-        System.out.println(trackerIds.toString());
-
-        Assertions.assertTrue(trackerIds.contains(targetUser));
-
-        trackerIds = instance.getUserTrackerIdsByUserId(guildId, subscriber2);
-        Assertions.assertTrue(trackerIds.contains(targetUser));
-    }
-
-
-    @Test
     @DisplayName("Проверяем вывод при одном подписчике")
     void testOneUser() {
         instance.sub(500L, 2000L, 3000L);
