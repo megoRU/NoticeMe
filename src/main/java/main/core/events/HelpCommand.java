@@ -24,7 +24,6 @@ public class HelpCommand {
         info.setColor(Color.GREEN);
         info.setTitle("NoticeMe");
 
-        String help = jsonParsers.getTranslation("help", guildIdString);
         String language = jsonParsers.getTranslation("language", guildIdString);
         String setup = jsonParsers.getTranslation("setup", guildIdString);
         String list = jsonParsers.getTranslation("list", guildIdString);
@@ -39,7 +38,6 @@ public class HelpCommand {
 
         String text = String.format(
                 """
-                        </help:1039918668135534624> - %s
                         </language:1039918668135534623> - %s
                         </setup:1039918668135534625> - %s
                         </list:1040218561261613157> - %s
@@ -53,7 +51,7 @@ public class HelpCommand {
                         
                         P. S.:
                         %s
-                        """, help, language, setup, list, unsub, sub, delete, suggestion, helpLock, helpUnlock, check, helpPs);
+                        """, language, setup, list, unsub, sub, delete, suggestion, helpLock, helpUnlock, check, helpPs);
 
         String slashCommands = jsonParsers.getTranslation("slash_commands", guildIdString);
         String messagesEventsLinks = jsonParsers.getTranslation("messages_events_links", guildIdString);
