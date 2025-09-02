@@ -38,7 +38,7 @@ public class UnSubCommand {
         unsub(user.getIdLong(), guildIdLong, userFromOptions.getIdLong(), event);
     }
 
-    public void unsub_v2(@NotNull SlashCommandInteractionEvent event) {
+    public void unsubV2(@NotNull SlashCommandInteractionEvent event) {
         var guildIdString = Objects.requireNonNull(event.getGuild()).getId();
         var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
 

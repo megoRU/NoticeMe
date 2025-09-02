@@ -116,7 +116,7 @@ public class UpdateController {
             }
             case "unsub-v2" -> {
                 UnSubCommand unSubCommand = new UnSubCommand(noticeRepository);
-                unSubCommand.unsub_v2(event);
+                unSubCommand.unsubV2(event);
             }
             case "check" -> {
                 Check check = new Check();
