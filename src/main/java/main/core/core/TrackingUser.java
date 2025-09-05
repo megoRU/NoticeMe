@@ -1,13 +1,14 @@
 package main.core.core;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TrackingUser {
 
     private final Set<Long> userList = ConcurrentHashMap.newKeySet();
-    private LocalDateTime timeJoin = null;
+    private Instant timeJoin = null;
 
     public String getUserList() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -25,7 +26,7 @@ public class TrackingUser {
         if (timeJoin == null) {
             setTimeJoin();
             return false;
-        } else if (LocalDateTime.now().isAfter(timeJoin)) {
+        } else if (Instant.now().isAfter(timeJoin)) {
             timeJoin = null;
             return false;
         } else {
@@ -50,6 +51,6 @@ public class TrackingUser {
     }
 
     private void setTimeJoin() {
-        timeJoin = LocalDateTime.now().plusMinutes(10);
+        timeJoin = Instant.now().plus(10, ChronoUnit.MINUTES);
     }
 }
