@@ -124,6 +124,8 @@ public class BotStartConfig {
                     }
             );
 
+            updateActivity();
+
             System.out.println("15:16");
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
@@ -297,8 +299,7 @@ public class BotStartConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 3600, initialDelay = 1, timeUnit = TimeUnit.SECONDS)
-    private void updateActivity() {
+    public static void updateActivity() {
         if (!Config.isIsDev()) {
             try {
                 int serverCount = jda.getGuilds().size();

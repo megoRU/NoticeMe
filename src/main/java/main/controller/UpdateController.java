@@ -5,6 +5,7 @@ import main.core.NoticeMeUtils;
 import main.core.events.*;
 import main.model.repository.*;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -59,6 +60,8 @@ public class UpdateController {
             buttonEvent(buttonInteractionEvent);
         } else if (event instanceof GuildJoinEvent guildJoinEvent) {
             joinEvent(guildJoinEvent);
+        } else if (event instanceof GuildLeaveEvent guildLeaveEvent) {
+            leaveEvent(guildLeaveEvent);
         }
     }
 
@@ -152,6 +155,11 @@ public class UpdateController {
     private void joinEvent(@NotNull GuildJoinEvent event) {
         JoinEvent joinEvent = new JoinEvent();
         joinEvent.join(event);
+    }
+
+    private void leaveEvent(@NotNull GuildLeaveEvent event) {
+        LeaveEvent leaveEvent = new LeaveEvent();
+        leaveEvent.leave(event);
     }
 
     private void userJoinChannelEvent(@NotNull GuildVoiceUpdateEvent event) {

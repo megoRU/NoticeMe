@@ -1,5 +1,6 @@
 package main.core.events;
 
+import main.config.BotStartConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,6 +34,8 @@ public class JoinEvent {
             if (hasPermission) {
                 messageChannel.sendMessageEmbeds(embedBuilder.build()).queue();
             }
+
+            BotStartConfig.updateActivity();
         } catch (Exception ignored) {
         }
     }
