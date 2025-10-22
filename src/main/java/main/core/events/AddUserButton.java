@@ -29,7 +29,7 @@ public class AddUserButton {
         Guild guild = Objects.requireNonNull(event.getGuild());
 
         var user = event.getUser();
-        String buttonId = event.getButton().getId();
+        String buttonId = event.getButton().getCustomId();
         if (buttonId == null) return;
 
         event.editButton(event.getButton().asDisabled()).queue();
@@ -62,7 +62,7 @@ public class AddUserButton {
         var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
 
         var user = event.getUser();
-        String buttonId = event.getButton().getId();
+        String buttonId = event.getButton().getCustomId();
         if (buttonId == null) return;
         Long userFromButton = Long.valueOf(buttonId.replaceAll("BUTTON_ADD_USER_", ""));
 

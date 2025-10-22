@@ -4,11 +4,12 @@ import lombok.AllArgsConstructor;
 import main.core.NoticeMeUtils;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,11 @@ public class SuggestionCommand {
             event.reply(noSuggestions).setEphemeral(true).queue();
         } else {
             String suggestionText = String.format(jsonParsers.getTranslation("suggestion_text", guildIdString), stringBuilder);
-            event.reply(suggestionText).setActionRow(buttonsList).setEphemeral(true).queue();
+            event.reply(suggestionText)
+                    .setComponents(ActionRow.of(buttonsList))
+                    .setEphemeral(true)
+                    .queue();
+
         }
     }
 }

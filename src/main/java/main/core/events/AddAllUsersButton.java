@@ -32,7 +32,7 @@ public class AddAllUsersButton {
         var guildIdLong = Objects.requireNonNull(event.getGuild()).getIdLong();
 
         var user = event.getUser();
-        String buttonId = event.getButton().getId();
+        String buttonId = event.getButton().getCustomId();
         if (buttonId == null) return;
 
         event.editButton(event.getButton().asDisabled()).queue();

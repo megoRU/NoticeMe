@@ -2,8 +2,9 @@ package main.core.events;
 
 import main.jsonparser.ParserClass;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,6 @@ public class DonateCommand {
         embedBuilder.setTitle("Donate");
         embedBuilder.setColor(Color.YELLOW);
         embedBuilder.appendDescription(donate);
-        event.replyEmbeds(embedBuilder.build()).addActionRow(tinkoff).queue();
+        event.replyEmbeds(embedBuilder.build()).setComponents(ActionRow.of(tinkoff)).queue();
     }
 }

@@ -132,7 +132,7 @@ public class UpdateController {
         if (event.getUser().isBot()) return;
         if (event.getGuild() == null) return;
 
-        String buttonId = event.getButton().getId();
+        String buttonId = event.getButton().getCustomId();
 
         if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_DELETE)) {
             DeleteButton deleteButton = new DeleteButton(guildRepository);

@@ -2,12 +2,14 @@ package main.core.events;
 
 import main.core.NoticeMeUtils;
 import main.jsonparser.ParserClass;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+
 
 @Service
 public class DeleteCommand {
@@ -20,7 +22,7 @@ public class DeleteCommand {
         String warningDeleteData = jsonParsers.getTranslation("warning_delete_data", guildIdString);
         event.reply(warningDeleteData)
                 .setEphemeral(true)
-                .setActionRow(Button.danger(NoticeMeUtils.BUTTON_DELETE, "Delete"))
+                .setComponents(ActionRow.of(Button.danger(NoticeMeUtils.BUTTON_DELETE, "Delete")))
                 .queue();
     }
 }
