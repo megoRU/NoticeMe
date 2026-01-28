@@ -22,7 +22,7 @@
 #### Prohibit tracking of visited channels and subscribing to you with the command: `/lock`
 
 ### 5. I have a question.
-#### Feel free to join my [Discord server](https://discord.gg/UrWG3R683d)
+#### Feel free to join my [Discord server](https://discord.gg/5UZfEwg2rf)
 
 ### Please note, that we can change this policy without any warning at any given time.
 #### **Last changed:** `08.07.2024`
