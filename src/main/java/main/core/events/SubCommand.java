@@ -62,7 +62,7 @@ public class SubCommand {
 
             if (trackingUser != null) {
                 Set<Long> userListSet = trackingUser.getUserListSet();
-                if (userListSet.contains(userDest.getIdLong())) {
+                if (userListSet.contains(user.getIdLong())) {
                     String youAlreadyTracked = jsonParsers.getTranslation("you_already_tracked", guildIdString);
                     event.getHook().sendMessage(youAlreadyTracked).setEphemeral(true).queue();
                 } else {

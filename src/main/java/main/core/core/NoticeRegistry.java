@@ -53,10 +53,21 @@ public class NoticeRegistry {
         trackingUserConcurrentMap.put(guildId, concurrentMap);
     }
 
-    /*
-        userId этот тот кто подписан на userIdTracker
+    /**
+     * Подписывает пользователя на отслеживание другого пользователя в рамках сервера (guild).
+     *
+     * <p>После вызова этого метода:
+     * <ul>
+     *     <li>userId начинает отслеживать userIdTracker;</li>
+     *     <li>если пользователь уже подписан, метод не добавляет дубликат;</li>
+     *     <li>инициализирует объекты TrackingUser при их отсутствии.</li>
+     * </ul>
+     *
+     * @param guildId ID сервера (guild), в котором происходит подписка
+     * @param userId ID пользователя, который подписывается (подписчик)
+     * @param userIdTracker ID пользователя, на которого подписываются (отслеживаемый)
      */
-    public void sub(Long guildId, Long userId, Long userIdTracker) {
+    public synchronized void sub(Long guildId, Long userId, Long userIdTracker) {
         if (!hasGuild(guildId)) {
             TrackingUser trackingUser = new TrackingUser();
             trackingUser.putUser(userId);
@@ -88,12 +99,15 @@ public class NoticeRegistry {
     }
 
     /**
-     * Получает список пользователей, на которых подписан конкретный пользователь в указанной гильдии.
+     * Возвращает множество пользователей, на которых подписан указанный пользователь в конкретной гильдии.
      *
-     * @param guildId ID гильдии, в рамках которой выполняется поиск.
-     * @param userId  ID пользователя, для которого нужно получить список подписок.
-     * @return Множество ID пользователей, на которых подписан `userId`, или пустое множество, если подписок нет.
+     * <p>Если пользователь не имеет подписок или его запись отсутствует, возвращается пустое множество.
+     *
+     * @param guildId ID гильдии, в которой выполняется поиск подписок.
+     * @param userId ID пользователя, для которого нужно получить список отслеживаемых пользователей.
+     * @return {@link Set} ID пользователей, на которых подписан `userId`, либо пустое множество, если подписок нет.
      */
+
     public Set<Long> getSuggestionsList(Long guildId, Long userId) {
         Suggestions suggestions = getSuggestions(guildId, userId);
         if (suggestions != null) {
