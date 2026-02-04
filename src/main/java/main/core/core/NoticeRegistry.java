@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 public class NoticeRegistry {
 
-    //Guild | List: userTrackerId | TrackingUser
+    //Guild | List: userTrackerId | TrackingUser . Target User | Target User list subscribes
     private static final ConcurrentMap<Long, ConcurrentMap<Long, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Long, Server> serverListMap = new ConcurrentHashMap<>();
     //Guild | List: user | Suggestions

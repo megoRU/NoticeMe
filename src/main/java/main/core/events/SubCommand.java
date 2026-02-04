@@ -58,7 +58,7 @@ public class SubCommand {
         Server server = instance.getServer(guildIdLong);
 
         if (server != null) {
-            TrackingUser trackingUser = instance.getUser(guildIdLong, user.getIdLong());
+            TrackingUser trackingUser = instance.getUser(guildIdLong, userDest.getIdLong());
 
             if (trackingUser != null) {
                 Set<Long> userListSet = trackingUser.getUserListSet();
