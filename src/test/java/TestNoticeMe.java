@@ -4,6 +4,8 @@ import org.junit.jupiter.api.*;
 
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @DisplayName("TestNoticeMe")
 public class TestNoticeMe {
 
@@ -130,7 +132,7 @@ public class TestNoticeMe {
         boolean first = user.hasUserJoin();
         boolean second = user.hasUserJoin();
         Assertions.assertFalse(first);
-        Assertions.assertTrue(second);
+        assertTrue(second);
     }
 
     @Test

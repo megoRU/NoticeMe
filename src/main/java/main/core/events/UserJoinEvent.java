@@ -45,6 +45,7 @@ public class UserJoinEvent {
         User user = eventMember.getUser();
         String userId = user.getId();
         Long userIdLong = user.getIdLong();
+        String guildName = guild.getName();
 
         Member selfMember = guild.getSelfMember();
         String effectiveName = eventMember.getEffectiveName();
@@ -87,7 +88,8 @@ public class UserJoinEvent {
                                     jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
                                     effectiveName,
                                     genderText,
-                                    voiceChannel.getId(),
+                                    guildName,
+                                    name,
                                     userList
                             );
                             textChannel.sendMessage(text).queue();
