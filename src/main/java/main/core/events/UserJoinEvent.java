@@ -88,7 +88,6 @@ public class UserJoinEvent {
                                     jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
                                     effectiveName,
                                     genderText,
-                                    guildName,
                                     name,
                                     userList
                             );

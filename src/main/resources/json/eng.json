@@ -1,5 +1,5 @@
 {
-  "user_enter_to_channel": "**%s** %s the channel: %s /%s \n%",
+  "user_enter_to_channel": "**%s** %s the channel: %s \n%",
   "user_enter_female": "has entered",
   "user_enter_male": "has entered",
   "language_set": "Language saved successfully",
