@@ -45,7 +45,6 @@ public class UserJoinEvent {
         User user = eventMember.getUser();
         String userId = user.getId();
         Long userIdLong = user.getIdLong();
-        String guildName = guild.getName();
 
         Member selfMember = guild.getSelfMember();
         String effectiveName = eventMember.getEffectiveName();
