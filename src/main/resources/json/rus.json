@@ -1,5 +1,5 @@
 {
-  "user_enter_to_channel": "**%s** %s в канал: %s \n%s",
+  "user_enter_to_channel": "%s %s в канал: %s \n%s",
   "user_enter_female": "зашла",
   "user_enter_male": "зашёл",
   "language_set": "Язык успешно сохранён",
