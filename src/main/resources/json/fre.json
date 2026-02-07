@@ -1,5 +1,5 @@
 {
-  "user_enter_to_channel": "%s %s dans le canal: %s \n%",
+  "user_enter_to_channel": "%s %s dans le canal: %s \n%s",
   "user_enter_female": "est entrée",
   "user_enter_male": "est entré",
   "language_set": "Langue enregistrée avec succès",
