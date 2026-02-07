@@ -73,8 +73,10 @@ public class UserJoinEvent {
 
             if (!instanceUser.hasUserJoin()) {
                 Server server = instance.getServer(guild.getIdLong());
+
                 if (server != null) {
                     TextChannel textChannel = guild.getTextChannelById(server.getTextChannelId());
+
                     if (textChannel != null) {
                         if (selfMember.hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND)) {
                             Map<String, Gender.GenderType> mapGenders = BotStartConfig.getMapGenders();
