@@ -70,6 +70,7 @@ public class UserJoinEvent {
 
             if (instanceUser == null) return;
             String userList = instanceUser.getUserList();
+
             if (!instanceUser.hasUserJoin()) {
                 Server server = instance.getServer(guild.getIdLong());
                 if (server != null) {
