@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 @Slf4j
@@ -36,7 +34,6 @@ import java.util.logging.Logger;
 public class UserJoinEvent {
 
     private static final ParserClass jsonParsers = new ParserClass();
-    private final static Logger LOGGER = Logger.getLogger(UserJoinEvent.class.getName());
     private final static NoticeRegistry instance = NoticeRegistry.getInstance();
 
     private final SuggestionsRepository suggestionsRepository;
@@ -101,7 +98,7 @@ public class UserJoinEvent {
                 }
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "UserJoinEvent: ", e);
+            log.error("UserJoinEvent: ", e);
         }
     }
 
@@ -109,7 +106,7 @@ public class UserJoinEvent {
     private VoiceChannel getAsChannel(AudioChannelUnion audioChannelUnion) {
         if (audioChannelUnion instanceof VoiceChannel) return audioChannelUnion.asVoiceChannel();
         else {
-            LOGGER.info(audioChannelUnion.getName() + " is not a VoiceChannel!");
+            log.info("{} is not a VoiceChannel!", audioChannelUnion.getName());
             return null;
         }
     }
