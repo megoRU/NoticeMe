@@ -2,6 +2,7 @@ package main.core.events;
 
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import main.config.BotStartConfig;
 import main.core.core.NoticeRegistry;
 import main.core.core.TrackingUser;
@@ -30,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 public class UserJoinEvent {
 
@@ -83,14 +85,17 @@ public class UserJoinEvent {
 
                             String genderKey = (genderType == Gender.GenderType.FEMALE) ? "user_enter_female" : "user_enter_male";
                             String genderText = jsonParsers.getTranslation(genderKey, guild.getId());
-                            String text = String.format(
-                                    jsonParsers.getTranslation("user_enter_to_channel", guild.getId()),
-                                    effectiveName,
-                                    genderText,
-                                    name,
-                                    userList
-                            );
-                            textChannel.sendMessage(text).queue();
+                            String template = jsonParsers.getTranslation("user_enter_to_channel", guild.getId());
+
+                            log.info("user_enter_to_channel template='{}', effectiveName='{}', genderText='{}', name='{}', userList='{}'", template, effectiveName, genderText, name, userList);
+
+                            try {
+                                String text = String.format(template, effectiveName, genderText, name, userList);
+                                log.info("Formatted message='{}'", text);
+                                textChannel.sendMessage(text).queue();
+                            } catch (Exception e) {
+                                log.error("Formatting error. template='{}'", template, e);
+                            }
                         }
                     }
                 }
