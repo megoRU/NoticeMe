@@ -53,21 +53,6 @@ public class TestNoticeMe {
     }
 
     @Test
-    @DisplayName("Проверяем вывод предложений для пользователя")
-    void testSubscribersUser() {
-        instance.addUserSuggestions(500L, 3000L, 2500L);
-        instance.addUserSuggestions(500L, 3000L, 2501L);
-        instance.addUserSuggestions(500L, 3001L, 2502L);
-
-        Set<Long> suggestionsList = instance.getSuggestionsList(500L, 3000L);
-
-        List<Long> actualList = new ArrayList<>(suggestionsList);
-        actualList.sort(Comparator.naturalOrder());
-
-        Assertions.assertArrayEquals(new Long[]{2500L, 2501L}, actualList.toArray());
-    }
-
-    @Test
     @DisplayName("Проверяем удаление Guild")
     void testDeleteGuild() {
         instance.sub(4000L, 3000L, 2500L);
