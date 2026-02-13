@@ -117,18 +117,6 @@ public class UpdateController {
         if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_DELETE)) {
             DeleteButton deleteButton = new DeleteButton(guildRepository);
             deleteButton.delete(event);
-            return;
-        }
-
-        if (buttonId != null && buttonId.contains(NoticeMeUtils.BUTTON_ADD_USER)) {
-            AddUserButton addUserButton = new AddUserButton(noticeRepository);
-            addUserButton.addUser(event);
-            return;
-        }
-
-        if (Objects.equals(buttonId, NoticeMeUtils.BUTTON_ALL_USERS)) {
-            AddAllUsersButton addAllUsersButton = new AddAllUsersButton(noticeRepository);
-            addAllUsersButton.addAllUsers(event);
         }
     }
 

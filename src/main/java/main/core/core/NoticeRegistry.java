@@ -3,7 +3,6 @@ package main.core.core;
 import main.model.entity.Server;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,7 +15,6 @@ public class NoticeRegistry {
     private static final ConcurrentMap<Long, ConcurrentMap<Long, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Long, Server> serverListMap = new ConcurrentHashMap<>();
     //Guild | List: user | Suggestions
-    private static final ConcurrentMap<Long, ConcurrentMap<Long, Suggestions>> userSuggestionsMap = new ConcurrentHashMap<>();
     private static volatile NoticeRegistry noticeRegistry;
 
     private NoticeRegistry() {
@@ -63,8 +61,8 @@ public class NoticeRegistry {
      *     <li>инициализирует объекты TrackingUser при их отсутствии.</li>
      * </ul>
      *
-     * @param guildId ID сервера (guild), в котором происходит подписка
-     * @param userId ID пользователя, который подписывается (подписчик)
+     * @param guildId       ID сервера (guild), в котором происходит подписка
+     * @param userId        ID пользователя, который подписывается (подписчик)
      * @param userIdTracker ID пользователя, на которого подписываются (отслеживаемый)
      */
     public synchronized void sub(Long guildId, Long userId, Long userIdTracker) {
@@ -83,48 +81,6 @@ public class NoticeRegistry {
             } else {
                 get(guildId).get(userIdTracker).putUser(userId);
             }
-        }
-    }
-
-    public void addUserSuggestions(Long guildId, Long userId, Long userSuggestionId) {
-        userSuggestionsMap.computeIfAbsent(guildId, k -> new ConcurrentHashMap<>());
-
-        Suggestions suggestions = userSuggestionsMap.get(guildId).get(userId);
-        if (suggestions == null) {
-            suggestions = new Suggestions();
-            userSuggestionsMap.get(guildId).put(userId, suggestions);
-        }
-
-        suggestions.putUser(userSuggestionId);
-    }
-
-    /**
-     * Возвращает множество пользователей, на которых подписан указанный пользователь в конкретной гильдии.
-     *
-     * <p>Если пользователь не имеет подписок или его запись отсутствует, возвращается пустое множество.
-     *
-     * @param guildId ID гильдии, в которой выполняется поиск подписок.
-     * @param userId ID пользователя, для которого нужно получить список отслеживаемых пользователей.
-     * @return {@link Set} ID пользователей, на которых подписан `userId`, либо пустое множество, если подписок нет.
-     */
-
-    public Set<Long> getSuggestionsList(Long guildId, Long userId) {
-        Suggestions suggestions = getSuggestions(guildId, userId);
-        if (suggestions != null) {
-            return suggestions.getUserList();
-        } else {
-            return new HashSet<>();
-        }
-    }
-
-    @Nullable
-    public Suggestions getSuggestions(Long guildId, Long userId) {
-        ConcurrentMap<Long, Suggestions> suggestionsConcurrentMap = userSuggestionsMap.get(guildId);
-
-        if (suggestionsConcurrentMap != null) {
-            return suggestionsConcurrentMap.get(userId);
-        } else {
-            return null;
         }
     }
 

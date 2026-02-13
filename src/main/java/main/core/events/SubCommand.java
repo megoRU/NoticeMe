@@ -3,7 +3,6 @@ package main.core.events;
 import lombok.AllArgsConstructor;
 import main.config.BotStartConfig;
 import main.core.core.NoticeRegistry;
-import main.core.core.Suggestions;
 import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
@@ -89,9 +88,6 @@ public class SubCommand {
         noticeRepository.save(notice);
 
         instance.sub(guildIdLong, user.getIdLong(), userDest.getIdLong());
-
-        Suggestions suggestions = instance.getSuggestions(guildIdLong, user.getIdLong());
-        if (suggestions != null) suggestions.removeUser(userDest.getIdLong());
 
         String nowYouWillReceive = String.format(jsonParsers.getTranslation("now_you_will_receive", guildIdString), userDest.getIdLong());
         event.getHook().sendMessage(nowYouWillReceive).setEphemeral(true).queue();
