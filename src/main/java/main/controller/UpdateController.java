@@ -1,6 +1,8 @@
 package main.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import main.core.NoticeMeUtils;
 import main.core.events.*;
 import main.model.repository.*;
@@ -10,14 +12,13 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
 @Getter
+@AllArgsConstructor
+@Slf4j
 @Component
 public class UpdateController {
 
@@ -26,24 +27,7 @@ public class UpdateController {
     private final GuildRepository guildRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
-    private final SuggestionsRepository suggestionsRepository;
     private final GenderRepository genderRepository;
-    private final static Logger LOGGER = LoggerFactory.getLogger(UpdateController.class.getName());
-
-    @Autowired
-    public UpdateController(NoticeRepository noticeRepository,
-                            GuildRepository guildRepository,
-                            LanguageRepository languageRepository,
-                            LockRepository lockRepository,
-                            SuggestionsRepository suggestionsRepository,
-                            GenderRepository genderRepository) {
-        this.noticeRepository = noticeRepository;
-        this.guildRepository = guildRepository;
-        this.languageRepository = languageRepository;
-        this.lockRepository = lockRepository;
-        this.suggestionsRepository = suggestionsRepository;
-        this.genderRepository = genderRepository;
-    }
 
     public void processEvent(Object event) {
         distributeEventsByType(event);
@@ -51,12 +35,12 @@ public class UpdateController {
 
     private void distributeEventsByType(Object event) {
         if (event instanceof SlashCommandInteractionEvent slashCommandInteractionEvent) {
-            LOGGER.info(slashCommandInteractionEvent.getName());
+            log.info(slashCommandInteractionEvent.getName());
             slashEvent(slashCommandInteractionEvent);
         } else if (event instanceof GuildVoiceUpdateEvent guildVoiceUpdateEvent) {
             userJoinChannelEvent(guildVoiceUpdateEvent);
         } else if (event instanceof ButtonInteractionEvent buttonInteractionEvent) {
-            LOGGER.info(buttonInteractionEvent.getButton().getLabel());
+            log.info(buttonInteractionEvent.getButton().getLabel());
             buttonEvent(buttonInteractionEvent);
         } else if (event instanceof GuildJoinEvent guildJoinEvent) {
             joinEvent(guildJoinEvent);
@@ -104,10 +88,6 @@ public class UpdateController {
             case "setup" -> {
                 SetupCommand setupCommand = new SetupCommand(guildRepository);
                 setupCommand.setup(event);
-            }
-            case "suggestion" -> {
-                SuggestionCommand suggestionCommand = new SuggestionCommand();
-                suggestionCommand.suggestion(event);
             }
             case "sub" -> {
                 SubCommand subCommand = new SubCommand(noticeRepository);
@@ -166,7 +146,7 @@ public class UpdateController {
         if (event.getMember().getUser().isBot()) return;
         if (event.getChannelJoined() == null) return;
 
-        UserJoinEvent userJoinEvent = new UserJoinEvent(suggestionsRepository);
+        UserJoinEvent userJoinEvent = new UserJoinEvent();
         userJoinEvent.userJoin(event);
     }
 }

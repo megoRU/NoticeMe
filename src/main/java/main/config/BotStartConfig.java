@@ -2,6 +2,7 @@ package main.config;
 
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
@@ -26,12 +27,9 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -39,17 +37,16 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
 @Configuration
 @EnableScheduling
+@Slf4j
 @AllArgsConstructor
 public class BotStartConfig {
 
     public static final String activity = "/sub | ";
-    private final static Logger LOGGER = LoggerFactory.getLogger(BotStartConfig.class.getName());
 
     private static final ConcurrentMap<String, Language.LanguageEnum> mapLanguages = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, Lock.Locked> mapLocks = new ConcurrentHashMap<>();
@@ -61,7 +58,6 @@ public class BotStartConfig {
 
     //REPOSITORY
     private final NoticeRepository noticeRepository;
-    private final SuggestionsRepository suggestionsRepository;
     private final LanguageRepository languageRepository;
     private final LockRepository lockRepository;
     private final GuildRepository guildRepository;
@@ -81,7 +77,6 @@ public class BotStartConfig {
             getAllServers();
             getLockStatus();
             getAllUsers();
-            getSuggestions();
 
             List<GatewayIntent> intents = new ArrayList<>(
                     Arrays.asList(
@@ -119,7 +114,7 @@ public class BotStartConfig {
                             String name = command.getName();
                             long id = command.getIdLong();
                             commandMap.put(name, id);
-                            System.out.printf("%s [%s]%n", id, name);
+                            log.info("{} [{}]\n", id, name);
                         }
                     }
             );
@@ -128,7 +123,7 @@ public class BotStartConfig {
 
             System.out.println("15:16");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -263,11 +258,6 @@ public class BotStartConfig {
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Удалить всех подписчиков с сервера")
                     .setDescriptionLocalization(DiscordLocale.FRENCH, "Supprimer tous les abonnés du serveur");
 
-            CommandData suggestionCommand = Commands.slash("suggestion", "List of suggestions for tracking users")
-                    .setContexts(InteractionContextType.GUILD)
-                    .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Список из предложений к отслеживанию пользователей")
-                    .setDescriptionLocalization(DiscordLocale.FRENCH, "Liste des suggestions d'utilisateurs à suivre");
-
             CommandData lockCommand = Commands.slash("lock", "Forbid tracking yourself on all servers")
                     .setContexts(InteractionContextType.GUILD)
                     .setDescriptionLocalization(DiscordLocale.RUSSIAN, "Запретить отслеживать себя на всех серверах")
@@ -290,12 +280,11 @@ public class BotStartConfig {
                             unsubV2Command,
                             checkCommand,
                             deleteCommand,
-                            suggestionCommand,
                             lockCommand,
                             unlockCommand)
                     .queue();
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -305,7 +294,7 @@ public class BotStartConfig {
                 int serverCount = jda.getGuilds().size();
                 jda.getPresence().setActivity(Activity.playing(BotStartConfig.activity + serverCount + " guilds"));
             } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -336,7 +325,7 @@ public class BotStartConfig {
             }
             System.out.println("setLanguages()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -348,7 +337,7 @@ public class BotStartConfig {
             }
             System.out.println("getLanguages()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -360,7 +349,7 @@ public class BotStartConfig {
             }
             System.out.println("getGenders()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -374,7 +363,7 @@ public class BotStartConfig {
             }
             System.out.println("getLockStatus()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -388,29 +377,7 @@ public class BotStartConfig {
             }
             System.out.println("getAllServers()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
-
-    private void getSuggestions() {
-        try {
-            List<Suggestions> suggestionsList = suggestionsRepository.findAll();
-            NoticeRegistry instance = NoticeRegistry.getInstance();
-
-            for (Suggestions suggestions : suggestionsList) {
-                Long suggestionUserId = suggestions.getSuggestionUserId();
-                Long userId = suggestions.getUserId();
-                Long guildId = suggestions.getGuildId();
-
-                Set<Long> stringSet = instance.getUserTrackerIdsByUserId(guildId, userId);
-
-                if (!stringSet.contains(suggestionUserId)) {
-                    instance.addUserSuggestions(guildId, userId, suggestionUserId);
-                }
-            }
-            System.out.println("getSuggestions()");
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -427,7 +394,7 @@ public class BotStartConfig {
             }
             System.out.println("getAllUsers()");
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 

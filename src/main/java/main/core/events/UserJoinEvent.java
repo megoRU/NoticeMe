@@ -9,8 +9,6 @@ import main.core.core.TrackingUser;
 import main.jsonparser.ParserClass;
 import main.model.entity.Gender;
 import main.model.entity.Server;
-import main.model.entity.Suggestions;
-import main.model.repository.SuggestionsRepository;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -22,11 +20,7 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -35,8 +29,6 @@ public class UserJoinEvent {
 
     private static final ParserClass jsonParsers = new ParserClass();
     private final static NoticeRegistry instance = NoticeRegistry.getInstance();
-
-    private final SuggestionsRepository suggestionsRepository;
 
     public void userJoin(@NotNull GuildVoiceUpdateEvent event) {
         Guild guild = event.getGuild();
@@ -57,16 +49,7 @@ public class UserJoinEvent {
 
             if (!hasPermissionViewChannel || name.contains("AFK")) return;
 
-            List<Member> members = voiceChannel.getMembers().stream()
-                    .filter(member -> !member.getUser().isBot())
-                    .filter(member -> !member.getUser().getId().equals(userId))
-                    .toList();
-
             TrackingUser instanceUser = instance.getUser(guild.getIdLong(), userIdLong);
-
-            if (!members.isEmpty()) {
-                CompletableFuture.runAsync(() -> updateUserSuggestions(userIdLong, members, guild.getIdLong(), instanceUser));
-            }
 
             if (instanceUser == null) return;
             String userList = instanceUser.getUserList();
@@ -112,44 +95,5 @@ public class UserJoinEvent {
             log.info("{} is not a VoiceChannel!", audioChannelUnion.getName());
             return null;
         }
-    }
-
-    // Сохраняет предложения, но только тех которых нет в БД
-    // userId кто зашел
-    // instanceUser кто, зашел и его список кто на него подписан
-    private void updateUserSuggestions(Long userId, List<Member> members, long guildId, @Nullable TrackingUser instanceUser) {
-        Set<Long> stringSet = instance.getUserTrackerIdsByUserId(guildId, userId);
-
-        Set<Long> currentSuggestions = instance.getSuggestionsList(guildId, userId);
-        Set<Long> subscribedUsers = (instanceUser != null) ? instanceUser.getUserListSet() : Collections.emptySet();
-
-        List<Member> newSuggestions = members.stream()
-                .filter(member -> !currentSuggestions.contains(member.getUser().getIdLong()))
-                .filter(member -> !subscribedUsers.contains(member.getUser().getIdLong()))
-                .filter(member -> !stringSet.contains(member.getUser().getIdLong()))
-                .toList();
-
-        if (!newSuggestions.isEmpty()) {
-            newSuggestions.forEach(member -> {
-                saveSuggestion(userId, member, guildId);
-                addSuggestions(userId, member, guildId);
-            });
-        }
-    }
-
-    private void addSuggestions(Long userId, Member suggestionMember, Long guildId) {
-        Long suggestionUserId = suggestionMember.getUser().getIdLong();
-        instance.addUserSuggestions(guildId, userId, suggestionUserId);
-    }
-
-    private void saveSuggestion(Long userId, Member suggestionMember, long guildId) {
-        long suggestionUserId = suggestionMember.getUser().getIdLong();
-
-        Suggestions suggestion = new Suggestions();
-        suggestion.setUserId(userId);
-        suggestion.setGuildId(guildId);
-        suggestion.setSuggestionUserId(suggestionUserId);
-
-        suggestionsRepository.save(suggestion);
     }
 }
