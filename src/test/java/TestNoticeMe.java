@@ -38,15 +38,16 @@ public class TestNoticeMe {
     }
 
     @Test
-    @DisplayName("Проверяем вывод пользователей кто подписан на него")
-    void testSubscribersByReferenceId() {
+    @DisplayName("Проверяем получение списка пользователей, на которых подписан пользователь")
+    void testTrackedUsersByUserId() {
+        // Пользователь 3000 подписывается на пользователей 2500, 2501, 2502
         instance.sub(500L, 3000L, 2500L);
         instance.sub(500L, 3000L, 2501L);
         instance.sub(500L, 3000L, 2502L);
 
-        Set<Long> subscribersSetByUserId = instance.getUserTrackerIdsByUserId(500L, 3000L);
+        Set<Long> trackedUsersSetByUserId = instance.getUserTrackerIdsByUserId(500L, 3000L);
 
-        List<Long> actualList = new ArrayList<>(subscribersSetByUserId);
+        List<Long> actualList = new ArrayList<>(trackedUsersSetByUserId);
         actualList.sort(Comparator.naturalOrder());
 
         Assertions.assertArrayEquals(new Long[]{2500L, 2501L, 2502L}, actualList.toArray());
@@ -92,20 +93,22 @@ public class TestNoticeMe {
     }
 
     @Test
-    @DisplayName("Проверяем удаление пользователя из всех Guild")
+    @DisplayName("Проверяем удаление пользователя (как цели отслеживания) из всех Guild")
     void testDeletingUserFromAllGuilds() {
+        // Пользователи 2500, 2501, 2502 подписаны на пользователя 3000 на сервере 500
         instance.sub(500L, 2500L, 3000L);
         instance.sub(500L, 2501L, 3000L);
         instance.sub(500L, 2502L, 3000L);
+        // Пользователь 2600 подписан на пользователя 3000 на сервере 600
+        instance.sub(600L, 2600L, 3000L);
 
-        TrackingUser user = instance.getUser(500L, 3000L);
-        Assertions.assertNotNull(user);
-        Assertions.assertEquals(3, user.getUserCount());
+        Assertions.assertNotNull(instance.getUser(500L, 3000L));
+        Assertions.assertNotNull(instance.getUser(600L, 3000L));
 
         instance.removeUserFromAllGuild(3000L);
-        Set<Long> stringSet = instance.getUserTrackerIdsByUserId(500L, 3000L);
 
-        Assertions.assertEquals(0, stringSet.size());
+        Assertions.assertNull(instance.getUser(500L, 3000L));
+        Assertions.assertNull(instance.getUser(600L, 3000L));
     }
 
     @Test
@@ -128,5 +131,22 @@ public class TestNoticeMe {
         TrackingUser user = instance.getUser(500L, 3000L);
         Assertions.assertNotNull(user);
         Assertions.assertEquals("<@2000>", user.getUserList());
+    }
+
+    @Test
+    @DisplayName("Проверяем независимость подписок на разных серверах")
+    void testCrossServerIndependence() {
+        // Пользователь 2000 подписан на пользователя 3000 на двух серверах
+        instance.sub(500L, 2000L, 3000L);
+        instance.sub(600L, 2000L, 3000L);
+
+        Assertions.assertEquals("<@2000>", instance.getUser(500L, 3000L).getUserList());
+        Assertions.assertEquals("<@2000>", instance.getUser(600L, 3000L).getUserList());
+
+        // Отписываемся на сервере 500
+        instance.unsub(500L, 3000L, 2000L);
+
+        Assertions.assertEquals("", instance.getUser(500L, 3000L).getUserList());
+        Assertions.assertEquals("<@2000>", instance.getUser(600L, 3000L).getUserList());
     }
 }

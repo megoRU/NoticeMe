@@ -63,7 +63,7 @@ public class UnSubCommand {
         if (trackingUser != null) {
             Set<Long> userListSet = trackingUser.getUserListSet();
             if (userListSet.contains(userId)) {
-                noticeRepository.deleteByUserTrackingId(userFromOptions.toString(), userId);
+                noticeRepository.deleteByUserTrackingId(userFromOptions.toString(), userId, guildId);
                 instance.unsub(guildId, userFromOptions, userId);
 
                 String successfullyDeleted = String.format(jsonParsers.getTranslation("successfully_deleted", guildId.toString()), userFromOptions);
