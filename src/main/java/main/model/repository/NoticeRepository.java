@@ -28,8 +28,8 @@ public interface NoticeRepository extends JpaRepository<Subs, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM Subs s WHERE s.userTrackingId = :userTrack AND s.userId = :userId")
-    void deleteByUserTrackingId(@Param("userTrack") String userTrack, @Param("userId") Long userId);
+    @Query(value = "DELETE FROM Subs s WHERE s.userTrackingId = :userTrack AND s.userId = :userId AND s.server.guildIdLong = :guildId")
+    void deleteByUserTrackingId(@Param("userTrack") String userTrack, @Param("userId") Long userId, @Param("guildId") Long guildId);
 
     @Override
     @NotNull

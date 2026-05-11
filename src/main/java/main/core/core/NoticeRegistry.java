@@ -32,11 +32,11 @@ public class NoticeRegistry {
     }
 
     /**
-     * Получает список пользователей, которые подписаны на указанного пользователя в заданной гильдии.
+     * Возвращает список пользователей, на которых подписан указанный пользователь в конкретной гильдии.
      *
-     * @param guildId     ID гильдии, в рамках которой выполняется поиск.
-     * @param referenceId ID пользователя, для которого нужно найти подписчиков.
-     * @return Множество ID пользователей, которые подписаны на referenceId, или пустое множество, если подписчиков нет.
+     * @param guildId     ID гильдии.
+     * @param referenceId ID пользователя (подписчика).
+     * @return Множество ID отслеживаемых пользователей.
      */
     public Set<Long> getUserTrackerIdsByUserId(Long guildId, Long referenceId) {
         return trackingUserConcurrentMap.getOrDefault(guildId, new ConcurrentHashMap<>())
