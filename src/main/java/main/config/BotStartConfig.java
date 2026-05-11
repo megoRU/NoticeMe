@@ -114,7 +114,7 @@ public class BotStartConfig {
                             String name = command.getName();
                             long id = command.getIdLong();
                             commandMap.put(name, id);
-                            log.info("{} [{}]\n", id, name);
+                            log.info("{} [{}]", id, name);
                         }
                     }
             );
