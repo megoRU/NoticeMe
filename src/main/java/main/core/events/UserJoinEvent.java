@@ -70,11 +70,8 @@ public class UserJoinEvent {
                             String genderText = jsonParsers.getTranslation(genderKey, guild.getId());
                             String template = jsonParsers.getTranslation("user_enter_to_channel", guild.getId());
 
-                            log.info("user_enter_to_channel template='{}', effectiveName='{}', genderText='{}', name='{}', userList='{}'", template, effectiveName, genderText, name, userList);
-
                             try {
                                 String text = String.format(template, effectiveName, genderText, name, userList);
-                                log.info("Formatted message='{}'", text);
                                 textChannel.sendMessage(text).queue();
                             } catch (Exception e) {
                                 log.error("Formatting error. template='{}'", template, e);
