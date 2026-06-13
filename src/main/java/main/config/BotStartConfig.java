@@ -106,7 +106,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(coreBot);
 
             if (Config.IS_PROXY) {
-                Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(Config.PROXY_IP, 10808));
+                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(Config.PROXY_IP, 10808));
                 OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
 
                 jdaBuilder.setHttpClient(client);
