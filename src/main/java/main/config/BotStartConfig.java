@@ -109,10 +109,10 @@ public class BotStartConfig {
                 System.setProperty("socksProxyHost", Config.PROXY_IP);
                 System.setProperty("socksProxyPort", "10808");
 
-                Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(Config.PROXY_IP, 10808));
-                OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
-
-                jdaBuilder.setHttpClient(client);
+//                Proxy proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(Config.PROXY_IP, 10808));
+//                OkHttpClient client = new OkHttpClient.Builder().proxy(proxy).build();
+//
+//                jdaBuilder.setHttpClient(client);
             }
 
             jda = jdaBuilder.build();
