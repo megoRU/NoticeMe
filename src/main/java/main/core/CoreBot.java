@@ -1,5 +1,6 @@
 package main.core;
 
+import lombok.AllArgsConstructor;
 import main.controller.UpdateController;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -8,18 +9,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class CoreBot extends ListenerAdapter {
 
     private final UpdateController updateController;
-
-    @Autowired
-    public CoreBot(UpdateController updateController) {
-        this.updateController = updateController;
-    }
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {

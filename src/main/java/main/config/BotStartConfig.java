@@ -3,7 +3,6 @@ package main.config;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import main.controller.UpdateController;
 import main.core.CoreBot;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
@@ -63,13 +62,12 @@ public class BotStartConfig {
     private final GuildRepository guildRepository;
     private final GenderRepository genderRepository;
 
-    private final UpdateController updateController;
+    //Core
+    private final CoreBot coreBot;
 
     @PostConstruct
     private void startBot() {
         try {
-            CoreBot coreBot = new CoreBot(updateController);
-
             //Update
             setLanguages();
             getLanguages();
