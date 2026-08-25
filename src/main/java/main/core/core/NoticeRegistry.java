@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class NoticeRegistry {
 
-    //Guild | List: userTrackerId | TrackingUser . Target User | Target User list subscribes
+    // Guild | userTrackerId list | TrackingUser | Target User | Target User's subscribers
     private static final ConcurrentMap<Long, ConcurrentMap<Long, TrackingUser>> trackingUserConcurrentMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Long, Server> serverListMap = new ConcurrentHashMap<>();
     //Guild | List: user | Suggestions
@@ -52,18 +52,14 @@ public class NoticeRegistry {
     }
 
     /**
-     * Подписывает пользователя на отслеживание другого пользователя в рамках сервера (guild).
+     * Подписывает пользователя на отслеживание другого пользователя в рамках указанного сервера.
      *
-     * <p>После вызова этого метода:
-     * <ul>
-     *     <li>userId начинает отслеживать userIdTracker;</li>
-     *     <li>если пользователь уже подписан, метод не добавляет дубликат;</li>
-     *     <li>инициализирует объекты TrackingUser при их отсутствии.</li>
-     * </ul>
+     * <p>Если подписка уже существует, повторно она не добавляется.
+     * При отсутствии необходимых объектов {@code TrackingUser} они создаются автоматически.</p>
      *
-     * @param guildId       ID сервера (guild), в котором происходит подписка
-     * @param userId        ID пользователя, который подписывается (подписчик)
-     * @param userIdTracker ID пользователя, на которого подписываются (отслеживаемый)
+     * @param guildId       ID сервера, в рамках которого создаётся подписка
+     * @param userId        ID пользователя, который будет отслеживать
+     * @param userIdTracker ID пользователя, которого необходимо отслеживать
      */
     public synchronized void sub(Long guildId, Long userId, Long userIdTracker) {
         if (!hasGuild(guildId)) {
@@ -84,7 +80,7 @@ public class NoticeRegistry {
         }
     }
 
-    //                                                        TrackingUser | Data
+    //TrackingUser | Data
     private void saveTrackingUser(Long guildId, Long user, TrackingUser trackingUser) {
         ConcurrentMap<Long, TrackingUser> stringTrackingUserConcurrentMap = trackingUserConcurrentMap.get(guildId);
         if (stringTrackingUserConcurrentMap == null) {

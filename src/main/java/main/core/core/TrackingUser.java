@@ -38,6 +38,7 @@ public class TrackingUser {
         return Set.copyOf(userList);
     }
 
+    @SuppressWarnings("unused")
     public int getUserCount() {
         return userList.size();
     }
