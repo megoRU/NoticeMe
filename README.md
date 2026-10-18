@@ -34,6 +34,10 @@ A Discord bot that allows users to subscribe to specific members and receive aut
 docker-compose up -d
 ```
 
+For an existing installation, apply `NoticeMe-migration-2026-10-18.sql` to the
+existing database before deploying this version. It adds the `gender` table and
+allows the `FR` language value without dropping existing data.
+
 5. Update the container:
 
 ```bash

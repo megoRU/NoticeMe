@@ -79,6 +79,9 @@ public class SetupCommand {
             String format = String.format(nowBotWillReceive, guildChannelUnion.asTextChannel().getIdLong());
 
             event.getHook().sendMessage(format).setEphemeral(true).queue();
+        } else {
+            String canNotBeChannel = String.format(canNotBeChannelTranslation, guildChannelUnion.getType().name());
+            event.getHook().sendMessage(canNotBeChannel).setEphemeral(true).queue();
         }
     }
 }

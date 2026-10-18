@@ -23,9 +23,17 @@ DROP TABLE IF EXISTS `language`;
 CREATE TABLE `language`
 (
     `guild_id` bigint(30) NOT NULL,
-    `language` enum('RU','EN') NOT NULL,
+    `language` enum('RU','EN','FR') NOT NULL,
     PRIMARY KEY (`guild_id`),
     UNIQUE KEY `guild_id` (`guild_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+DROP TABLE IF EXISTS `gender`;
+CREATE TABLE `gender`
+(
+    `user_id` bigint(30) NOT NULL,
+    `gender`  enum('MALE','FEMALE') NOT NULL,
+    PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `locks`;
