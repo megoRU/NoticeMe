@@ -1,5 +1,6 @@
 package main.config;
 
+import com.neovisionaries.ws.client.WebSocketFactory;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,20 @@ import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class TelegramHttpConfig {
+
+    @Bean
+    public WebSocketFactory telegramWebSocketFactory() {
+        WebSocketFactory factory = new WebSocketFactory().setConnectionTimeout(30_000);
+
+        if (Config.IS_PROXY) {
+            // Port 10808 accepts HTTP CONNECT as well as SOCKS.
+            factory.getProxySettings()
+                    .setHost(Config.PROXY_IP)
+                    .setPort(10808);
+        }
+
+        return factory;
+    }
 
     @Bean
     public OkHttpClient telegramOkHttpClient() {

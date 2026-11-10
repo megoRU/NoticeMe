@@ -1,5 +1,6 @@
 package main.config;
 
+import com.neovisionaries.ws.client.WebSocketFactory;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,6 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -67,6 +67,7 @@ public class BotStartConfig {
     //Core
     private final CoreBot coreBot;
     private final OkHttpClient telegramOkHttpClient;
+    private final WebSocketFactory telegramWebSocketFactory;
 
     @PostConstruct
     private void startBot() {
@@ -104,6 +105,7 @@ public class BotStartConfig {
             jdaBuilder.addEventListeners(coreBot);
 
             jdaBuilder.setHttpClient(telegramOkHttpClient);
+            jdaBuilder.setWebsocketFactory(telegramWebSocketFactory);
 
             jda = jdaBuilder.build();
             jda.awaitReady();
