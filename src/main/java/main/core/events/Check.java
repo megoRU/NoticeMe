@@ -1,6 +1,7 @@
 package main.core.events;
 
 import lombok.AllArgsConstructor;
+import main.config.BotStartConfig;
 import main.core.core.NoticeRegistry;
 import main.jsonparser.ParserClass;
 import main.model.entity.Server;
@@ -31,7 +32,9 @@ public class Check {
         Member selfMember = guild.getSelfMember();
 
         Server server = instance.getServer(guild.getIdLong());
-        String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
+        Long check = BotStartConfig.getCommandId("check");
+
+        String youCannotSetChannel = String.format(jsonParsers.getTranslation("you_cannot_set_channel", guildIdString), check);
 
         if (server == null) {
             event.reply(youCannotSetChannel).setEphemeral(true).queue();

@@ -71,7 +71,9 @@ public class SubCommand {
                 saveUserTracking(event, server, userDest);
             }
         } else {
-            String youCannotSetChannel = jsonParsers.getTranslation("you_cannot_set_channel", guildIdString);
+            Long check = BotStartConfig.getCommandId("check");
+
+            String youCannotSetChannel = String.format(jsonParsers.getTranslation("you_cannot_set_channel", guildIdString), check);
             event.getHook().sendMessage(youCannotSetChannel).setEphemeral(true).queue();
         }
     }
