@@ -10,7 +10,7 @@ import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class TelegramHttpConfig {
+public class DiscordHttpConfig {
 
     @Bean
     public WebSocketFactory telegramWebSocketFactory() {

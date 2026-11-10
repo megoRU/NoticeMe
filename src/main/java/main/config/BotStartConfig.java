@@ -66,8 +66,8 @@ public class BotStartConfig {
 
     //Core
     private final CoreBot coreBot;
-    private final OkHttpClient telegramOkHttpClient;
-    private final WebSocketFactory telegramWebSocketFactory;
+    private final OkHttpClient discordOkHttpClient;
+    private final WebSocketFactory discordWebSocketFactory;
 
     @PostConstruct
     private void startBot() {
@@ -104,8 +104,8 @@ public class BotStartConfig {
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(coreBot);
 
-            jdaBuilder.setHttpClient(telegramOkHttpClient);
-            jdaBuilder.setWebsocketFactory(telegramWebSocketFactory);
+            jdaBuilder.setHttpClient(discordOkHttpClient);
+            jdaBuilder.setWebsocketFactory(discordWebSocketFactory);
 
             jda = jdaBuilder.build();
             jda.awaitReady();
