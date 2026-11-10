@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.Nullable;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -36,6 +37,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 import static net.dv8tion.jda.api.interactions.commands.OptionType.*;
 
@@ -64,6 +66,7 @@ public class BotStartConfig {
 
     //Core
     private final CoreBot coreBot;
+    private final OkHttpClient telegramOkHttpClient;
 
     @PostConstruct
     private void startBot() {
@@ -100,10 +103,7 @@ public class BotStartConfig {
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.addEventListeners(coreBot);
 
-            if (Config.IS_PROXY) {
-                System.setProperty("socksProxyHost", Config.PROXY_IP);
-                System.setProperty("socksProxyPort", "10808");
-            }
+            jdaBuilder.setHttpClient(telegramOkHttpClient);
 
             jda = jdaBuilder.build();
             jda.awaitReady();
